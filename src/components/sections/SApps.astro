@@ -254,28 +254,36 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
       const buildKeyholePath = (inset = 0) => {
         const cx = centerX
         const r = Math.max(headRadius - inset, 12)
-        const neckHalf = Math.max(r * 0.2 - inset * 0.12, 7)
-        const baseHalf = Math.max(r * 0.74 - inset * 0.32, 14)
-        const notchWidth = Math.max(baseHalf * 0.34 - inset * 0.16, 8)
-        const notchHeight = Math.max(baseHalf * 0.28 - inset * 0.14, 8)
+        const neckHalf = Math.max(r * 0.16 - inset * 0.08, 7)
+        const shoulderHalf = Math.max(r * 0.28 - inset * 0.12, 10)
+        const bodyHalf = Math.max(r * 0.62 - inset * 0.28, 14)
+        const notchWidth = Math.max(bodyHalf * 0.26 - inset * 0.1, 8)
+        const notchHeight = Math.max(bodyHalf * 0.22 - inset * 0.08, 8)
         const topY = offsetY + inset
         const circleCenterY = topY + r
-        const shoulderY = topY + r * 1.9
-        const baseY = shaftBottom - inset
+        const neckBottomY = topY + r * 1.55
+        const shoulderY = topY + r * 2.05
+        const bodyMidY = topY + r * 3.05
+        const baseY = Math.min(shaftBottom - inset, topY + r * 4.2)
         const holeRadius = Math.max(r * 0.38 - inset * 0.2, 8)
         const holeTopY = circleCenterY - holeRadius
+        const notchX = cx - bodyHalf * 0.14
 
         return [
           `M ${cx} ${topY}`,
           `A ${r} ${r} 0 1 1 ${cx - 0.01} ${topY}`,
-          `L ${cx + neckHalf} ${shoulderY}`,
-          `L ${cx + baseHalf} ${baseY}`,
-          `L ${cx - baseHalf * 0.08} ${baseY}`,
-          `L ${cx - baseHalf * 0.08} ${baseY - notchHeight}`,
-          `L ${cx - baseHalf * 0.08 - notchWidth} ${baseY - notchHeight}`,
-          `L ${cx - baseHalf * 0.08 - notchWidth} ${baseY}`,
-          `L ${cx - baseHalf} ${baseY}`,
-          `L ${cx - neckHalf} ${shoulderY}`,
+          `L ${cx + neckHalf} ${neckBottomY}`,
+          `L ${cx + shoulderHalf} ${shoulderY}`,
+          `L ${cx + bodyHalf * 0.88} ${bodyMidY}`,
+          `L ${cx + bodyHalf} ${baseY}`,
+          `L ${notchX} ${baseY}`,
+          `L ${notchX} ${baseY - notchHeight}`,
+          `L ${notchX - notchWidth} ${baseY - notchHeight}`,
+          `L ${notchX - notchWidth} ${baseY}`,
+          `L ${cx - bodyHalf} ${baseY}`,
+          `L ${cx - bodyHalf * 0.88} ${bodyMidY}`,
+          `L ${cx - shoulderHalf} ${shoulderY}`,
+          `L ${cx - neckHalf} ${neckBottomY}`,
           'Z',
           `M ${cx} ${holeTopY}`,
           `A ${holeRadius} ${holeRadius} 0 1 1 ${cx - 0.01} ${holeTopY}`,
