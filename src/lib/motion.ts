@@ -63,17 +63,6 @@ export function initSiteMotion() {
     })
   })
 
-  document.querySelectorAll<HTMLElement>('.apps-section__intro').forEach((item) => {
-    ScrollTrigger.create({
-      trigger: item,
-      start: 'top 112px',
-      endTrigger: '.apps-section',
-      end: 'bottom bottom',
-      pin: window.innerWidth > 900,
-      pinSpacing: false,
-    })
-  })
-
   document.querySelectorAll<HTMLElement>('.hero-section__lead').forEach((item) => {
     gsap.fromTo(
       item,

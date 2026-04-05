@@ -5,6 +5,34 @@ import type { AppItem } from '../lib/types'
 
 export const apps: AppItem[] = [
   {
+    id: 'vokabeltrainer',
+    title: 'Vokabeltrainer',
+    kind: 'app',
+    status: 'LIVE',
+    excerpt: 'A deployed study tool for vocabulary practice with a clear utility-first interface and repeatable training flow.',
+    tags: ['Study', 'UI', 'Training', 'Web'],
+    liveUrl: 'https://vokabeltrainer-five.vercel.app/',
+    media: {
+      type: 'video',
+      src: penVideo,
+    },
+    featured: true,
+  },
+  {
+    id: 'swiss-tournaments',
+    title: 'Swiss Tournaments',
+    kind: 'app',
+    status: 'LIVE',
+    excerpt: 'A tournament management deployment focused on Swiss-system workflows, registrations, and structured event handling.',
+    tags: ['Chess', 'Scheduler', 'Admin', 'Web'],
+    liveUrl: 'https://turnier.schachmagie.xyz/',
+    media: {
+      type: 'video',
+      src: dummyVideo,
+    },
+    featured: true,
+  },
+  {
     id: 'packet-lab',
     title: 'Packet Lab',
     kind: 'lab',
@@ -13,11 +41,6 @@ export const apps: AppItem[] = [
     tags: ['DNS', 'HTTP', 'Packets', 'Wireshark'],
     repoUrl: 'https://github.com/danyel-ii/packet-lab', // TODO: replace with real repository
     liveUrl: 'https://packet-lab.danyel-ii.xyz', // TODO: replace with real deployment
-    media: {
-      type: 'video',
-      src: penVideo,
-    },
-    featured: true,
   },
   {
     id: 'cipher-notebook',
@@ -27,11 +50,6 @@ export const apps: AppItem[] = [
     excerpt: 'Reference notes and small executable examples for substitution, transposition, and introductory modern cipher ideas.',
     tags: ['Crypto', 'Notes', 'Classical', 'Reference'],
     repoUrl: 'https://github.com/danyel-ii/cipher-notebook', // TODO: replace with real repository
-    media: {
-      type: 'video',
-      src: dummyVideo,
-    },
-    featured: true,
   },
   {
     id: 'hash-playground',
@@ -41,24 +59,6 @@ export const apps: AppItem[] = [
     excerpt: 'A comparison surface for hash functions, digest lengths, collision notes, and basic implementation observations.',
     tags: ['Crypto', 'Hash', 'SHA', 'MD5'],
     repoUrl: 'https://github.com/danyel-ii/hash-playground', // TODO: replace with real repository
-  },
-  {
-    id: 'recon-desk',
-    title: 'Recon Desk',
-    kind: 'tool',
-    status: 'WIP',
-    excerpt: 'A restrained dashboard for reconnaissance tasks, checklist logging, and repeatable collection of public target metadata.',
-    tags: ['Recon', 'OSINT', 'CLI', 'Workflow'],
-    repoUrl: 'https://github.com/danyel-ii/recon-desk', // TODO: replace with real repository
-  },
-  {
-    id: 'policy-mapper',
-    title: 'Policy Mapper',
-    kind: 'script',
-    status: 'RESEARCH',
-    excerpt: 'A parser for mapping policy statements into simpler relationship views for access review and documentation.',
-    tags: ['Policy', 'Access', 'Parsing', 'Notes'],
-    repoUrl: 'https://github.com/danyel-ii/policy-mapper', // TODO: replace with real repository
   },
   {
     id: 'lab-journal-cli',
