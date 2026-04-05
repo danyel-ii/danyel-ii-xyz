@@ -23,37 +23,50 @@ const sceneApps = apps.slice(0, 4)
     <div class="apps-section__content">
       <div class="apps-scene js-apps-scene" data-reveal>
         <div class="apps-scene__sticky">
-          <div class="apps-scene__wall" aria-hidden="true">
-            {Array.from({ length: 4 }).map(() => (
-              <div class="apps-scene__row">
-                {Array.from({ length: 5 }).map(() => <span>APPS</span>)}
-              </div>
-            ))}
-          </div>
+          <div class="apps-scene__underlay" aria-hidden="true"></div>
 
-          <div class="apps-scene__cards">
-            {
-              sceneApps.map((item, index) => (
-                <article class:list={['apps-scene__card', `apps-scene__card--${index + 1}`, 'js-apps-scene-card']}>
-                  <div class="apps-scene__card-frame">
-                    <div class="apps-scene__card-top">
-                      <span>{item.kind}</span>
-                      <span>{item.status}</span>
-                    </div>
-                    <div class="apps-scene__card-screen">
-                      <div class="apps-scene__card-screen-inner">
-                        <h3>{item.title}</h3>
-                        <p>{item.excerpt}</p>
+          <div class="apps-scene__viewport js-apps-viewport">
+            <div class="apps-scene__wall" aria-hidden="true">
+              {Array.from({ length: 4 }).map(() => (
+                <div class="apps-scene__row">
+                  {Array.from({ length: 5 }).map(() => <span>APPS</span>)}
+                </div>
+              ))}
+            </div>
+
+            <div class="apps-scene__cards">
+              {
+                sceneApps.map((item, index) => (
+                  <article class:list={['apps-scene__card', `apps-scene__card--${index + 1}`, 'js-apps-scene-card']}>
+                    <div class="apps-scene__card-frame">
+                      <div class="apps-scene__card-top">
+                        <span>{item.kind}</span>
+                        <span>{item.status}</span>
+                      </div>
+                      <div class="apps-scene__card-screen">
+                        <div class="apps-scene__card-screen-inner">
+                          <h3>{item.title}</h3>
+                          <p>{item.excerpt}</p>
+                        </div>
+                      </div>
+                      <div class="apps-scene__card-bottom">
+                        <span>{item.tags.slice(0, 2).join(' // ')}</span>
+                        <span>#{String(index + 1).padStart(3, '0')}</span>
                       </div>
                     </div>
-                    <div class="apps-scene__card-bottom">
-                      <span>{item.tags.slice(0, 2).join(' // ')}</span>
-                      <span>#{String(index + 1).padStart(3, '0')}</span>
-                    </div>
-                  </div>
-                </article>
-              ))
-            }
+                  </article>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="apps-scene__gate js-apps-gate" aria-hidden="true">
+            <div class="apps-scene__gate-inner">
+              <span>A</span>
+              <span>P</span>
+              <span>P</span>
+              <span>S</span>
+            </div>
           </div>
         </div>
       </div>
@@ -83,6 +96,8 @@ const sceneApps = apps.slice(0, 4)
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const cards = Array.from(scene.querySelectorAll('.js-apps-scene-card'))
     const wallRows = Array.from(scene.querySelectorAll('.apps-scene__row'))
+    const viewport = scene.querySelector('.js-apps-viewport')
+    const gate = scene.querySelector('.js-apps-gate')
 
     if (reduced || window.innerWidth < 901) {
       cards.forEach((card, index) => {
@@ -95,6 +110,9 @@ const sceneApps = apps.slice(0, 4)
     gsap.set(cards[1], { xPercent: 46, yPercent: -18, rotation: 4, scale: 0.95 })
     gsap.set(cards[2], { xPercent: -38, yPercent: 26, rotation: -3, scale: 0.98 })
     gsap.set(cards[3], { xPercent: 56, yPercent: 34, rotation: 5, scale: 0.88 })
+    if (viewport instanceof HTMLElement) {
+      gsap.set(viewport, { clipPath: 'inset(3% 41% 3% 41% round 999px)' })
+    }
 
     const timeline = gsap.timeline({
       scrollTrigger: {
@@ -107,16 +125,18 @@ const sceneApps = apps.slice(0, 4)
     })
 
     timeline
-      .fromTo(wallRows, { xPercent: 0 }, { xPercent: -8, stagger: 0.08, ease: 'none' }, 0)
-      .to(cards[0], { xPercent: -8, yPercent: -8, rotation: -1, scale: 1.04, ease: 'power2.inOut' }, 0.04)
-      .to(cards[1], { xPercent: 8, yPercent: -2, rotation: 1, scale: 1.08, ease: 'power2.inOut' }, 0.18)
-      .to(cards[2], { xPercent: -16, yPercent: 12, rotation: 0, scale: 1.02, ease: 'power2.inOut' }, 0.34)
-      .to(cards[3], { xPercent: 22, yPercent: 18, rotation: 2, scale: 1.02, ease: 'power2.inOut' }, 0.5)
-      .to(cards[0], { xPercent: -66, yPercent: -34, rotation: -7, scale: 0.8, ease: 'power2.inOut' }, 0.7)
-      .to(cards[1], { xPercent: 60, yPercent: -28, rotation: 6, scale: 0.82, ease: 'power2.inOut' }, 0.74)
-      .to(cards[2], { xPercent: -58, yPercent: 42, rotation: -4, scale: 0.84, ease: 'power2.inOut' }, 0.78)
-      .to(cards[3], { xPercent: 64, yPercent: 44, rotation: 7, scale: 0.8, ease: 'power2.inOut' }, 0.82)
-      .to(wallRows, { xPercent: -16, stagger: 0.08, ease: 'none' }, 0.66)
+      .to(viewport, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'power2.inOut' }, 0.08)
+      .to(gate, { scaleY: 1.18, scaleX: 1.12, opacity: 0, ease: 'power2.inOut' }, 0.08)
+      .fromTo(wallRows, { xPercent: 0 }, { xPercent: -6, stagger: 0.08, ease: 'none' }, 0.12)
+      .to(cards[0], { xPercent: -10, yPercent: -10, rotation: -1, scale: 1.03, ease: 'power2.inOut' }, 0.2)
+      .to(cards[1], { xPercent: 8, yPercent: -4, rotation: 1, scale: 1.06, ease: 'power2.inOut' }, 0.28)
+      .to(cards[2], { xPercent: -18, yPercent: 10, rotation: 0, scale: 1.01, ease: 'power2.inOut' }, 0.42)
+      .to(cards[3], { xPercent: 18, yPercent: 20, rotation: 2, scale: 1.01, ease: 'power2.inOut' }, 0.54)
+      .to(cards[0], { xPercent: -70, yPercent: -40, rotation: -8, scale: 0.78, ease: 'power2.inOut' }, 0.78)
+      .to(cards[1], { xPercent: 64, yPercent: -34, rotation: 7, scale: 0.8, ease: 'power2.inOut' }, 0.8)
+      .to(cards[2], { xPercent: -62, yPercent: 48, rotation: -5, scale: 0.82, ease: 'power2.inOut' }, 0.82)
+      .to(cards[3], { xPercent: 68, yPercent: 50, rotation: 7, scale: 0.78, ease: 'power2.inOut' }, 0.84)
+      .to(wallRows, { xPercent: -15, stagger: 0.08, ease: 'none' }, 0.68)
   }
 
   if (document.readyState === 'loading') {
