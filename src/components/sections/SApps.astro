@@ -5,7 +5,7 @@ import { apps } from '../../data/apps'
 
 const featured = apps.filter((item) => item.featured)
 const rest = apps.filter((item) => !item.featured)
-const sceneApps = apps.slice(0, 4)
+const sceneApps = [...apps, ...apps.slice(0, 2)]
 ---
 
 <section id="apps" class="section-shell apps-section">
@@ -21,55 +21,80 @@ const sceneApps = apps.slice(0, 4)
     </div>
 
     <div class="apps-section__content">
-      <div class="apps-scene js-apps-scene" data-reveal>
-        <div class="apps-scene__sticky">
-          <div class="apps-scene__underlay" aria-hidden="true"></div>
+      <section class="apps-work js-apps-work">
+        <div class="apps-work__outer">
+          <div class="apps-work__inner js-apps-container">
+            <h3 class="apps-work__title">
+              <span class="apps-work__title-inner js-apps-title">
+                <span class="apps-work__title-letter js-apps-letter">A</span>
+                <span class="apps-work__title-letter js-apps-letter">P</span>
+                <span class="apps-work__title-letter js-apps-letter">P</span>
+                <span class="apps-work__title-letter js-apps-letter">S</span>
+              </span>
+            </h3>
 
-          <div class="apps-scene__viewport js-apps-viewport">
-            <div class="apps-scene__wall" aria-hidden="true">
-              {Array.from({ length: 4 }).map(() => (
-                <div class="apps-scene__row">
-                  {Array.from({ length: 5 }).map(() => <span>APPS</span>)}
-                </div>
-              ))}
-            </div>
-
-            <div class="apps-scene__cards">
+            <div class="apps-work__scene js-apps-scene">
               {
                 sceneApps.map((item, index) => (
-                  <article class:list={['apps-scene__card', `apps-scene__card--${index + 1}`, 'js-apps-scene-card']}>
-                    <div class="apps-scene__card-frame">
-                      <div class="apps-scene__card-top">
-                        <span>{item.kind}</span>
-                        <span>{item.status}</span>
-                      </div>
-                      <div class="apps-scene__card-screen">
-                        <div class="apps-scene__card-screen-inner">
-                          <h3>{item.title}</h3>
-                          <p>{item.excerpt}</p>
+                  <article
+                    class="apps-work__surface js-apps-surface"
+                    data-kind={item.kind}
+                    data-status={item.status}
+                    style={`--index:${index}; --progress:1;`}
+                  >
+                    <a href={item.liveUrl ?? item.repoUrl ?? '#'} target="_blank" rel="noreferrer">
+                      <div class="apps-work__surface-inner">
+                        {
+                          item.media?.type === 'video' ? (
+                            <video
+                              class="apps-work__video js-apps-video"
+                              data-src={item.media.src}
+                              loop
+                              muted
+                              playsinline
+                              preload="none"
+                              poster={item.media.poster}
+                            ></video>
+                          ) : (
+                            <div class="apps-work__placeholder">
+                              <div class="apps-work__placeholder-top">
+                                <span>{item.kind}</span>
+                                <span>{item.status}</span>
+                              </div>
+                              <div class="apps-work__placeholder-body">
+                                <h4>{item.title}</h4>
+                                <p>{item.excerpt}</p>
+                              </div>
+                            </div>
+                          )
+                        }
+                        <div class="apps-work__caption">
+                          <div class="apps-work__caption-text">{item.title}</div>
+                          <div class="apps-work__caption-key">#{String(index + 1).padStart(3, '0')}</div>
                         </div>
                       </div>
-                      <div class="apps-scene__card-bottom">
-                        <span>{item.tags.slice(0, 2).join(' // ')}</span>
-                        <span>#{String(index + 1).padStart(3, '0')}</span>
-                      </div>
-                    </div>
+                    </a>
                   </article>
                 ))
               }
             </div>
+
+            <canvas class="apps-work__canvas js-apps-canvas"></canvas>
           </div>
 
-          <div class="apps-scene__gate js-apps-gate" aria-hidden="true">
-            <div class="apps-scene__gate-inner">
-              <span>A</span>
-              <span>P</span>
-              <span>P</span>
-              <span>S</span>
+          <div class="apps-work__mask-outer">
+            <div class="apps-work__mask js-apps-mask">
+              <svg class="apps-work__mask-svg js-apps-mask-svg">
+                <path class="apps-work__mask-path-outer js-apps-mask-path-outer" d=""></path>
+                <path class="apps-work__mask-path-inner js-apps-mask-path-inner" d=""></path>
+                <path class="apps-work__mask-path-lines js-apps-mask-path-lines" d=""></path>
+              </svg>
             </div>
           </div>
+
+          <div class="apps-work__ruler js-apps-ruler"></div>
         </div>
-      </div>
+      </section>
 
       <div class="apps-section__featured">
         {featured.map((item) => <AppCard item={item} featured={true} />)}
@@ -88,60 +113,390 @@ const sceneApps = apps.slice(0, 4)
 
   gsap.registerPlugin(ScrollTrigger)
 
-  const initAppsScene = () => {
-    const scene = document.querySelector('.js-apps-scene')
-    if (!(scene instanceof HTMLElement) || scene.dataset.ready === 'true') return
-    scene.dataset.ready = 'true'
+  class AppsWorkSection {
+    constructor() {
+      this.el = document.querySelector('.js-apps-work')
+      if (!(this.el instanceof HTMLElement)) return
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const cards = Array.from(scene.querySelectorAll('.js-apps-scene-card'))
-    const wallRows = Array.from(scene.querySelectorAll('.apps-scene__row'))
-    const viewport = scene.querySelector('.js-apps-viewport')
-    const gate = scene.querySelector('.js-apps-gate')
+      this.container = this.el.querySelector('.js-apps-container')
+      this.ruler = this.el.querySelector('.js-apps-ruler')
+      this.scene = this.el.querySelector('.js-apps-scene')
+      this.canvas = this.el.querySelector('.js-apps-canvas')
+      this.ctx = this.canvas.getContext('2d')
+      this.title = this.el.querySelector('.js-apps-title')
+      this.videos = this.el.querySelectorAll('.js-apps-video')
 
-    if (reduced || window.innerWidth < 901) {
-      cards.forEach((card, index) => {
-        card.style.transform = `translate3d(0, ${index * 8}px, 0)`
+      this.mask = {
+        width: 0,
+        height: 0,
+        maxScale: 1,
+        lines: [],
+        el: this.el.querySelector('.js-apps-mask'),
+        svg: this.el.querySelector('.js-apps-mask-svg'),
+        pathOuter: this.el.querySelector('.js-apps-mask-path-outer'),
+        pathInner: this.el.querySelector('.js-apps-mask-path-inner'),
+        pathLines: this.el.querySelector('.js-apps-mask-path-lines'),
+      }
+
+      this.letters = []
+      this.title.querySelectorAll('.js-apps-letter').forEach((el) => {
+        this.letters.push({ el, ghosts: [] })
       })
-      return
+
+      this.works = []
+      this.scene.querySelectorAll('.js-apps-surface').forEach((el) => {
+        this.works.push({ el })
+      })
+
+      this.points = []
+      this.last = { animationProgress: 0, pointsProgress: 0 }
+      this.scrollProgress = 0
+      this.smoothScrollProgress = 0
+      this.state = 0
+      this.animationProgress = 0
+      this.pointsProgress = 0
+      this.speed = 0
+      this.isPaused = true
+      this.loadIsStarted = false
+
+      this.onResize = this.onResize.bind(this)
+      this.tick = this.tick.bind(this)
+
+      this.init()
     }
 
-    gsap.set(cards[0], { xPercent: -58, yPercent: -30, rotation: -5, scale: 0.92 })
-    gsap.set(cards[1], { xPercent: 46, yPercent: -18, rotation: 4, scale: 0.95 })
-    gsap.set(cards[2], { xPercent: -38, yPercent: 26, rotation: -3, scale: 0.98 })
-    gsap.set(cards[3], { xPercent: 56, yPercent: 34, rotation: 5, scale: 0.88 })
-    if (viewport instanceof HTMLElement) {
-      gsap.set(viewport, { clipPath: 'inset(3% 41% 3% 41% round 999px)' })
+    init() {
+      this.setCtxStyle()
+      this.setSize()
+      this.setMask()
+      this.setPoints()
+      this.setLetters()
+      this.setWorks()
+      this.setTimeline()
+      this.bindEvents()
     }
 
-    const timeline = gsap.timeline({
-      scrollTrigger: {
-        trigger: scene,
-        start: 'top top+=92',
-        end: '+=2200',
-        scrub: 1,
-        pin: true,
-      },
-    })
+    bindEvents() {
+      window.addEventListener('resize', this.onResize)
 
-    timeline
-      .to(viewport, { clipPath: 'inset(0% 0% 0% 0% round 0px)', ease: 'power2.inOut' }, 0.08)
-      .to(gate, { scaleY: 1.18, scaleX: 1.12, opacity: 0, ease: 'power2.inOut' }, 0.08)
-      .fromTo(wallRows, { xPercent: 0 }, { xPercent: -6, stagger: 0.08, ease: 'none' }, 0.12)
-      .to(cards[0], { xPercent: -10, yPercent: -10, rotation: -1, scale: 1.03, ease: 'power2.inOut' }, 0.2)
-      .to(cards[1], { xPercent: 8, yPercent: -4, rotation: 1, scale: 1.06, ease: 'power2.inOut' }, 0.28)
-      .to(cards[2], { xPercent: -18, yPercent: 10, rotation: 0, scale: 1.01, ease: 'power2.inOut' }, 0.42)
-      .to(cards[3], { xPercent: 18, yPercent: 20, rotation: 2, scale: 1.01, ease: 'power2.inOut' }, 0.54)
-      .to(cards[0], { xPercent: -70, yPercent: -40, rotation: -8, scale: 0.78, ease: 'power2.inOut' }, 0.78)
-      .to(cards[1], { xPercent: 64, yPercent: -34, rotation: 7, scale: 0.8, ease: 'power2.inOut' }, 0.8)
-      .to(cards[2], { xPercent: -62, yPercent: 48, rotation: -5, scale: 0.82, ease: 'power2.inOut' }, 0.82)
-      .to(cards[3], { xPercent: 68, yPercent: 50, rotation: 7, scale: 0.78, ease: 'power2.inOut' }, 0.84)
-      .to(wallRows, { xPercent: -15, stagger: 0.08, ease: 'none' }, 0.68)
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          this.isPaused = !entry.isIntersecting
+          if (this.isPaused) {
+            gsap.ticker.remove(this.tick)
+          } else {
+            gsap.ticker.add(this.tick)
+          }
+
+          if (!this.loadIsStarted && entry.isIntersecting) {
+            this.loadNextVideo()
+            this.loadIsStarted = true
+          }
+        })
+      })
+
+      this.observer.observe(this.el)
+    }
+
+    onResize() {
+      this.setCtxStyle()
+      this.setSize()
+      this.setMask()
+      this.setPoints()
+      this.setLetters()
+      this.setWorks()
+      this.setTimeline()
+    }
+
+    setCtxStyle() {
+      const color = getComputedStyle(document.documentElement).getPropertyValue('--cyan') || '#ffffff'
+      this.ctx.strokeStyle = color.trim()
+    }
+
+    setSize() {
+      this.el.style.setProperty('--height', `${this.works.length * 44}lvh`)
+
+      const bounding = this.container.getBoundingClientRect()
+      this.bounding = {
+        left: bounding.left,
+        top: bounding.top,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      }
+
+      this.canvas.width = this.bounding.width
+      this.canvas.height = this.bounding.height
+      this.speed = Math.hypot(this.bounding.width, this.bounding.height) * 4
+    }
+
+    setMask() {
+      const { mask } = this
+      const width = mask.el.clientWidth
+      const height = mask.el.clientHeight
+      mask.width = width
+      mask.height = height
+
+      mask.svg.style.width = `${width}px`
+      mask.svg.style.height = `${height}px`
+
+      const elBounding = this.el.getBoundingClientRect()
+      const rulerBounding = this.ruler.getBoundingClientRect()
+      const rulerWidth = rulerBounding.width
+      const rulerHeight = rulerBounding.height
+      const offsetX = rulerBounding.left - elBounding.left
+      const offsetY = rulerBounding.top - elBounding.top
+
+      const dOuter = `M -1 0 L ${width + 2} 0 L ${width + 2} ${height} L -1 ${height} Z`
+      const corners = {
+        tl: { x: offsetX, y: offsetY },
+        tr: { x: offsetX + rulerWidth, y: offsetY },
+        br: { x: offsetX + rulerWidth, y: offsetY + rulerHeight },
+        bl: { x: offsetX, y: offsetY + rulerHeight },
+      }
+
+      let size = (corners.tr.x - corners.tl.x) / 2
+      mask.maxScale = window.innerWidth / size
+
+      let dInner = `M ${corners.tl.x} ${corners.tl.y + size} A ${size} ${size} 0 0 1 ${corners.tr.x} ${corners.tr.y + size} L ${corners.br.x} ${corners.br.y - size} A ${size} ${size} 0 0 1 ${corners.bl.x} ${corners.bl.y - size} Z`
+      const linesClip = `${dOuter} ${dInner}`
+      mask.pathOuter.setAttribute('d', `${dOuter} ${dInner}`)
+
+      const thickness = window.innerWidth > 767 ? 16 : 8
+      corners.tl.x += thickness
+      corners.tl.y += thickness
+      corners.tr.x -= thickness
+      corners.tr.y += thickness
+      corners.br.x -= thickness
+      corners.br.y -= thickness
+      corners.bl.x += thickness
+      corners.bl.y -= thickness
+
+      size = (corners.tr.x - corners.tl.x) / 2
+      dInner = `M ${corners.tl.x} ${corners.tl.y + size} A ${size} ${size} 0 0 1 ${corners.tr.x} ${corners.tr.y + size} L ${corners.br.x} ${corners.br.y - size} A ${size} ${size} 0 0 1 ${corners.bl.x} ${corners.bl.y - size} Z`
+      mask.pathInner.setAttribute('d', `${dOuter} ${dInner}`)
+
+      mask.lines = []
+      const vLines = window.innerWidth > 767 ? 12 : 8
+      const gapX = width / vLines
+      const gapY = height * 0.11
+      const hLines = Math.ceil(height / gapY)
+
+      for (let i = 1; i < vLines; i++) {
+        const x = gapX * i
+        mask.lines.push({ p1: { x, y: 0 }, p2: { x, y: height } })
+      }
+
+      for (let i = 0; i < hLines; i++) {
+        const y = gapY * i
+        mask.lines.push({ p1: { x: 0, y }, p2: { x: width, y } })
+      }
+
+      let dLines = ''
+      mask.lines.forEach((line) => {
+        dLines += `M ${line.p1.x} ${line.p1.y} L ${line.p2.x} ${line.p2.y} `
+      })
+
+      mask.pathLines.setAttribute('d', dLines)
+      mask.pathLines.style.clipPath = `path(evenodd, '${linesClip}')`
+    }
+
+    setLetters() {
+      const { letters, scene } = this
+      letters.forEach((letter, j) => {
+        letter.ghosts.forEach((ghost) => ghost.el.remove())
+        letter.ghosts = []
+
+        const bounding = letter.el.getBoundingClientRect()
+        letter.width = bounding.width
+        letter.height = bounding.height
+        letter.top = bounding.top - this.bounding.top
+        letter.left = bounding.left
+        letter.freq = 1 + Math.random()
+
+        const multiplier = window.innerWidth > 767 ? 0.75 : 0.5
+        letter.total = Math.round((this.bounding.width / letter.width) * multiplier) + 2
+
+        for (let i = 0; i < letter.total; i++) {
+          const el = document.createElement('span')
+          el.classList.add('apps-work__scene-letter')
+          el.innerText = letter.el.innerText
+          el.dataset.letter = letter.el.innerText
+          scene.appendChild(el)
+
+          const ghost = {
+            el,
+            x: letter.left,
+            y: letter.top,
+            i: i - letter.total * 0.5,
+            p: (i / letter.total - 0.5) * 2,
+            ap: Math.abs(i / letter.total - 0.5) * 2,
+          }
+
+          el.style.top = `${ghost.y}px`
+          el.style.left = `${ghost.x}px`
+          el.style.zIndex = String(j !== 1 && j !== 2 && (j + letters.length + i) % 5 === 0 ? 3 : 1)
+          el.style.setProperty('--ix', String(ghost.i))
+          el.style.setProperty('--iy', String(((j + 1) / (letters.length + 1) - 0.5) * 2))
+          el.style.setProperty('--ap', String(ghost.ap))
+          el.style.setProperty('--p', String(ghost.p))
+          letter.ghosts.push(ghost)
+        }
+      })
+    }
+
+    setWorks() {
+      this.works.forEach((work, i) => {
+        work.el.style.setProperty('--size', String(0.5 + Math.random() * 0.5))
+        work.el.style.setProperty('--y', String((0.5 + Math.random() * 0.5) * (i % 2 ? -1 : 1)))
+      })
+    }
+
+    setTimeline() {
+      const { el, container, works, scene, mask } = this
+      if (this.tl) this.tl.kill()
+      const worksEl = works.map((work) => work.el)
+
+      this.tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 25%',
+          end: 'bottom 75%',
+          scrub: 1,
+        },
+        onUpdate: () => {
+          scene.style.setProperty('--state', String(this.state))
+        },
+      })
+
+      this.tl
+        .fromTo(mask.el, { scale: 1 }, { scale: mask.maxScale, duration: 0.75, ease: 'power4.in' }, 0)
+        .fromTo(scene, { scale: 0.75 }, { scale: 1, duration: 0.75, ease: 'power3.in' }, 0)
+        .fromTo(container, { clipPath: 'inset(0 1rem)' }, { clipPath: 'inset(0 0rem)', duration: 0.75, ease: 'power3.in' }, 0)
+        .fromTo(this, { pointsProgress: 0 }, { pointsProgress: 1, duration: 1, ease: 'power4.inOut' }, 0)
+        .fromTo(this, { state: 0 }, { state: 1, duration: 0.75, ease: 'power4.in' }, 0)
+        .fromTo(worksEl, { '--progress': 1 }, { '--progress': -1, ease: 'slow(0.15, 0.6)', stagger: 0.25 }, 0.75)
+        .fromTo(this, { animationProgress: 0 }, { animationProgress: 10000, duration: this.tl?.totalDuration?.() ?? 2, ease: 'power1.out' }, 0.75)
+        .fromTo(this, { state: 1 }, { state: 0, duration: 0.75, ease: 'power4.inOut', immediateRender: false }, '-=1')
+        .fromTo(mask.el, { scale: mask.maxScale }, { scale: 1, duration: 0.75, ease: 'power4.inOut', immediateRender: false }, '-=1')
+        .fromTo(scene, { scale: 1 }, { scale: 0.75, duration: 0.75, ease: 'power3.inOut', immediateRender: false }, '-=1')
+        .fromTo(container, { clipPath: 'inset(0 0rem)' }, { clipPath: 'inset(0 1rem)', duration: 0.75, ease: 'power3.inOut', immediateRender: false }, '-=1')
+        .fromTo(this, { pointsProgress: 1 }, { pointsProgress: 0, duration: 1, ease: 'power4.inOut' }, '-=1')
+    }
+
+    loadNextVideo() {
+      const video = Array.from(this.videos).find((item) => !item.classList.contains('is-loaded'))
+      if (!video) return
+
+      if (video.readyState >= 3) {
+        this.videoLoaded(video)
+      } else {
+        video.addEventListener('canplaythrough', () => this.videoLoaded(video), { once: true })
+        video.setAttribute('src', video.getAttribute('data-src') || '')
+        video.load()
+      }
+    }
+
+    videoLoaded(video) {
+      video.classList.add('is-loaded')
+      this.loadNextVideo()
+    }
+
+    moveLetters() {
+      const { speed, letters, animationProgress } = this
+      letters.forEach((letter) => {
+        const letterSpeed = speed * letter.freq
+        letter.ghosts.forEach((ghost, index) => {
+          const progress = ((((animationProgress % letterSpeed) / letterSpeed + index / letter.total) % 1) / 0.7) - 0.15
+          ghost.el.style.setProperty('--progress', String(progress))
+        })
+      })
+    }
+
+    setPoints() {
+      const { width, height } = this.bounding
+      this.points = []
+      const gap = 24
+      const cols = Math.ceil((width * 1.2) / gap)
+      const rows = Math.ceil((height * 1.2) / gap)
+      const offsetX = (width - cols * gap) * 0.5
+      const offsetY = (height - rows * gap) * 0.5
+      const hWidth = width * 0.5
+      const hHeight = height * 0.5
+
+      for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+          const x = i * gap + offsetX
+          const y = j * gap + offsetY
+          const dx = hWidth - x
+          const dy = hHeight - y
+          this.points.push({ x, y, dx, dy, flowX: 0 })
+        }
+      }
+    }
+
+    movePoints() {
+      this.points.forEach((point) => {
+        point.flowX = (this.animationProgress * -0.05) % 24
+      })
+    }
+
+    drawPoints() {
+      const { width, height } = this.bounding
+      const rAnimationProgress = Math.round(this.animationProgress * 100) / 100
+      const rPointsProgress = Math.round(this.pointsProgress * 100) / 100
+      if (rPointsProgress === this.last.pointsProgress && rAnimationProgress === this.last.animationProgress) return
+
+      this.ctx.clearRect(0, 0, width, height)
+      this.ctx.beginPath()
+
+      this.points.forEach((point) => {
+        const x = point.x + point.dx * (1 - this.pointsProgress) * 0.2 + point.flowX
+        const y = point.y + point.dy * (1 - this.pointsProgress) * 0.2
+        this.ctx.rect(x, y, 0.5, 0.5)
+      })
+
+      this.ctx.stroke()
+      this.last.pointsProgress = rPointsProgress
+      this.last.animationProgress = rAnimationProgress
+    }
+
+    updateVideos() {
+      this.works.forEach((work) => {
+        const video = work.el.querySelector('.js-apps-video')
+        if (!(video instanceof HTMLVideoElement) || !video.classList.contains('is-loaded')) return
+        const progress = Number.parseFloat(getComputedStyle(work.el).getPropertyValue('--progress'))
+        const active = progress > -0.98 && progress < 0.98
+        if (active) {
+          video.play().catch(() => {})
+        } else {
+          video.pause()
+        }
+      })
+    }
+
+    tick() {
+      const topProgress = Math.max(Math.min(1, ScrollTrigger.positionInViewport(this.el, 'top')), 0)
+      const bottomProgress = Math.max(Math.min(1, ScrollTrigger.positionInViewport(this.el, 'bottom')), 0)
+      this.scrollProgress = topProgress * -1 + (1 - bottomProgress)
+      this.smoothScrollProgress += (this.scrollProgress - this.smoothScrollProgress) * 0.1
+
+      this.el.style.setProperty('--scroll-progress', String(this.scrollProgress))
+      this.movePoints()
+      this.moveLetters()
+      this.drawPoints()
+      this.updateVideos()
+    }
+  }
+
+  const initAppsWork = () => {
+    if (window.__appsWorkInitialized) return
+    window.__appsWorkInitialized = true
+    new AppsWorkSection()
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAppsScene, { once: true })
+    document.addEventListener('DOMContentLoaded', initAppsWork, { once: true })
   } else {
-    initAppsScene()
+    initAppsWork()
   }
 </script>
