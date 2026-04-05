@@ -1,0 +1,22 @@
+---
+import { initialsFromName } from '../../lib/format'
+import type { NftItem } from '../../lib/types'
+
+const { item } = Astro.props as { item: NftItem }
+---
+
+<article class="nft-card" data-reveal>
+  <div class="nft-card__tile" aria-hidden="true">
+    {item.image ? <img src={item.image} alt="" loading="lazy" /> : <span>{initialsFromName(item.name)}</span>}
+  </div>
+  <div class="nft-card__body">
+    <p class="nft-card__collection">{item.collection}</p>
+    <h3>{item.name}</h3>
+    <dl class="nft-card__meta">
+      <div><dt>Year</dt><dd>{item.year}</dd></div>
+      <div><dt>Chain</dt><dd>{item.chain}</dd></div>
+    </dl>
+    <p class="nft-card__note">{item.note}</p>
+    {item.href && <a href={item.href} target="_blank" rel="noreferrer">View record</a>}
+  </div>
+</article>

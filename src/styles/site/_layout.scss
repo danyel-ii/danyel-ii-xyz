@@ -1,0 +1,137 @@
+@use "../helpers/responsive" as *;
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  &:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+.site-main {
+  width: 100%;
+}
+
+.construction-ribbon {
+  position: fixed;
+  top: 54px;
+  right: -88px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 420px;
+  padding: 10px 26px;
+  border-top: 2px solid rgba(0, 0, 0, 0.78);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.78);
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      #f6d860 0 18px,
+      #111114 18px 30px
+    );
+  color: #111114;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  transform: rotate(32deg);
+  transform-origin: center;
+  pointer-events: none;
+
+  span {
+    font-family: var(--mono-font);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #111114;
+    background: rgba(246, 216, 96, 0.94);
+    padding: 2px 6px;
+  }
+
+  @include mq(phone) {
+    top: 68px;
+    right: -132px;
+    min-width: 360px;
+    padding: 8px 20px;
+
+    span {
+      font-size: 0.64rem;
+    }
+  }
+}
+
+.section-shell {
+  width: var(--site-width);
+  margin: 0 auto;
+  padding: var(--section-space) 0;
+}
+
+.section-shell--hero {
+  min-height: calc(100svh - 88px);
+  display: flex;
+  align-items: center;
+}
+
+.section-shell__intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+  gap: clamp(20px, 4vw, 56px);
+  margin-bottom: clamp(32px, 4vw, 48px);
+
+  @include mq(phone) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-shell__heading {
+  display: grid;
+  gap: 14px;
+
+  h1,
+  h2 {
+    margin: 0;
+    font-family: var(--display-font);
+    font-size: clamp(2.1rem, 5.4vw, 4.8rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    color: var(--text-strong);
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0;
+    max-width: 56ch;
+    color: var(--text);
+    font-size: clamp(1rem, 1.5vw, 1.18rem);
+    line-height: 1.55;
+  }
+}
+
+.site-head,
+.site-foot {
+  width: var(--site-width);
+  margin: 0 auto;
+}

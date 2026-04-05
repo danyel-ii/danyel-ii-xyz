@@ -1,0 +1,111 @@
+---
+const {
+  mode = 'protocol',
+  tokens = [],
+  compact = false,
+} = Astro.props as {
+  mode?: 'binary' | 'hex' | 'protocol'
+  tokens?: string[]
+  compact?: boolean
+}
+
+const toBinary = (value: string) =>
+  value
+    .split('')
+    .map((char) => char.charCodeAt(0).toString(2).padStart(8, '0'))
+    .join(' ')
+
+const toHex = (value: string) =>
+  value
+    .split('')
+    .map((char) => `0x${char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`)
+    .join(' ')
+
+const renderedTokens = tokens.map((token) => {
+  if (mode === 'binary') return toBinary(token)
+  if (mode === 'hex') return toHex(token)
+  return token
+})
+---
+
+<protocol-separator class:list={['protocol-separator', `protocol-separator--${mode}`, compact && 'is-compact']}>
+  <span class="protocol-separator__edge" aria-hidden="true"></span>
+  <div class="protocol-separator__track" aria-label="Section separator">
+    {
+      renderedTokens.map((token, index) => (
+        <>
+          <span class="protocol-separator__token js-token">{token}</span>
+          {index < renderedTokens.length - 1 && <span class="protocol-separator__divider">//</span>}
+        </>
+      ))
+    }
+  </div>
+  <span class="protocol-separator__edge" aria-hidden="true"></span>
+</protocol-separator>
+
+<script>
+  class ProtocolSeparatorElement extends HTMLElement {
+    connectedCallback() {
+      this.tokens = Array.from(this.querySelectorAll('.js-token'))
+      this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (this.reduced) return
+
+      this.onIntersect = this.onIntersect.bind(this)
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            this.start()
+          } else {
+            this.stop()
+          }
+        })
+      })
+      this.observer.observe(this)
+    }
+
+    disconnectedCallback() {
+      this.stop()
+      this.observer?.disconnect()
+    }
+
+    start() {
+      if (this.interval) return
+      this.interval = window.setInterval(() => {
+        this.tokens.forEach((token) => {
+          if (Math.random() > 0.18) return
+          const text = token.textContent ?? ''
+          if (!/[01A-Z]/.test(text)) return
+          const chars = text.split('')
+          const index = Math.floor(Math.random() * chars.length)
+          if (chars[index] === ' ') return
+          if (this.classList.contains('protocol-separator--binary')) {
+            chars[index] = chars[index] === '0' ? '1' : '0'
+          } else if (this.classList.contains('protocol-separator--hex')) {
+            const pool = '0123456789ABCDEF'
+            chars[index] = pool[Math.floor(Math.random() * pool.length)]
+          } else {
+            chars[index] = String.fromCharCode(65 + Math.floor(Math.random() * 26))
+          }
+          token.textContent = chars.join('')
+          window.setTimeout(() => {
+            token.textContent = token.dataset.original ?? text
+          }, 260)
+        })
+      }, 900)
+
+      this.tokens.forEach((token) => {
+        token.dataset.original = token.textContent ?? ''
+      })
+    }
+
+    stop() {
+      if (!this.interval) return
+      clearInterval(this.interval)
+      this.interval = null
+    }
+  }
+
+  if (!customElements.get('protocol-separator')) {
+    customElements.define('protocol-separator', ProtocolSeparatorElement)
+  }
+</script>

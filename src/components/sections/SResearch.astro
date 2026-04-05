@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content'
+import PostCard from '../cards/PostCard.astro'
+import SectionEyebrow from '../ui/SectionEyebrow.astro'
+
+const isDraftVisible = !import.meta.env.PROD
+
+const blogEntries = (await getCollection('blog'))
+  .filter((entry) => isDraftVisible || !entry.data.draft)
+const researchEntries = (await getCollection('research'))
+  .filter((entry) => isDraftVisible || !entry.data.draft)
+
+const latestEntries = [...blogEntries, ...researchEntries]
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+  .slice(0, 4)
+---
+
+<section id="research" class="section-shell research-section">
+  <div class="section-shell__intro" data-reveal>
+    <SectionEyebrow label="RES.ARC // BLOG + RESEARCH" />
+    <div class="section-shell__heading">
+      <h2>Recent writing across blog posts, working notes, and protocol observations.</h2>
+      <p>
+        The writing sections collect decisions, references, and short-form analysis in a format that can expand without losing structure.
+      </p>
+    </div>
+  </div>
+
+  <div class="research-section__grid research-section__grid--mixed">
+    {
+      latestEntries.map((entry) => (
+        <PostCard
+          entry={entry}
+          collectionLabel={entry.collection.toUpperCase()}
+          href={`/${entry.collection}/${entry.slug}/`}
+        />
+      ))
+    }
+  </div>
+
+  <div class="research-section__links" data-reveal>
+    <a href="/blog/">View all blog posts</a>
+    <a href="/research/">View all research notes</a>
+  </div>
+</section>

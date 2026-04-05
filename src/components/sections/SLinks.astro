@@ -1,0 +1,30 @@
+---
+import SectionEyebrow from '../ui/SectionEyebrow.astro'
+import { socialLinks } from '../../data/social'
+---
+
+<section id="links" class="section-shell links-section">
+  <div class="section-shell__intro" data-reveal>
+    <SectionEyebrow label="COM.LINK // GITHUB + SOCIAL" />
+    <div class="section-shell__heading">
+      <h2>Open for collaboration, study groups, and research conversations.</h2>
+      <p>
+        Contact points are kept explicit and minimal so it is clear where code lives, where writing is published, and where direct communication should happen.
+      </p>
+    </div>
+  </div>
+
+  <div class="links-section__panel" data-reveal>
+    {
+      socialLinks.map((link) => (
+        <div class="links-section__row">
+          <span>{link.label}</span>
+          <span>{link.value}</span>
+          <a href={link.href} target={link.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+            Open
+          </a>
+        </div>
+      ))
+    }
+  </div>
+</section>

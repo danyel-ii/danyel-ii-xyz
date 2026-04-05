@@ -1,0 +1,35 @@
+<div class="site-scrollbar" aria-hidden="true">
+  <div class="site-scrollbar__track"></div>
+  <div class="site-scrollbar__thumb js-scrollbar-thumb"></div>
+</div>
+
+<script>
+  const initScrollbar = () => {
+    const thumb = document.querySelector('.js-scrollbar-thumb')
+    if (!(thumb instanceof HTMLElement) || thumb.dataset.ready === 'true') return
+
+    const update = () => {
+      const doc = document.documentElement
+      const viewport = window.innerHeight
+      const scrollHeight = doc.scrollHeight
+      const maxScroll = Math.max(scrollHeight - viewport, 1)
+      const progress = window.scrollY / maxScroll
+      const thumbHeight = Math.max((viewport / scrollHeight) * viewport, 48)
+      const top = progress * (viewport - thumbHeight)
+
+      thumb.style.height = `${thumbHeight}px`
+      thumb.style.transform = `translate3d(0, ${top}px, 0)`
+    }
+
+    thumb.dataset.ready = 'true'
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    window.addEventListener('resize', update)
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initScrollbar, { once: true })
+  } else {
+    initScrollbar()
+  }
+</script>

@@ -1,0 +1,44 @@
+@use "../helpers/fonts" as *;
+
+:root {
+  --bg: #09090b;
+  --surface-0: #111114;
+  --surface-1: #1a1b20;
+  --surface-2: #262830;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --text-strong: #f7f2e8;
+  --text: #ddd2c2;
+  --text-muted: #9f917b;
+  --cyan: #ffffff;
+  --yellow: #f6d860;
+  --green: #8fbf8f;
+  --focus: #f6d860;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --site-width: min(1240px, calc(100vw - 48px));
+  --gutter: clamp(20px, 3vw, 36px);
+  --section-space: clamp(72px, 11vw, 132px);
+  --grid-gap: clamp(18px, 2vw, 28px);
+  --display-font: var(--font-family-bigger);
+  --copy-font: var(--font-family-editorial);
+  --mono-font: var(--font-family-fraktion);
+  color-scheme: dark;
+}
+
+.theme-light {
+  --bg: #f4efe6;
+  --surface-0: #fffaf1;
+  --surface-1: #efe5d6;
+  --surface-2: #e4d4bf;
+  --line: rgba(53, 42, 33, 0.12);
+  --line-strong: rgba(53, 42, 33, 0.2);
+  --text-strong: #2b2118;
+  --text: #4a3a2c;
+  --text-muted: #7e6b57;
+  --cyan: #6c5842;
+  --yellow: #b98939;
+  --green: #6f8f67;
+  --focus: #b98939;
+  color-scheme: light;
+}

@@ -1,0 +1,56 @@
+---
+import { getCollection, render } from 'astro:content'
+import SiteHead from '../../components/layout/SiteHead.astro'
+import SiteFoot from '../../components/layout/SiteFoot.astro'
+import SiteScrollbar from '../../components/layout/SiteScrollbar.astro'
+import { formatDate } from '../../lib/format'
+import { siteMeta } from '../../data/site'
+
+import '../../styles/global.scss'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('blog', ({ data }) => !data.draft)
+  return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{entry.data.title} | {siteMeta.domain}</title>
+    <meta name="description" content={entry.data.description} />
+  </head>
+  <body>
+    <SiteHead />
+    <SiteScrollbar />
+    <main class="site-main site-main--detail">
+      <article class="content-detail section-shell">
+        <header class="content-detail__header" data-reveal>
+          <p class="content-detail__eyebrow">BLOG // ENTRY</p>
+          <h1>{entry.data.title}</h1>
+          <div class="content-detail__meta">
+            <span>{formatDate(entry.data.pubDate)}</span>
+            <span>{entry.data.topic}</span>
+          </div>
+          <p class="content-detail__description">{entry.data.description}</p>
+          <ul class="content-detail__tags">
+            {entry.data.tags.map((tag: string) => <li>{tag}</li>)}
+          </ul>
+        </header>
+        <div class="content-detail__body prose" data-reveal>
+          <Content />
+        </div>
+      </article>
+    </main>
+    <SiteFoot />
+  </body>
+</html>
+
+<script>
+  import { initSiteMotion } from '../../lib/motion'
+  initSiteMotion()
+</script>

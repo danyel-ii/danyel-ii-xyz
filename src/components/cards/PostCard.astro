@@ -1,0 +1,30 @@
+---
+import { formatDate } from '../../lib/format'
+
+const { entry, collectionLabel, href } = Astro.props as {
+  entry: {
+    data: {
+      title: string
+      description: string
+      pubDate: Date
+      topic: string
+      tags: string[]
+    }
+  }
+  collectionLabel: string
+  href: string
+}
+---
+
+<article class="post-card" data-reveal>
+  <div class="post-card__meta">
+    <span>{collectionLabel}</span>
+    <span>{formatDate(entry.data.pubDate)}</span>
+  </div>
+  <h3><a href={href}>{entry.data.title}</a></h3>
+  <p class="post-card__topic">{entry.data.topic}</p>
+  <p class="post-card__description">{entry.data.description}</p>
+  <ul class="post-card__tags">
+    {entry.data.tags.map((tag) => <li>{tag}</li>)}
+  </ul>
+</article>

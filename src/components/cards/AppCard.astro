@@ -1,0 +1,89 @@
+---
+import StatusPill from '../ui/StatusPill.astro'
+import type { AppItem } from '../../lib/types'
+
+const { item, featured = false } = Astro.props as {
+  item: AppItem
+  featured?: boolean
+}
+---
+
+<article class:list={['app-card', featured && 'app-card--featured']} data-reveal data-parallax={featured ? 'deep' : 'soft'}>
+  <div class="app-card__media">
+    {
+      item.media?.type === 'video' ? (
+        <video
+          class="js-app-video"
+          data-src={item.media.src}
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster={item.media.poster}
+          aria-label={`${item.title} preview`}
+        ></video>
+      ) : (
+        <div class="app-card__placeholder" aria-hidden="true">
+          <span>{item.kind}</span>
+          <span>{item.status}</span>
+        </div>
+      )
+    }
+  </div>
+
+  <div class="app-card__body">
+    <div class="app-card__meta">
+      <p class="app-card__kind">{item.kind}</p>
+      <StatusPill status={item.status} />
+    </div>
+
+    <h3>{item.title}</h3>
+    <p class="app-card__excerpt">{item.excerpt}</p>
+
+    <ul class="app-card__tags" aria-label={`${item.title} tags`}>
+      {item.tags.map((tag) => <li>{tag}</li>)}
+    </ul>
+
+    <div class="app-card__links">
+      {item.repoUrl && <a href={item.repoUrl} target="_blank" rel="noreferrer">Repository</a>}
+      {item.liveUrl && <a href={item.liveUrl} target="_blank" rel="noreferrer">Open</a>}
+    </div>
+  </div>
+</article>
+
+<script>
+  const initAppVideos = () => {
+    const videos = document.querySelectorAll('.js-app-video:not([data-ready])')
+    if (!videos.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target
+          if (!(video instanceof HTMLVideoElement)) return
+
+          if (entry.isIntersecting) {
+            if (!video.src) {
+              video.src = video.dataset.src ?? ''
+            }
+            video.play().catch(() => {})
+          } else {
+            video.pause()
+          }
+        })
+      },
+      { threshold: 0.45 }
+    )
+
+    videos.forEach((video) => {
+      video.setAttribute('data-ready', 'true')
+      observer.observe(video)
+    })
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAppVideos, { once: true })
+  } else {
+    initAppVideos()
+  }
+</script>

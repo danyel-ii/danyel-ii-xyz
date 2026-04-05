@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content'
+import SiteHead from '../../components/layout/SiteHead.astro'
+import SiteFoot from '../../components/layout/SiteFoot.astro'
+import SiteScrollbar from '../../components/layout/SiteScrollbar.astro'
+import PostCard from '../../components/cards/PostCard.astro'
+import SectionEyebrow from '../../components/ui/SectionEyebrow.astro'
+import { siteMeta } from '../../data/site'
+
+import '../../styles/global.scss'
+
+const entries = (await getCollection('research'))
+  .filter((entry) => !import.meta.env.PROD || !entry.data.draft)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Research | {siteMeta.domain}</title>
+    <meta name="description" content="Research notes from danyel-ii.xyz." />
+  </head>
+  <body>
+    <SiteHead />
+    <SiteScrollbar />
+    <main class="site-main site-main--detail">
+      <section class="section-shell content-index">
+        <div class="section-shell__intro" data-reveal>
+          <SectionEyebrow label="RES.ARC // ALL NOTES" />
+          <div class="section-shell__heading">
+            <h1>Research notes and protocol observations.</h1>
+            <p>Entries are ordered by publication date and kept close to the actual learning process.</p>
+          </div>
+        </div>
+        <div class="research-section__grid">
+          {entries.map((entry) => <PostCard entry={entry} collectionLabel="RESEARCH" href={`/research/${entry.slug}/`} />)}
+        </div>
+      </section>
+    </main>
+    <SiteFoot />
+  </body>
+</html>
+
+<script>
+  import { initSiteMotion } from '../../lib/motion'
+  initSiteMotion()
+</script>

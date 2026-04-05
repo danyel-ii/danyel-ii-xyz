@@ -1,0 +1,63 @@
+---
+import MetaList from '../ui/MetaList.astro'
+import ProtocolWaves from '../ui/ProtocolWaves.astro'
+import SectionEyebrow from '../ui/SectionEyebrow.astro'
+import StatusPill from '../ui/StatusPill.astro'
+import { siteMeta } from '../../data/site'
+import { socialLinks } from '../../data/social'
+
+const github = socialLinks.find((item) => item.id === 'github')
+---
+
+<section id="hero" class="hero-section section-shell section-shell--hero">
+  <ProtocolWaves class="hero-section__waves" />
+  <div class="hero-section__grid">
+    <div class="hero-section__lead" data-reveal>
+      <SectionEyebrow label="ID. DANYEL-II // CYBER SECURITY KNOWLEDGE SYSTEM" />
+      <h1>DANYEL II<br />CYBER SECURITY<br />LEARNING PATH</h1>
+      <p class="hero-section__summary">
+        A public record of applied learning in networking, systems, cryptography, tooling, and research.
+      </p>
+      <div class="hero-section__actions">
+        <a class="button-link" href="#apps">View Apps</a>
+        <a class="button-link button-link--ghost" href="#research">Read Research</a>
+      </div>
+    </div>
+
+    <div class="hero-section__side" data-reveal>
+      <div class="hero-section__panel">
+        <div class="hero-section__status">
+          <span class="hero-section__label">STATUS</span>
+          <StatusPill status={siteMeta.status} />
+        </div>
+        <MetaList
+          items={[
+            { label: 'Domain', value: siteMeta.domain },
+            { label: 'Protocol', value: siteMeta.protocol },
+            { label: 'Current Focus', value: siteMeta.focus },
+            { label: 'GitHub', value: github?.value ?? 'github.com/danyel-ii' },
+          ]}
+        />
+      </div>
+
+      <div class="hero-section__diagram" aria-hidden="true" data-parallax="soft">
+        <svg viewBox="0 0 420 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="24" y="24" width="372" height="272" rx="8" stroke="currentColor" stroke-opacity="0.28"/>
+          <rect x="62" y="58" width="124" height="86" rx="6" stroke="currentColor"/>
+          <rect x="236" y="48" width="120" height="52" rx="6" stroke="currentColor"/>
+          <rect x="244" y="160" width="104" height="96" rx="6" stroke="currentColor"/>
+          <path d="M186 101H236" stroke="currentColor"/>
+          <path d="M124 144V200H244" stroke="currentColor"/>
+          <path d="M296 100V160" stroke="currentColor"/>
+          <circle cx="124" cy="101" r="12" fill="currentColor"/>
+          <circle cx="236" cy="101" r="12" fill="currentColor"/>
+          <circle cx="296" cy="100" r="12" fill="currentColor"/>
+          <circle cx="244" cy="200" r="12" fill="currentColor"/>
+          <path d="M86 220H182" stroke="currentColor" stroke-opacity="0.5"/>
+          <path d="M86 238H164" stroke="currentColor" stroke-opacity="0.5"/>
+          <path d="M86 256H146" stroke="currentColor" stroke-opacity="0.5"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>

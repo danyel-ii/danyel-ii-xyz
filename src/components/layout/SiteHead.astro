@@ -1,0 +1,54 @@
+---
+import { siteMeta } from '../../data/site'
+---
+
+<header class="site-head">
+  <div class="site-head__brand">
+    <a href="#hero">{siteMeta.domain}</a>
+  </div>
+
+  <nav class="site-head__nav" aria-label="Primary">
+    <a href="#learning">Learning</a>
+    <a href="#apps">Apps</a>
+    <a href="#research">Research</a>
+    <a href="#archive">Archive</a>
+    <a href="#links">Links</a>
+  </nav>
+
+  <div class="site-head__utilities">
+    <button class="site-head__theme js-contrast-toggle" type="button" aria-label="Toggle contrast">
+      Contrast
+    </button>
+    <span class="status-pill status-pill--accent">{siteMeta.status}</span>
+    <span class="site-head__domain">{siteMeta.domain}</span>
+  </div>
+</header>
+
+<script>
+  const initContrastToggle = () => {
+    const button = document.querySelector('.js-contrast-toggle')
+    if (!(button instanceof HTMLButtonElement) || button.dataset.ready === 'true') return
+
+    const root = document.documentElement
+    const storageKey = 'danyel-ii-contrast'
+
+    const applyMode = (mode) => {
+      root.classList.toggle('theme-light', mode === 'light')
+    }
+
+    applyMode(localStorage.getItem(storageKey) ?? 'dark')
+    button.dataset.ready = 'true'
+
+    button.addEventListener('click', () => {
+      const next = root.classList.contains('theme-light') ? 'dark' : 'light'
+      applyMode(next)
+      localStorage.setItem(storageKey, next)
+    })
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initContrastToggle, { once: true })
+  } else {
+    initContrastToggle()
+  }
+</script>

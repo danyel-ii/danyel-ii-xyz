@@ -1,0 +1,32 @@
+---
+import AppCard from '../cards/AppCard.astro'
+import SectionEyebrow from '../ui/SectionEyebrow.astro'
+import { apps } from '../../data/apps'
+
+const featured = apps.filter((item) => item.featured)
+const rest = apps.filter((item) => !item.featured)
+---
+
+<section id="apps" class="section-shell apps-section">
+  <div class="apps-section__layout">
+    <div class="section-shell__intro apps-section__intro" data-reveal>
+      <SectionEyebrow label="DIR.EXE // APPLICATIONS" />
+      <div class="section-shell__heading">
+        <h2>Tools, small systems, and experiments that support the learning path.</h2>
+        <p>
+          These entries are kept descriptive and narrow in scope. The goal is to show what each item does, what it is testing, and where it is incomplete.
+        </p>
+      </div>
+    </div>
+
+    <div class="apps-section__content">
+      <div class="apps-section__featured">
+        {featured.map((item) => <AppCard item={item} featured={true} />)}
+      </div>
+
+      <div class="apps-section__grid">
+        {rest.map((item) => <AppCard item={item} />)}
+      </div>
+    </div>
+  </div>
+</section>

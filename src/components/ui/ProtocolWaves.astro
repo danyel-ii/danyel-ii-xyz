@@ -1,0 +1,177 @@
+---
+const { class: className } = Astro.props
+---
+
+<protocol-waves class:list={['protocol-waves', className]} aria-hidden="true">
+  <svg class="protocol-waves__svg js-svg"></svg>
+</protocol-waves>
+
+<script>
+  import Noise from '../../utils/Noise'
+
+  class ProtocolWaves extends HTMLElement {
+    connectedCallback() {
+      this.svg = this.querySelector('.js-svg')
+      this.noise = new Noise(Math.random())
+      this.paths = []
+      this.points = []
+      this.mouse = { x: -999, y: -999, sx: -999, sy: -999, set: false, angle: 0, velocity: 0 }
+      this.isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      this.isVisible = true
+      this.time = 0
+
+      this.onMove = this.onMove.bind(this)
+      this.onResize = this.onResize.bind(this)
+      this.onFrame = this.onFrame.bind(this)
+
+      this.resize()
+      this.bindEvents()
+      this.frame = requestAnimationFrame(this.onFrame)
+    }
+
+    disconnectedCallback() {
+      cancelAnimationFrame(this.frame)
+      window.removeEventListener('pointermove', this.onMove)
+      window.removeEventListener('resize', this.onResize)
+      this.observer?.disconnect()
+    }
+
+    bindEvents() {
+      window.addEventListener('pointermove', this.onMove, { passive: true })
+      window.addEventListener('resize', this.onResize)
+
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          this.isVisible = entry.isIntersecting
+        })
+      })
+      this.observer.observe(this)
+    }
+
+    onMove(event) {
+      const rect = this.getBoundingClientRect()
+      this.mouse.x = event.clientX - rect.left
+      this.mouse.y = event.clientY - rect.top
+
+      if (!this.mouse.set) {
+        this.mouse.sx = this.mouse.x
+        this.mouse.sy = this.mouse.y
+        this.mouse.set = true
+      }
+    }
+
+    onResize() {
+      this.resize()
+    }
+
+    resize() {
+      const rect = this.getBoundingClientRect()
+      this.width = rect.width
+      this.height = rect.height
+      this.svg.setAttribute('viewBox', `0 0 ${this.width} ${this.height}`)
+
+      this.paths.forEach((path) => path.remove())
+      this.paths = []
+      this.points = []
+
+      const xGap = 22
+      const yGap = 28
+      const columns = Math.ceil((this.width + 120) / xGap)
+      const rows = Math.ceil((this.height + 60) / yGap)
+      const xStart = (this.width - columns * xGap) / 2
+      const yStart = (this.height - rows * yGap) / 2
+
+      for (let x = 0; x < columns; x++) {
+        const line = []
+        for (let y = 0; y < rows; y++) {
+          line.push({
+            x: xStart + x * xGap,
+            y: yStart + y * yGap,
+            waveX: 0,
+            waveY: 0,
+            cursorX: 0,
+            cursorY: 0,
+            velX: 0,
+            velY: 0,
+          })
+        }
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.setAttribute('class', 'protocol-waves__path')
+        this.svg.appendChild(path)
+        this.paths.push(path)
+        this.points.push(line)
+      }
+    }
+
+    moved(point, withCursor = true) {
+      return {
+        x: point.x + point.waveX + (withCursor ? point.cursorX : 0),
+        y: point.y + point.waveY + (withCursor ? point.cursorY : 0),
+      }
+    }
+
+    draw() {
+      this.points.forEach((line, lineIndex) => {
+        let d = ''
+        line.forEach((point, index) => {
+          const current = this.moved(point, index !== line.length - 1)
+          if (index === 0) {
+            d += `M ${current.x.toFixed(1)} ${current.y.toFixed(1)}`
+            return
+          }
+          const previous = this.moved(line[index - 1], false)
+          const midX = ((previous.x + current.x) * 0.5).toFixed(1)
+          const midY = ((previous.y + current.y) * 0.5).toFixed(1)
+          d += ` Q ${previous.x.toFixed(1)} ${previous.y.toFixed(1)} ${midX} ${midY}`
+        })
+
+        this.paths[lineIndex].setAttribute('d', d)
+      })
+    }
+
+    onFrame(time) {
+      if (!this.isVisible) {
+        this.frame = requestAnimationFrame(this.onFrame)
+        return
+      }
+
+      this.time = time * 0.001
+      this.mouse.sx += (this.mouse.x - this.mouse.sx) * 0.08
+      this.mouse.sy += (this.mouse.y - this.mouse.sy) * 0.08
+
+      this.points.forEach((line) => {
+        line.forEach((point) => {
+          const noise = this.noise.perlin2((point.x + this.time * 80) * 0.003, (point.y + this.time * 24) * 0.002)
+          point.waveX = Math.cos(noise * Math.PI) * (this.isReduced ? 2 : 8)
+          point.waveY = Math.sin(noise * Math.PI) * (this.isReduced ? 1 : 14)
+
+          if (!this.isReduced && this.mouse.set) {
+            const dx = point.x - this.mouse.sx
+            const dy = point.y - this.mouse.sy
+            const distance = Math.hypot(dx, dy)
+            if (distance < 180) {
+              const strength = (1 - distance / 180) * 3.2
+              point.velX += (dx / Math.max(distance, 1)) * strength
+              point.velY += (dy / Math.max(distance, 1)) * strength
+            }
+          }
+
+          point.velX += (0 - point.cursorX) * 0.025
+          point.velY += (0 - point.cursorY) * 0.025
+          point.velX *= 0.88
+          point.velY *= 0.88
+          point.cursorX += point.velX
+          point.cursorY += point.velY
+        })
+      })
+
+      this.draw()
+      this.frame = requestAnimationFrame(this.onFrame)
+    }
+  }
+
+  if (!customElements.get('protocol-waves')) {
+    customElements.define('protocol-waves', ProtocolWaves)
+  }
+</script>

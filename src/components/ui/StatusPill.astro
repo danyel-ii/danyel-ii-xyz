@@ -1,0 +1,12 @@
+---
+const { status } = Astro.props
+
+const tone =
+  status === 'ACTIVE' || status === 'LIVE'
+    ? 'accent'
+    : status === 'WIP'
+      ? 'warning'
+      : 'research'
+---
+
+<span class:list={['status-pill', `status-pill--${tone}`]}>{status}</span>

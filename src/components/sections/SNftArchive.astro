@@ -1,0 +1,21 @@
+---
+import NftCard from '../cards/NftCard.astro'
+import SectionEyebrow from '../ui/SectionEyebrow.astro'
+import { nftArchive } from '../../data/nfts'
+---
+
+<section id="archive" class="section-shell archive-section">
+  <div class="section-shell__intro" data-reveal>
+    <SectionEyebrow label="NFT.REG // COLLECTION ARCHIVE" />
+    <div class="section-shell__heading">
+      <h2>Collected works archived as records rather than promoted as products.</h2>
+      <p>
+        This section is a catalog of pieces and references worth retaining. The framing is archival: what the item is, where it sits, and why it remains on record.
+      </p>
+    </div>
+  </div>
+
+  <div class="archive-section__grid">
+    {nftArchive.map((item) => <NftCard item={item} />)}
+  </div>
+</section>

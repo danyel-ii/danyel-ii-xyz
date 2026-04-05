@@ -1,0 +1,20 @@
+---
+import { socialLinks } from '../../data/social'
+
+const github = socialLinks.find((item) => item.id === 'github')
+const email = socialLinks.find((item) => item.id === 'email')
+---
+
+<section class="section-shell cta-section">
+  <div class="cta-section__inner" data-reveal>
+    <p class="cta-section__eyebrow">FINAL.NODE // NEXT ACTIONS</p>
+    <h2>Build. Study. Document.</h2>
+    <p>
+      This site tracks work in progress: tools, notes, experiments, and collected references.
+    </p>
+    <div class="cta-section__actions">
+      {github && <a class="button-link" href={github.href} target="_blank" rel="noreferrer">Go to GitHub</a>}
+      {email && <a class="button-link button-link--ghost" href={email.href}>Send Email</a>}
+    </div>
+  </div>
+</section>

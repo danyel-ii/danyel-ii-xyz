@@ -1,0 +1,27 @@
+---
+type Item = {
+  label: string
+  value: string | string[]
+}
+
+const { items } = Astro.props as { items: Item[] }
+---
+
+<dl class="meta-list">
+  {
+    items.map((item) => (
+      <div class="meta-list__row">
+        <dt>{item.label}</dt>
+        <dd>
+          {Array.isArray(item.value) ? (
+            <ul class="meta-list__values">
+              {item.value.map((value) => <li>{value}</li>)}
+            </ul>
+          ) : (
+            item.value
+          )}
+        </dd>
+      </div>
+    ))
+  }
+</dl>

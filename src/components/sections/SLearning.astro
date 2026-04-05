@@ -1,0 +1,56 @@
+---
+import SectionEyebrow from '../ui/SectionEyebrow.astro'
+import StatusPill from '../ui/StatusPill.astro'
+import { learningTracks } from '../../data/learning'
+---
+
+<section id="learning" class="section-shell learning-section">
+  <div class="section-shell__intro" data-reveal>
+    <SectionEyebrow label="LEARN.LOG // TRACKS" />
+    <div class="section-shell__heading">
+      <h2>Structured study with visible notes, clear phases, and documented gaps.</h2>
+      <p>
+        The learning path is organized as a set of active tracks rather than a generic list of interests.
+        Notes are written in public so the reasoning behind each step stays inspectable.
+      </p>
+    </div>
+  </div>
+
+  <div class="learning-section__grid">
+    <div class="learning-section__tracks">
+      {
+        learningTracks.map((track) => (
+          <article class="learning-card" data-reveal>
+            <div class="learning-card__top">
+              <p class="learning-card__phase">{track.phase}</p>
+              <StatusPill status={track.phase === 'Current' ? 'ACTIVE' : track.phase === 'Next' ? 'WIP' : 'RESEARCH'} />
+            </div>
+            <h3>{track.title}</h3>
+            <p>{track.summary}</p>
+            <ul>
+              {track.bullets.map((bullet) => <li>{bullet}</li>)}
+            </ul>
+            <div class="learning-card__progress">
+              <div class="learning-card__progress-bar">
+                <span style={`width:${track.progress}%`}></span>
+              </div>
+              <strong>{track.progress}%</strong>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <aside class="learning-section__notes" data-reveal>
+      <SectionEyebrow label="CURRENT LAB NOTES" />
+      <p>
+        Findings are being documented publicly to keep terminology consistent, preserve mistakes, and make later comparisons easier.
+      </p>
+      <ul>
+        <li>Packet captures are logged with the question that triggered the session.</li>
+        <li>Short command notes are retained when they save repeat setup time.</li>
+        <li>Research entries are kept concise enough to revisit during active work.</li>
+      </ul>
+    </aside>
+  </div>
+</section>
