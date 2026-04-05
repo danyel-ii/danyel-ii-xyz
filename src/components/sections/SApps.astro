@@ -248,33 +248,24 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
 
       const dOuter = `M -1 0 L ${width + 2} 0 L ${width + 2} ${height} L -1 ${height} Z`
       const centerX = offsetX + rulerWidth * 0.5
-      const baseRadius = rulerWidth * 0.5
+      const baseRadius = rulerWidth * 0.72
       const buildHeartPath = (inset = 0) => {
         const cx = centerX
         const r = Math.max(baseRadius - inset, 12)
-        const topY = offsetY + inset + r * 0.28
-        const leftX = cx - r * 1.18
-        const rightX = cx + r * 1.18
-        const lobeY = topY + r * 0.2
-        const cleftY = topY - r * 0.3
-        const bodyY = topY + r * 1.45
-        const tipY = Math.min(offsetY + rulerHeight - inset, topY + r * 2.8)
-        const innerScale = 0.42
-        const innerTopY = topY + r * 0.42
-        const innerTipY = topY + r * 1.62
+        const topY = offsetY + inset + r * 0.2
+        const leftX = cx - r * 1.32
+        const rightX = cx + r * 1.32
+        const lobeY = topY + r * 0.24
+        const cleftY = topY - r * 0.36
+        const bodyY = topY + r * 1.66
+        const tipY = Math.min(offsetY + rulerHeight - inset, topY + r * 3.22)
 
         return [
           `M ${cx} ${tipY}`,
-          `C ${cx - r * 0.2} ${tipY - r * 0.2} ${leftX} ${bodyY} ${leftX} ${topY + r * 0.72}`,
+          `C ${cx - r * 0.18} ${tipY - r * 0.16} ${leftX} ${bodyY} ${leftX} ${topY + r * 0.8}`,
           `C ${leftX} ${lobeY} ${cx - r * 0.62} ${cleftY} ${cx} ${topY + r * 0.32}`,
-          `C ${cx + r * 0.62} ${cleftY} ${rightX} ${lobeY} ${rightX} ${topY + r * 0.72}`,
-          `C ${rightX} ${bodyY} ${cx + r * 0.2} ${tipY - r * 0.2} ${cx} ${tipY}`,
-          'Z',
-          `M ${cx} ${innerTipY}`,
-          `C ${cx - r * 0.08} ${innerTipY - r * 0.08} ${cx - r * 0.46} ${topY + r * 1.18} ${cx - r * innerScale} ${innerTopY + r * 0.18}`,
-          `C ${cx - r * 0.34} ${innerTopY - r * 0.12} ${cx - r * 0.16} ${innerTopY - r * 0.26} ${cx} ${innerTopY}`,
-          `C ${cx + r * 0.16} ${innerTopY - r * 0.26} ${cx + r * 0.34} ${innerTopY - r * 0.12} ${cx + r * innerScale} ${innerTopY + r * 0.18}`,
-          `C ${cx + r * 0.46} ${topY + r * 1.18} ${cx + r * 0.08} ${innerTipY - r * 0.08} ${cx} ${innerTipY}`,
+          `C ${cx + r * 0.62} ${cleftY} ${rightX} ${lobeY} ${rightX} ${topY + r * 0.8}`,
+          `C ${rightX} ${bodyY} ${cx + r * 0.18} ${tipY - r * 0.16} ${cx} ${tipY}`,
           'Z',
         ].join(' ')
       }
@@ -285,8 +276,7 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
       const linesClip = `${dOuter} ${dInner}`
       mask.pathOuter.setAttribute('d', `${dOuter} ${dInner}`)
 
-      const thickness = window.innerWidth > 767 ? 16 : 8
-      dInner = buildHeartPath(thickness)
+      dInner = buildHeartPath(0)
       mask.pathInner.setAttribute('d', `${dOuter} ${dInner}`)
 
       mask.lines = []

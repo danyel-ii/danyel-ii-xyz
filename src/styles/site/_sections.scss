@@ -461,12 +461,9 @@ protocol-separator {
 }
 
 .apps-work__mask-path-inner {
-  fill: #ea3247;
-  fill-rule: evenodd;
-  stroke: rgba(23, 8, 10, 0.72);
-  stroke-width: 1px;
-  transform: translate3d(0, calc(var(--scroll-progress) * 48px), 0);
-  will-change: transform;
+  fill: none;
+  stroke: none;
+  opacity: 0;
 }
 
 .apps-work__mask-path-lines {
