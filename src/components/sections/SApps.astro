@@ -247,32 +247,50 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
       const offsetY = rulerBounding.top - elBounding.top
 
       const dOuter = `M -1 0 L ${width + 2} 0 L ${width + 2} ${height} L -1 ${height} Z`
-      const corners = {
-        tl: { x: offsetX, y: offsetY },
-        tr: { x: offsetX + rulerWidth, y: offsetY },
-        br: { x: offsetX + rulerWidth, y: offsetY + rulerHeight },
-        bl: { x: offsetX, y: offsetY + rulerHeight },
+      const centerX = offsetX + rulerWidth * 0.5
+      const headRadius = rulerWidth * 0.5
+      const shaftBottom = offsetY + rulerHeight
+
+      const buildKeyholePath = (inset = 0) => {
+        const cx = centerX
+        const r = Math.max(headRadius - inset, 12)
+        const neckHalf = Math.max(r * 0.2 - inset * 0.12, 7)
+        const baseHalf = Math.max(r * 0.74 - inset * 0.32, 14)
+        const notchWidth = Math.max(baseHalf * 0.34 - inset * 0.16, 8)
+        const notchHeight = Math.max(baseHalf * 0.28 - inset * 0.14, 8)
+        const topY = offsetY + inset
+        const circleCenterY = topY + r
+        const shoulderY = topY + r * 1.9
+        const baseY = shaftBottom - inset
+        const holeRadius = Math.max(r * 0.38 - inset * 0.2, 8)
+        const holeTopY = circleCenterY - holeRadius
+
+        return [
+          `M ${cx} ${topY}`,
+          `A ${r} ${r} 0 1 1 ${cx - 0.01} ${topY}`,
+          `L ${cx + neckHalf} ${shoulderY}`,
+          `L ${cx + baseHalf} ${baseY}`,
+          `L ${cx - baseHalf * 0.08} ${baseY}`,
+          `L ${cx - baseHalf * 0.08} ${baseY - notchHeight}`,
+          `L ${cx - baseHalf * 0.08 - notchWidth} ${baseY - notchHeight}`,
+          `L ${cx - baseHalf * 0.08 - notchWidth} ${baseY}`,
+          `L ${cx - baseHalf} ${baseY}`,
+          `L ${cx - neckHalf} ${shoulderY}`,
+          'Z',
+          `M ${cx} ${holeTopY}`,
+          `A ${holeRadius} ${holeRadius} 0 1 1 ${cx - 0.01} ${holeTopY}`,
+          'Z',
+        ].join(' ')
       }
 
-      let size = (corners.tr.x - corners.tl.x) / 2
-      mask.maxScale = window.innerWidth / size
+      mask.maxScale = window.innerWidth / (headRadius * 0.74)
 
-      let dInner = `M ${corners.tl.x} ${corners.tl.y + size} A ${size} ${size} 0 0 1 ${corners.tr.x} ${corners.tr.y + size} L ${corners.br.x} ${corners.br.y - size} A ${size} ${size} 0 0 1 ${corners.bl.x} ${corners.bl.y - size} Z`
+      let dInner = buildKeyholePath(0)
       const linesClip = `${dOuter} ${dInner}`
       mask.pathOuter.setAttribute('d', `${dOuter} ${dInner}`)
 
       const thickness = window.innerWidth > 767 ? 16 : 8
-      corners.tl.x += thickness
-      corners.tl.y += thickness
-      corners.tr.x -= thickness
-      corners.tr.y += thickness
-      corners.br.x -= thickness
-      corners.br.y -= thickness
-      corners.bl.x += thickness
-      corners.bl.y -= thickness
-
-      size = (corners.tr.x - corners.tl.x) / 2
-      dInner = `M ${corners.tl.x} ${corners.tl.y + size} A ${size} ${size} 0 0 1 ${corners.tr.x} ${corners.tr.y + size} L ${corners.br.x} ${corners.br.y - size} A ${size} ${size} 0 0 1 ${corners.bl.x} ${corners.bl.y - size} Z`
+      dInner = buildKeyholePath(thickness)
       mask.pathInner.setAttribute('d', `${dOuter} ${dInner}`)
 
       mask.lines = []
