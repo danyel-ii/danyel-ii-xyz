@@ -405,12 +405,22 @@ protocol-separator {
 .apps-work {
   --height: 100lvh;
   --scroll-progress: 0;
+  --apps-grid-bg: color-mix(in srgb, var(--yellow) 70%, var(--bg) 30%);
+  --apps-grid-line: color-mix(in srgb, var(--surface-0) 74%, transparent);
+  --apps-scene-bg: color-mix(in srgb, var(--surface-0) 88%, var(--bg) 12%);
+  --apps-ink: color-mix(in srgb, var(--surface-0) 92%, var(--bg) 8%);
+  --apps-accent: color-mix(in srgb, var(--yellow) 68%, white 32%);
+  --apps-shadow-letter: color-mix(in srgb, var(--surface-0) 94%, transparent);
+  --apps-video-bg: var(--surface-2);
+  --apps-paper-bg: color-mix(in srgb, var(--surface-0) 10%, var(--text-strong) 90%);
+  --apps-paper-ink: color-mix(in srgb, var(--surface-0) 90%, var(--bg) 10%);
+  --apps-paper-muted: color-mix(in srgb, var(--surface-0) 60%, var(--text-muted) 40%);
 
   position: relative;
   z-index: 2;
   height: var(--height);
-  background: #ea3247;
-  border: 1px solid rgba(23, 8, 10, 0.45);
+  background: var(--apps-grid-bg);
+  border: 1px solid color-mix(in srgb, var(--apps-grid-line) 70%, transparent);
   border-radius: 10px;
   overflow: hidden;
 
@@ -421,7 +431,7 @@ protocol-separator {
     z-index: 2;
     width: 100%;
     height: 1px;
-    background: rgba(23, 8, 10, 0.72);
+    background: var(--apps-grid-line);
     content: '';
   }
 }
@@ -454,9 +464,9 @@ protocol-separator {
 }
 
 .apps-work__mask-path-outer {
-  fill: #ea3247;
+  fill: var(--apps-grid-bg);
   fill-rule: evenodd;
-  stroke: rgba(23, 8, 10, 0.72);
+  stroke: var(--apps-grid-line);
   stroke-width: 1px;
 }
 
@@ -468,7 +478,7 @@ protocol-separator {
 
 .apps-work__mask-path-lines {
   fill: none;
-  stroke: rgba(23, 8, 10, 0.72);
+  stroke: var(--apps-grid-line);
   stroke-width: 1px;
 }
 
@@ -487,8 +497,8 @@ protocol-separator {
   justify-content: center;
   width: 100%;
   height: 100%;
-  background: #14080a;
-  color: #ff4f67;
+  background: var(--apps-scene-bg);
+  color: var(--apps-accent);
   transform: translate3d(0, calc(var(--scroll-progress) * -15%), 0);
   will-change: clip-path, transform;
 
@@ -560,7 +570,7 @@ protocol-separator {
   top: 0;
   left: 0;
   display: block;
-  color: #ff4f67;
+  color: var(--apps-accent);
   line-height: 0.82;
   transform: rotateY(calc(var(--head) * -10deg * var(--state)))
     translate3d(
@@ -576,7 +586,7 @@ protocol-separator {
     top: 0;
     left: 0;
     z-index: -1;
-    color: rgba(47, 6, 11, 0.92);
+    color: var(--apps-shadow-letter);
     opacity: min(calc(var(--state) * 2), 1);
     transform: scale(1.05, 1.02)
       translate3d(calc(var(--head) * 0.1rem * var(--state) * var(--state)), 0, 0);
@@ -592,7 +602,7 @@ protocol-separator {
   left: 50%;
   z-index: 2;
   padding: 0.5rem 0.5rem 0;
-  background: #14080a;
+  background: var(--apps-ink);
   transform: rotateY(calc(var(--progress) * -20deg))
     translate3d(
       calc(var(--progress) * (50vw + 100%) - 50%),
@@ -646,15 +656,15 @@ protocol-separator {
 
 .apps-work__video {
   aspect-ratio: 1082 / 636;
-  background: #232a34;
+  background: var(--apps-video-bg);
 }
 
 .apps-work__placeholder {
   display: grid;
   min-width: min(38vw, 540px);
   min-height: min(30vw, 320px);
-  background: #f5efe6;
-  color: #1d1510;
+  background: var(--apps-paper-bg);
+  color: var(--apps-paper-ink);
 }
 
 .apps-work__placeholder-top {
@@ -667,7 +677,7 @@ protocol-separator {
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(29, 21, 16, 0.68);
+  color: var(--apps-paper-muted);
 }
 
 .apps-work__placeholder-body {
@@ -676,7 +686,7 @@ protocol-separator {
   gap: 14px;
   min-height: 230px;
   padding: 22px;
-  border-top: 1px solid rgba(29, 21, 16, 0.12);
+  border-top: 1px solid color-mix(in srgb, var(--apps-paper-ink) 12%, transparent);
 }
 
 .apps-work__placeholder-body h4 {
@@ -685,7 +695,7 @@ protocol-separator {
   font-size: clamp(1.7rem, 3vw, 2.8rem);
   line-height: 0.92;
   letter-spacing: -0.05em;
-  color: #24150f;
+  color: var(--apps-paper-ink);
   text-transform: uppercase;
 }
 
@@ -694,7 +704,7 @@ protocol-separator {
   max-width: 28ch;
   font-size: 0.96rem;
   line-height: 1.5;
-  color: #5c4a3f;
+  color: var(--apps-paper-muted);
 }
 
 .apps-work__caption {
@@ -702,7 +712,7 @@ protocol-separator {
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem;
-  color: #ea3247;
+  color: var(--apps-accent);
   font: 700 11px / 1 var(--mono-font);
   letter-spacing: 0.15em;
   text-transform: uppercase;
