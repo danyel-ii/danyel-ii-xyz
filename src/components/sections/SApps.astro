@@ -248,57 +248,45 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
 
       const dOuter = `M -1 0 L ${width + 2} 0 L ${width + 2} ${height} L -1 ${height} Z`
       const centerX = offsetX + rulerWidth * 0.5
-      const headRadius = rulerWidth * 0.5
-      const shaftBottom = offsetY + rulerHeight
-
-      const buildKeyholePath = (inset = 0) => {
+      const baseRadius = rulerWidth * 0.5
+      const buildHeartPath = (inset = 0) => {
         const cx = centerX
-        const r = Math.max(headRadius - inset, 12)
-        const neckHalf = Math.max(r * 0.16 - inset * 0.08, 7)
-        const shoulderHalf = Math.max(r * 0.28 - inset * 0.12, 10)
-        const bodyHalf = Math.max(r * 0.62 - inset * 0.28, 14)
-        const notchWidth = Math.max(bodyHalf * 0.26 - inset * 0.1, 8)
-        const notchHeight = Math.max(bodyHalf * 0.22 - inset * 0.08, 8)
-        const topY = offsetY + inset
-        const circleCenterY = topY + r
-        const neckBottomY = topY + r * 1.55
-        const shoulderY = topY + r * 2.05
-        const bodyMidY = topY + r * 3.05
-        const baseY = Math.min(shaftBottom - inset, topY + r * 4.2)
-        const holeRadius = Math.max(r * 0.38 - inset * 0.2, 8)
-        const holeTopY = circleCenterY - holeRadius
-        const notchX = cx - bodyHalf * 0.14
+        const r = Math.max(baseRadius - inset, 12)
+        const topY = offsetY + inset + r * 0.28
+        const leftX = cx - r * 1.18
+        const rightX = cx + r * 1.18
+        const lobeY = topY + r * 0.2
+        const cleftY = topY - r * 0.3
+        const bodyY = topY + r * 1.45
+        const tipY = Math.min(offsetY + rulerHeight - inset, topY + r * 2.8)
+        const innerScale = 0.42
+        const innerTopY = topY + r * 0.42
+        const innerTipY = topY + r * 1.62
 
         return [
-          `M ${cx} ${topY}`,
-          `A ${r} ${r} 0 1 1 ${cx - 0.01} ${topY}`,
-          `L ${cx + neckHalf} ${neckBottomY}`,
-          `L ${cx + shoulderHalf} ${shoulderY}`,
-          `L ${cx + bodyHalf * 0.88} ${bodyMidY}`,
-          `L ${cx + bodyHalf} ${baseY}`,
-          `L ${notchX} ${baseY}`,
-          `L ${notchX} ${baseY - notchHeight}`,
-          `L ${notchX - notchWidth} ${baseY - notchHeight}`,
-          `L ${notchX - notchWidth} ${baseY}`,
-          `L ${cx - bodyHalf} ${baseY}`,
-          `L ${cx - bodyHalf * 0.88} ${bodyMidY}`,
-          `L ${cx - shoulderHalf} ${shoulderY}`,
-          `L ${cx - neckHalf} ${neckBottomY}`,
+          `M ${cx} ${tipY}`,
+          `C ${cx - r * 0.2} ${tipY - r * 0.2} ${leftX} ${bodyY} ${leftX} ${topY + r * 0.72}`,
+          `C ${leftX} ${lobeY} ${cx - r * 0.62} ${cleftY} ${cx} ${topY + r * 0.32}`,
+          `C ${cx + r * 0.62} ${cleftY} ${rightX} ${lobeY} ${rightX} ${topY + r * 0.72}`,
+          `C ${rightX} ${bodyY} ${cx + r * 0.2} ${tipY - r * 0.2} ${cx} ${tipY}`,
           'Z',
-          `M ${cx} ${holeTopY}`,
-          `A ${holeRadius} ${holeRadius} 0 1 1 ${cx - 0.01} ${holeTopY}`,
+          `M ${cx} ${innerTipY}`,
+          `C ${cx - r * 0.08} ${innerTipY - r * 0.08} ${cx - r * 0.46} ${topY + r * 1.18} ${cx - r * innerScale} ${innerTopY + r * 0.18}`,
+          `C ${cx - r * 0.34} ${innerTopY - r * 0.12} ${cx - r * 0.16} ${innerTopY - r * 0.26} ${cx} ${innerTopY}`,
+          `C ${cx + r * 0.16} ${innerTopY - r * 0.26} ${cx + r * 0.34} ${innerTopY - r * 0.12} ${cx + r * innerScale} ${innerTopY + r * 0.18}`,
+          `C ${cx + r * 0.46} ${topY + r * 1.18} ${cx + r * 0.08} ${innerTipY - r * 0.08} ${cx} ${innerTipY}`,
           'Z',
         ].join(' ')
       }
 
-      mask.maxScale = window.innerWidth / (headRadius * 0.74)
+      mask.maxScale = window.innerWidth / (baseRadius * 0.9)
 
-      let dInner = buildKeyholePath(0)
+      let dInner = buildHeartPath(0)
       const linesClip = `${dOuter} ${dInner}`
       mask.pathOuter.setAttribute('d', `${dOuter} ${dInner}`)
 
       const thickness = window.innerWidth > 767 ? 16 : 8
-      dInner = buildKeyholePath(thickness)
+      dInner = buildHeartPath(thickness)
       mask.pathInner.setAttribute('d', `${dOuter} ${dInner}`)
 
       mask.lines = []
