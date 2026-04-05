@@ -248,17 +248,18 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
 
       const dOuter = `M -1 0 L ${width + 2} 0 L ${width + 2} ${height} L -1 ${height} Z`
       const centerX = offsetX + rulerWidth * 0.5
-      const baseRadius = rulerWidth * 0.72
+      const baseRadius = rulerWidth * 0.88
       const buildHeartPath = (inset = 0) => {
         const cx = centerX
         const r = Math.max(baseRadius - inset, 12)
-        const topY = offsetY + inset + r * 0.2
-        const leftX = cx - r * 1.32
-        const rightX = cx + r * 1.32
+        const heartHeight = r * 3.26
+        const topY = offsetY + (rulerHeight - heartHeight) * 0.5 + inset
+        const leftX = cx - r * 1.38
+        const rightX = cx + r * 1.38
         const lobeY = topY + r * 0.24
         const cleftY = topY - r * 0.36
         const bodyY = topY + r * 1.66
-        const tipY = Math.min(offsetY + rulerHeight - inset, topY + r * 3.22)
+        const tipY = topY + heartHeight
 
         return [
           `M ${cx} ${tipY}`,
@@ -270,7 +271,9 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
         ].join(' ')
       }
 
-      mask.maxScale = window.innerWidth / (baseRadius * 0.9)
+      const heartCenterY = offsetY + rulerHeight * 0.56
+      mask.el.style.transformOrigin = `${centerX}px ${heartCenterY}px`
+      mask.maxScale = Math.max(window.innerWidth, window.innerHeight) / (baseRadius * 0.82)
 
       let dInner = buildHeartPath(0)
       const linesClip = `${dOuter} ${dInner}`
@@ -374,7 +377,7 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
 
       this.tl
         .fromTo(mask.el, { scale: 1 }, { scale: mask.maxScale, duration: 0.75, ease: 'power4.in' }, 0)
-        .fromTo(scene, { scale: 0.75 }, { scale: 1, duration: 0.75, ease: 'power3.in' }, 0)
+        .fromTo(scene, { scale: 0.58 }, { scale: 1, duration: 0.82, ease: 'power3.in' }, 0)
         .fromTo(container, { clipPath: 'inset(0 1rem)' }, { clipPath: 'inset(0 0rem)', duration: 0.75, ease: 'power3.in' }, 0)
         .fromTo(this, { pointsProgress: 0 }, { pointsProgress: 1, duration: 1, ease: 'power4.inOut' }, 0)
         .fromTo(this, { state: 0 }, { state: 1, duration: 0.75, ease: 'power4.in' }, 0)
@@ -382,7 +385,7 @@ const sceneApps = [...apps, ...apps.slice(0, 2)]
         .fromTo(this, { animationProgress: 0 }, { animationProgress: 10000, duration: this.tl?.totalDuration?.() ?? 2, ease: 'power1.out' }, 0.75)
         .fromTo(this, { state: 1 }, { state: 0, duration: 0.75, ease: 'power4.inOut', immediateRender: false }, '-=1')
         .fromTo(mask.el, { scale: mask.maxScale }, { scale: 1, duration: 0.75, ease: 'power4.inOut', immediateRender: false }, '-=1')
-        .fromTo(scene, { scale: 1 }, { scale: 0.75, duration: 0.75, ease: 'power3.inOut', immediateRender: false }, '-=1')
+        .fromTo(scene, { scale: 1 }, { scale: 0.58, duration: 0.82, ease: 'power3.inOut', immediateRender: false }, '-=1')
         .fromTo(container, { clipPath: 'inset(0 0rem)' }, { clipPath: 'inset(0 1rem)', duration: 0.75, ease: 'power3.inOut', immediateRender: false }, '-=1')
         .fromTo(this, { pointsProgress: 1 }, { pointsProgress: 0, duration: 1, ease: 'power4.inOut' }, '-=1')
     }
