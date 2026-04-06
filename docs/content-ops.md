@@ -44,6 +44,7 @@ Collection-specific additions:
 - `/research` and `/research/[slug]`
 - `/search`
 - `/admin`
+- `/capture`
 
 ## Manual editing
 
@@ -91,6 +92,19 @@ Search is powered by Pagefind.
 - Build command: `npm run build`
 - Build output includes `dist/pagefind`
 - Detail pages emit Pagefind filters for `kind`, `status`, and `topic`
+
+## Installable mobile shell
+
+The site now includes a basic PWA shell for browser install prompts and home-screen install support.
+
+Relevant files:
+
+- `public/icons/site.webmanifest`
+- `public/sw.js`
+- `src/layouts/SiteLayout.astro`
+- `src/pages/index.astro`
+
+This is separate from content authoring. It improves mobile installability, not editing permissions.
 
 ## Current structure note
 

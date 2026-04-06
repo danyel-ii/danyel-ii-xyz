@@ -48,6 +48,7 @@ npm run build
 
 Additional docs:
 
+- `docs/site-overview.md`
 - `docs/content-ops.md`
 - `docs/admin-auth.md`
 

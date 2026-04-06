@@ -56,3 +56,12 @@ Remaining manual production work:
 ## Vercel note
 
 Because the site is hosted on Vercel, production auth should be treated as a separate deployment concern. The repo is ready for local authoring now and documents the remaining manual production setup instead of guessing at secrets or callback infrastructure.
+
+## Current intended split
+
+Use:
+
+- `/admin` for structured editing once production auth is configured
+- `/capture` for fast mobile logging when speed matters more than full CMS editing
+
+These two surfaces are complementary rather than competing.
