@@ -25,6 +25,7 @@ The stack remains intentionally close to the original fork:
 - Collections now include `blog`, `research`, `notes`, `logs`, `projects`, and `topics`.
 - `/search` is powered by Pagefind.
 - `/admin` is powered by Decap CMS with a local backend workflow.
+- `/capture` is a mobile-first quick-entry surface for new log files.
 
 ## Run Locally
 

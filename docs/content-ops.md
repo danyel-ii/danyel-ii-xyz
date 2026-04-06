@@ -56,6 +56,34 @@ Quick guidance:
 - Projects: include current state plus repo/live links when available
 - Topics: keep these curated; they act as subject hubs
 
+## Mobile workflows
+
+There are now two intended mobile paths.
+
+### Structured path: `/admin`
+
+Use this when you want the real authoring workflow.
+
+1. Open `/admin` on the site from mobile.
+2. Log in once production Decap auth is configured.
+3. Create a new `log` entry.
+4. Save directly through the CMS.
+
+This is the intended structured path because it preserves the collection schema and writes directly to the repository once auth is in place.
+
+### Fast path: `/capture`
+
+Use this when speed matters more than a full CMS session.
+
+1. Open `/capture` on mobile.
+2. Fill in the minimum fields: title, summary, optional topics, rough body.
+3. Copy the generated Markdown blob.
+4. Either:
+   - paste it into a new file under `src/content/logs`, or
+   - use the generated GitHub new-file link from the page.
+
+The capture page is deliberately narrow. It is for quick journal entries, not full editorial review.
+
 ## Search
 
 Search is powered by Pagefind.

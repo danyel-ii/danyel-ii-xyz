@@ -1,0 +1,159 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro'
+import SectionEyebrow from '../components/ui/SectionEyebrow.astro'
+import { formatIsoDate } from '../lib/format'
+import { siteMeta } from '../data/site'
+
+const today = formatIsoDate(new Date())
+---
+
+<SiteLayout
+  title={`Capture | ${siteMeta.domain}`}
+  description="Ultra-light mobile capture for new log entries."
+  canonical="/capture/"
+>
+  <section class="section-shell capture-page">
+    <div class="section-shell__intro" data-reveal>
+      <SectionEyebrow label="CAPTURE.LOG // MOBILE QUICK ENTRY" />
+      <div class="section-shell__heading">
+        <h1>Fast capture for on-the-go notes.</h1>
+        <p>
+          Use this when you want to capture a log entry quickly from mobile. It generates a ready-to-save Markdown file for `src/content/logs` and can also open a GitHub new-file page.
+        </p>
+      </div>
+    </div>
+
+    <div class="capture-page__panel" data-reveal>
+      <div class="capture-page__controls">
+        <label class="capture-page__field">
+          <span>Title</span>
+          <input id="capture-title" type="text" placeholder="Short log title" />
+        </label>
+        <label class="capture-page__field">
+          <span>Status</span>
+          <select id="capture-status">
+            <option value="active" selected>active</option>
+            <option value="seed">seed</option>
+            <option value="stable">stable</option>
+            <option value="archived">archived</option>
+          </select>
+        </label>
+        <label class="capture-page__field">
+          <span>Date</span>
+          <input id="capture-date" type="date" value={today} />
+        </label>
+        <label class="capture-page__field capture-page__field--wide">
+          <span>Summary</span>
+          <textarea id="capture-summary" rows="3" placeholder="One sentence is enough."></textarea>
+        </label>
+        <label class="capture-page__field capture-page__field--wide">
+          <span>Topics</span>
+          <input id="capture-topics" type="text" placeholder="Networking, Documentation" />
+        </label>
+        <label class="capture-page__field capture-page__field--wide">
+          <span>Body</span>
+          <textarea id="capture-body" rows="8" placeholder="Rough notes, observations, commands, next steps."></textarea>
+        </label>
+      </div>
+
+      <div class="capture-page__actions">
+        <button id="capture-copy" class="button-link" type="button">Copy Markdown</button>
+        <a id="capture-github" class="button-link button-link--ghost" href="https://github.com/danyel-ii/danyel-ii-xyz/new/main" target="_blank" rel="noreferrer">
+          Open GitHub File
+        </a>
+        <a class="button-link button-link--ghost" href="/admin/">Open Admin</a>
+      </div>
+
+      <p id="capture-meta" class="capture-page__meta">Filename and export text update as you type.</p>
+
+      <label class="capture-page__field capture-page__field--wide">
+        <span>Generated Markdown</span>
+        <textarea id="capture-output" rows="18" readonly></textarea>
+      </label>
+    </div>
+  </section>
+</SiteLayout>
+
+<script is:inline>
+  const repoBase = 'https://github.com/danyel-ii/danyel-ii-xyz/new/main';
+  const titleNode = document.getElementById('capture-title');
+  const summaryNode = document.getElementById('capture-summary');
+  const topicsNode = document.getElementById('capture-topics');
+  const bodyNode = document.getElementById('capture-body');
+  const statusNode = document.getElementById('capture-status');
+  const dateNode = document.getElementById('capture-date');
+  const outputNode = document.getElementById('capture-output');
+  const metaNode = document.getElementById('capture-meta');
+  const githubNode = document.getElementById('capture-github');
+  const copyNode = document.getElementById('capture-copy');
+
+  const slugify = (value) =>
+    value
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'quick-note';
+
+  const buildTopics = (value) =>
+    value
+      .split(',')
+      .map((topic) => topic.trim())
+      .filter(Boolean);
+
+  const buildMarkdown = () => {
+    if (!(titleNode instanceof HTMLInputElement) ||
+      !(summaryNode instanceof HTMLTextAreaElement) ||
+      !(topicsNode instanceof HTMLInputElement) ||
+      !(bodyNode instanceof HTMLTextAreaElement) ||
+      !(statusNode instanceof HTMLSelectElement) ||
+      !(dateNode instanceof HTMLInputElement) ||
+      !(outputNode instanceof HTMLTextAreaElement) ||
+      !(metaNode instanceof HTMLElement) ||
+      !(githubNode instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    const date = dateNode.value || new Date().toISOString().slice(0, 10);
+    const title = titleNode.value.trim() || 'Quick Capture';
+    const summary = summaryNode.value.trim() || 'Short log entry captured from mobile.';
+    const topics = buildTopics(topicsNode.value);
+    const topicBlock = topics.length
+      ? `topics:\n${topics.map((topic) => `  - ${topic}`).join('\n')}`
+      : 'topics: []';
+    const markdown = `---\ntitle: "${title.replace(/"/g, '\\"')}"\nsummary: "${summary.replace(/"/g, '\\"')}"\nstatus: ${statusNode.value}\n${topicBlock}\ncreated: ${date}\nupdated: ${date}\ndraft: false\nfeatured: false\nrelated: []\ntags: []\n---\n\n${bodyNode.value.trim() || 'Captured from /capture for later cleanup.'}\n`;
+    const filename = `src/content/logs/${date}-${slugify(title)}.md`;
+
+    outputNode.value = markdown;
+    metaNode.textContent = `Target file: ${filename}`;
+    githubNode.href = `${repoBase}?filename=${encodeURIComponent(filename)}&value=${encodeURIComponent(markdown)}`;
+  };
+
+  const copyMarkdown = async () => {
+    if (!(outputNode instanceof HTMLTextAreaElement) || !(copyNode instanceof HTMLButtonElement)) return;
+    try {
+      await navigator.clipboard.writeText(outputNode.value);
+      copyNode.textContent = 'Copied';
+      window.setTimeout(() => {
+        copyNode.textContent = 'Copy Markdown';
+      }, 1400);
+    } catch (error) {
+      copyNode.textContent = 'Copy Failed';
+      window.setTimeout(() => {
+        copyNode.textContent = 'Copy Markdown';
+      }, 1400);
+      console.error(error);
+    }
+  };
+
+  const inputs = [titleNode, summaryNode, topicsNode, bodyNode, statusNode, dateNode].filter(Boolean);
+  for (const input of inputs) {
+    input.addEventListener('input', buildMarkdown);
+    input.addEventListener('change', buildMarkdown);
+  }
+
+  if (copyNode instanceof HTMLButtonElement) {
+    copyNode.addEventListener('click', copyMarkdown);
+  }
+
+  buildMarkdown();
+</script>

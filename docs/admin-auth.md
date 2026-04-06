@@ -22,6 +22,20 @@ The CMS config uses:
 
 This is the recommended workflow for quick note/log capture during development.
 
+## Mobile `/admin` workflow
+
+Once production Decap auth is configured, `/admin` can also be used from mobile as the structured content path.
+
+Recommended use:
+
+1. Open `https://danyel-ii.xyz/admin/`
+2. Sign in through the configured GitHub/Decap auth flow
+3. Choose the `Logs` collection
+4. Create a new entry with the minimum required fields
+5. Save the entry back to the repository
+
+If you only need fast capture and do not want to complete a full sign-in/editor session on mobile, use `/capture` instead.
+
 ## Production state
 
 The repo contains the Decap CMS surface and config, but production GitHub authentication is not fully completed in-code because that requires external auth configuration.
