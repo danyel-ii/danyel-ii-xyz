@@ -1,14 +1,19 @@
 ---
 title: "Hash Function Basics"
-description: "A working note on how to compare common hash properties without overstating what they provide."
-pubDate: 2026-04-03
-topic: "Cryptography"
+summary: "A working note on how to compare common hash properties without overstating what they provide."
+status: active
+topics:
+  - Cryptography
 tags:
   - Hash
   - Crypto
   - Reference
+created: 2026-04-03
+updated: 2026-04-03
 featured: true
 draft: false
+related:
+  - /topics/cryptography/
 ---
 
 This note is an attempt to keep the basics straight.

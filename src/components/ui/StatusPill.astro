@@ -1,12 +1,14 @@
 ---
 const { status } = Astro.props
 
+const normalized = String(status).toUpperCase()
+
 const tone =
-  status === 'ACTIVE' || status === 'LIVE'
+  normalized === 'ACTIVE' || normalized === 'LIVE' || normalized === 'STABLE'
     ? 'accent'
-    : status === 'WIP'
+    : normalized === 'WIP' || normalized === 'SEED'
       ? 'warning'
       : 'research'
 ---
 
-<span class:list={['status-pill', `status-pill--${tone}`]}>{status}</span>
+<span class:list={['status-pill', `status-pill--${tone}`]}>{normalized}</span>

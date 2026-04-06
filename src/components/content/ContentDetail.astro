@@ -1,0 +1,80 @@
+---
+import PagefindMeta from './PagefindMeta.astro'
+import StatusPill from '../ui/StatusPill.astro'
+import { formatDate, formatStatus } from '../../lib/format'
+import { getTopicHref } from '../../lib/content'
+
+const {
+  entry,
+  kind,
+  tags = [],
+} = Astro.props as {
+  entry: {
+    data: {
+      title: string
+      summary: string
+      status: string
+      topics: string[]
+      related?: string[]
+      created: Date
+      updated: Date
+    }
+  }
+  kind: string
+  tags?: string[]
+}
+
+const updated = entry.data.updated ?? entry.data.created
+const related = entry.data.related ?? []
+---
+
+<article class="content-detail section-shell" data-pagefind-body>
+  <PagefindMeta
+    kind={kind.toLowerCase()}
+    status={entry.data.status}
+    topics={entry.data.topics}
+    updated={updated}
+    summary={entry.data.summary}
+  />
+
+  <header class="content-detail__header" data-reveal>
+    <p class="content-detail__eyebrow">{kind} // ENTRY</p>
+    <h1>{entry.data.title}</h1>
+    <div class="content-detail__meta">
+      <span>{formatDate(updated)}</span>
+      <span>{entry.data.topics.join(' / ') || 'Unfiled'}</span>
+      <StatusPill status={formatStatus(entry.data.status)} />
+    </div>
+    <p class="content-detail__description">{entry.data.summary}</p>
+    {
+      entry.data.topics.length > 0 && (
+        <ul class="content-detail__tags">
+          {entry.data.topics.map((topic) => <li><a href={getTopicHref(topic)}>{topic}</a></li>)}
+        </ul>
+      )
+    }
+    {
+      tags.length > 0 && (
+        <ul class="content-detail__tags content-detail__tags--secondary">
+          {tags.map((tag) => <li>{tag}</li>)}
+        </ul>
+      )
+    }
+    <slot name="after-header" />
+  </header>
+
+  <div class="content-detail__body prose" data-reveal>
+    <slot />
+  </div>
+
+  {
+    related.length > 0 && (
+      <aside class="content-detail__related" data-reveal>
+        <p class="content-detail__eyebrow">LINK.SET // RELATED</p>
+        <ul>
+          {related.map((link) => <li><a href={link}>{link}</a></li>)}
+        </ul>
+      </aside>
+    )
+  }
+</article>

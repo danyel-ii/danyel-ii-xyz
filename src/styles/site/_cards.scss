@@ -2,7 +2,9 @@
 
 .app-card,
 .post-card,
-.nft-card {
+.nft-card,
+.knowledge-card,
+.topic-card {
   display: grid;
   overflow: hidden;
 }
@@ -39,7 +41,9 @@
 
 .app-card__body,
 .post-card,
-.nft-card {
+.nft-card,
+.knowledge-card,
+.topic-card {
   padding: 20px;
 }
 
@@ -101,6 +105,63 @@
 
 .post-card {
   gap: 14px;
+}
+
+.knowledge-card,
+.topic-card {
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--panel-bg);
+}
+
+.knowledge-card__meta,
+.topic-card__meta,
+.knowledge-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--text-muted);
+  font-family: var(--mono-font);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.knowledge-card h3,
+.knowledge-card p,
+.topic-card h3,
+.topic-card p,
+.topic-card__count {
+  margin: 0;
+}
+
+.knowledge-card h3 a,
+.topic-card h3 a {
+  color: var(--text-strong);
+}
+
+.knowledge-card__topics {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li a {
+    color: var(--cyan);
+  }
+}
+
+.topic-card__count {
+  color: var(--text-muted);
+  font-family: var(--mono-font);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .post-card__meta {

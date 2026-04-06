@@ -10,6 +10,7 @@ import SResearch from '../components/sections/SResearch.astro'
 import SNftArchive from '../components/sections/SNftArchive.astro'
 import SLinks from '../components/sections/SLinks.astro'
 import SCTA from '../components/sections/SCTA.astro'
+import SKnowledgeSurfaces from '../components/sections/SKnowledgeSurfaces.astro'
 import { siteMeta } from '../data/site'
 
 import '../styles/global.scss'
@@ -44,6 +45,7 @@ import '../styles/global.scss'
     <SiteScrollbar />
     <main class="site-main">
       <SHero />
+      <SKnowledgeSurfaces />
       <ProtocolSeparator mode="protocol" tokens={['AUTH', 'SEC', 'ADMIN', 'ACTIVE']} />
       <SLearning />
       <ProtocolSeparator mode="hex" tokens={['0x41', '0x55', '0x54', '0x48']} />

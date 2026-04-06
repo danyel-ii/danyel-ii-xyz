@@ -1,0 +1,69 @@
+---
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin | danyel-ii.xyz</title>
+    <meta name="robots" content="noindex" />
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #09090b;
+        --surface: #111114;
+        --line: rgba(255, 255, 255, 0.1);
+        --text: #f7f2e8;
+        --muted: #9f917b;
+        --accent: #f6d860;
+        --mono: "PPFraktionMono-Regular", "SFMono-Regular", monospace;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--mono);
+      }
+
+      .admin-shell {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .admin-shell__frame {
+        margin-bottom: 24px;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+      }
+
+      .admin-shell__frame strong,
+      .admin-shell__frame code {
+        color: var(--accent);
+      }
+
+      .admin-shell__frame p {
+        margin: 0;
+        line-height: 1.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-shell">
+      <div class="admin-shell__frame">
+        <p><strong>CMS.NODE // LOCAL FIRST</strong></p>
+        <p>
+          Run <code>npm run cms</code> alongside <code>npm run dev</code> to use Decap’s local backend. Production GitHub auth remains documented in <code>docs/admin-auth.md</code>.
+        </p>
+      </div>
+      <div id="nc-root"></div>
+    </div>
+    <script src="https://unpkg.com/decap-cms@^3.11.0/dist/decap-cms.js"></script>
+  </body>
+</html>

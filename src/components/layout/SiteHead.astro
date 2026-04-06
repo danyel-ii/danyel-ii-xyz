@@ -4,7 +4,7 @@ import { siteMeta } from '../../data/site'
 
 <header class="site-head">
   <div class="site-head__brand">
-    <a href="#hero">{siteMeta.domain}</a>
+    <a href="/">{siteMeta.domain}</a>
   </div>
 
   <div class="site-head__console" aria-hidden="true">
@@ -15,11 +15,12 @@ import { siteMeta } from '../../data/site'
   </div>
 
   <nav class="site-head__nav" aria-label="Primary">
-    <a href="#learning">Learning</a>
-    <a href="#apps">Apps</a>
-    <a href="#research">Research</a>
-    <a href="#archive">Archive</a>
-    <a href="#links">Links</a>
+    <a href="/projects/">Projects</a>
+    <a href="/notes/">Notes</a>
+    <a href="/log/">Log</a>
+    <a href="/topics/">Topics</a>
+    <a href="/research/">Research</a>
+    <a href="/search/">Search</a>
   </nav>
 
   <div class="site-head__utilities">
@@ -29,6 +30,9 @@ import { siteMeta } from '../../data/site'
     <button class="site-head__theme js-contrast-toggle" type="button" aria-label="Toggle contrast">
       Contrast
     </button>
+    <a class="site-head__search" href="/search/" aria-label="Open search">
+      Search
+    </a>
     <span class="status-pill status-pill--accent">{siteMeta.status}</span>
     <span class="site-head__domain">{siteMeta.domain}</span>
   </div>
@@ -87,13 +91,37 @@ import { siteMeta } from '../../data/site'
     })
   }
 
+  const initSearchShortcut = () => {
+    if (document.documentElement.dataset.searchReady === 'true') return
+
+    document.documentElement.dataset.searchReady = 'true'
+    document.addEventListener('keydown', (event) => {
+      const target = event.target
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      ) {
+        return
+      }
+
+      if ((event.key === 'k' && (event.metaKey || event.ctrlKey)) || event.key === '/') {
+        event.preventDefault()
+        window.location.href = '/search/'
+      }
+    })
+  }
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       initBannerToggle()
       initContrastToggle()
+      initSearchShortcut()
     }, { once: true })
   } else {
     initBannerToggle()
     initContrastToggle()
+    initSearchShortcut()
   }
 </script>

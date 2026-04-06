@@ -6,20 +6,20 @@ import { siteMeta } from '../../data/site'
 import {
   getCollectionLabel,
   getEntryHref,
-  sortByUpdatedDesc,
+  sortProjects,
   getVisibleCollection,
 } from '../../lib/content'
 
-const entries = sortByUpdatedDesc(await getVisibleCollection('blog'))
+const entries = sortProjects(await getVisibleCollection('projects'))
 ---
 
-<SiteLayout title={`Blog | ${siteMeta.domain}`} description="Blog posts from danyel-ii.xyz." canonical="/blog/">
+<SiteLayout title={`Projects | ${siteMeta.domain}`} description="Projects, tools, and deployed experiments from danyel-ii.xyz." canonical="/projects/">
   <section class="section-shell content-index">
     <div class="section-shell__intro" data-reveal>
-      <SectionEyebrow label="BLOG.LOG // ALL POSTS" />
+      <SectionEyebrow label="DIR.EXE // PROJECT RECORDS" />
       <div class="section-shell__heading">
-        <h1>Blog posts and progress notes.</h1>
-        <p>Newest entries are listed first. Drafts stay visible locally and are excluded from production builds.</p>
+        <h1>Projects with durable pages instead of only homepage cards.</h1>
+        <p>Featured and stable work is sorted first, followed by active and seed-stage records. Each project keeps its own links, stack, and current state.</p>
       </div>
     </div>
     <div class="knowledge-grid">

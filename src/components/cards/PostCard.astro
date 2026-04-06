@@ -1,13 +1,15 @@
 ---
 import { formatDate } from '../../lib/format'
+import StatusPill from '../ui/StatusPill.astro'
 
 const { entry, collectionLabel, href } = Astro.props as {
   entry: {
     data: {
       title: string
-      description: string
-      pubDate: Date
-      topic: string
+      summary: string
+      updated: Date
+      status: string
+      topics: string[]
       tags: string[]
     }
   }
@@ -19,11 +21,12 @@ const { entry, collectionLabel, href } = Astro.props as {
 <article class="post-card" data-reveal>
   <div class="post-card__meta">
     <span>{collectionLabel}</span>
-    <span>{formatDate(entry.data.pubDate)}</span>
+    <span>{formatDate(entry.data.updated)}</span>
   </div>
+  <StatusPill status={entry.data.status.toUpperCase()} />
   <h3><a href={href}>{entry.data.title}</a></h3>
-  <p class="post-card__topic">{entry.data.topic}</p>
-  <p class="post-card__description">{entry.data.description}</p>
+  <p class="post-card__topic">{entry.data.topics.join(' / ')}</p>
+  <p class="post-card__description">{entry.data.summary}</p>
   <ul class="post-card__tags">
     {entry.data.tags.map((tag) => <li>{tag}</li>)}
   </ul>

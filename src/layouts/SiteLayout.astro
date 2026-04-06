@@ -1,0 +1,47 @@
+---
+import SiteHead from '../components/layout/SiteHead.astro'
+import SiteFoot from '../components/layout/SiteFoot.astro'
+import SiteScrollbar from '../components/layout/SiteScrollbar.astro'
+import { siteMeta } from '../data/site'
+
+import '../styles/global.scss'
+
+const {
+  title,
+  description = siteMeta.subtitle,
+  canonical = Astro.url.pathname,
+  pageClass = '',
+} = Astro.props
+
+const canonicalHref = canonical.startsWith('http')
+  ? canonical
+  : new URL(canonical, `https://${siteMeta.domain}`).toString()
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalHref} />
+    <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <meta name="theme-color" content="#050505" />
+  </head>
+  <body class={pageClass}>
+    <slot name="before-shell" />
+    <SiteHead />
+    <SiteScrollbar />
+    <main class="site-main site-main--detail">
+      <slot />
+    </main>
+    <SiteFoot />
+  </body>
+</html>
+
+<script>
+  import { initSiteMotion } from '../lib/motion'
+  initSiteMotion()
+</script>

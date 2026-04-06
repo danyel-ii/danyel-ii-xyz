@@ -10,16 +10,16 @@ import {
   getVisibleCollection,
 } from '../../lib/content'
 
-const entries = sortByUpdatedDesc(await getVisibleCollection('blog'))
+const entries = sortByUpdatedDesc(await getVisibleCollection('notes'))
 ---
 
-<SiteLayout title={`Blog | ${siteMeta.domain}`} description="Blog posts from danyel-ii.xyz." canonical="/blog/">
+<SiteLayout title={`Notes | ${siteMeta.domain}`} description="Evergreen notes and references from danyel-ii.xyz." canonical="/notes/">
   <section class="section-shell content-index">
     <div class="section-shell__intro" data-reveal>
-      <SectionEyebrow label="BLOG.LOG // ALL POSTS" />
+      <SectionEyebrow label="NOTE.REG // REFERENCE LAYER" />
       <div class="section-shell__heading">
-        <h1>Blog posts and progress notes.</h1>
-        <p>Newest entries are listed first. Drafts stay visible locally and are excluded from production builds.</p>
+        <h1>Evergreen notes and reference material.</h1>
+        <p>These entries are sorted by recent revision so the most actively maintained material stays near the top.</p>
       </div>
     </div>
     <div class="knowledge-grid">

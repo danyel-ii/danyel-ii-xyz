@@ -5,7 +5,7 @@ import ContentDetail from '../../components/content/ContentDetail.astro'
 import { siteMeta } from '../../data/site'
 
 export async function getStaticPaths() {
-  const entries = await getCollection('blog', ({ data }) => !data.draft)
+  const entries = await getCollection('projects', ({ data }) => !data.draft)
   return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }))
 }
 
@@ -16,9 +16,13 @@ const { Content } = await render(entry)
 <SiteLayout
   title={`${entry.data.title} | ${siteMeta.domain}`}
   description={entry.data.summary}
-  canonical={`/blog/${entry.slug}/`}
+  canonical={`/projects/${entry.slug}/`}
 >
-  <ContentDetail entry={entry} kind="BLOG" tags={entry.data.tags}>
+  <ContentDetail entry={entry} kind="PROJECT" tags={entry.data.stack}>
+    <div slot="after-header" class="content-detail__linkset">
+      {entry.data.repoUrl && <a href={entry.data.repoUrl} target="_blank" rel="noreferrer">Repository</a>}
+      {entry.data.liveUrl && <a href={entry.data.liveUrl} target="_blank" rel="noreferrer">Live surface</a>}
+    </div>
     <Content />
   </ContentDetail>
 </SiteLayout>

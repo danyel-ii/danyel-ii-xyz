@@ -1,0 +1,143 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro'
+import SectionEyebrow from '../components/ui/SectionEyebrow.astro'
+import { siteMeta } from '../data/site'
+---
+
+<SiteLayout title={`Search | ${siteMeta.domain}`} description="Static search across notes, logs, projects, topics, blog posts, and research." canonical="/search/">
+  <section class="section-shell search-page">
+    <div class="section-shell__intro" data-reveal>
+      <SectionEyebrow label="FIND.SYS // PAGEFIND INDEX" />
+      <div class="section-shell__heading">
+        <h1>Search the site by title, topic, status, or collection.</h1>
+        <p>The search index is built statically at deploy time. Detail pages carry collection, topic, and status metadata into the Pagefind index.</p>
+      </div>
+    </div>
+
+    <div class="search-page__panel" data-reveal>
+      <div class="search-page__controls">
+        <label class="search-page__field">
+          <span>Query</span>
+          <input id="search-query" type="search" placeholder="Search notes, logs, projects, or writing…" />
+        </label>
+        <label class="search-page__field">
+          <span>Kind</span>
+          <select id="search-kind">
+            <option value="">All</option>
+            <option value="blog">Blog</option>
+            <option value="research">Research</option>
+            <option value="note">Note</option>
+            <option value="log">Log</option>
+            <option value="project">Project</option>
+            <option value="topic">Topic</option>
+          </select>
+        </label>
+        <label class="search-page__field">
+          <span>Status</span>
+          <select id="search-status">
+            <option value="">All</option>
+            <option value="seed">Seed</option>
+            <option value="active">Active</option>
+            <option value="stable">Stable</option>
+            <option value="archived">Archived</option>
+          </select>
+        </label>
+        <label class="search-page__field">
+          <span>Topic</span>
+          <select id="search-topic">
+            <option value="">All</option>
+          </select>
+        </label>
+      </div>
+
+      <p id="search-status-message" class="search-page__message">Search index will become available after the Pagefind build step runs.</p>
+      <div id="search-results" class="search-page__results"></div>
+    </div>
+  </section>
+</SiteLayout>
+
+<script is:inline>
+  const statusNode = document.getElementById('search-status-message');
+  const resultsNode = document.getElementById('search-results');
+  const queryNode = document.getElementById('search-query');
+  const kindNode = document.getElementById('search-kind');
+  const statusFilterNode = document.getElementById('search-status');
+  const topicNode = document.getElementById('search-topic');
+
+  const escapeHtml = (value) =>
+    value.replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character] ?? character));
+
+  const renderResults = (items) => {
+    if (!resultsNode) return;
+    if (!items.length) {
+      resultsNode.innerHTML = '<p class="search-page__empty">No matching entries.</p>';
+      return;
+    }
+
+    resultsNode.innerHTML = items.map((item) => `
+      <article class="search-result">
+        <div class="search-result__meta">
+          <span>${escapeHtml(item.meta.kind ?? 'entry')}</span>
+          <span>${escapeHtml(item.meta.status ?? '')}</span>
+          <span>${escapeHtml(item.meta.updated ?? '')}</span>
+        </div>
+        <h3><a href="${item.url}">${escapeHtml(item.meta.title ?? item.url)}</a></h3>
+        <p>${escapeHtml(item.meta.summary ?? item.excerpt ?? '')}</p>
+        <p class="search-result__topics">${escapeHtml(item.meta.topics ?? '')}</p>
+      </article>
+    `).join('');
+  };
+
+  const initSearch = async () => {
+    if (!(queryNode instanceof HTMLInputElement) || !(kindNode instanceof HTMLSelectElement) || !(statusFilterNode instanceof HTMLSelectElement) || !(topicNode instanceof HTMLSelectElement)) {
+      return;
+    }
+
+    try {
+      const pagefind = await import('/pagefind/pagefind.js');
+      const filters = await pagefind.filters();
+
+      const topics = Object.keys(filters?.topic ?? {}).sort((left, right) => left.localeCompare(right));
+      for (const topic of topics) {
+        const option = document.createElement('option');
+        option.value = topic;
+        option.textContent = topic;
+        topicNode.append(option);
+      }
+
+      statusNode.textContent = 'Index ready. Use filters to narrow the result set.';
+
+      const runSearch = async () => {
+        const term = queryNode.value.trim();
+        const filter = {};
+
+        if (kindNode.value) filter.kind = [kindNode.value];
+        if (statusFilterNode.value) filter.status = [statusFilterNode.value];
+        if (topicNode.value) filter.topic = [topicNode.value];
+
+        const search = await pagefind.search(term, { filters: filter });
+        const items = await Promise.all(search.results.slice(0, 24).map((result) => result.data()));
+        renderResults(items);
+        statusNode.textContent = `${search.results.length} result${search.results.length === 1 ? '' : 's'} found.`;
+      };
+
+      queryNode.addEventListener('input', runSearch);
+      kindNode.addEventListener('change', runSearch);
+      statusFilterNode.addEventListener('change', runSearch);
+      topicNode.addEventListener('change', runSearch);
+
+      await runSearch();
+    } catch (error) {
+      statusNode.textContent = 'Search assets are not available in dev until the Pagefind build has run.';
+      console.error(error);
+    }
+  };
+
+  initSearch();
+</script>

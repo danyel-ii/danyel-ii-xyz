@@ -1,0 +1,31 @@
+---
+import { formatIsoDate, formatStatus } from '../../lib/format'
+
+const {
+  kind,
+  status,
+  topics = [],
+  updated,
+  summary,
+} = Astro.props as {
+  kind: string
+  status: string
+  topics?: string[]
+  updated: Date
+  summary: string
+}
+---
+
+<div class="pagefind-meta" hidden aria-hidden="true">
+  <span data-pagefind-filter="kind">{kind}</span>
+  <span data-pagefind-filter="status">{status}</span>
+  <span data-pagefind-filter="updated">{formatIsoDate(updated)}</span>
+  <span data-pagefind-meta="kind">{kind}</span>
+  <span data-pagefind-meta="status">{formatStatus(status)}</span>
+  <span data-pagefind-meta="summary">{summary}</span>
+  <span data-pagefind-meta="topics">{topics.join(', ')}</span>
+  <time datetime={updated.toISOString()} data-pagefind-meta="updated" data-pagefind-sort="updated">
+    {formatIsoDate(updated)}
+  </time>
+  {topics.map((topic) => <span data-pagefind-filter="topic">{topic}</span>)}
+</div>

@@ -1,14 +1,19 @@
 ---
 title: "Packet Analysis Notes"
-description: "A short record of what becomes easier to see once packet captures are tied back to protocol structure."
-pubDate: 2026-03-26
-topic: "Networking"
+summary: "A short record of what becomes easier to see once packet captures are tied back to protocol structure."
+status: active
+topics:
+  - Networking
 tags:
   - Packets
   - DNS
   - HTTP
+created: 2026-03-26
+updated: 2026-03-26
 draft: false
 featured: false
+related:
+  - /notes/protocol-checklist/
 ---
 
 Packet analysis becomes more useful when it is tied to a specific question.

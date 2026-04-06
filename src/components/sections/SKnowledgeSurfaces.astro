@@ -1,0 +1,59 @@
+---
+import SectionEyebrow from '../ui/SectionEyebrow.astro'
+
+const surfaces = [
+  {
+    id: 'search',
+    label: 'Search',
+    href: '/search/',
+    summary: 'Query the full site index across writing, notes, logs, topics, and project records.',
+  },
+  {
+    id: 'topics',
+    label: 'Topics',
+    href: '/topics/',
+    summary: 'Browse curated subject hubs that aggregate entries from multiple collections.',
+  },
+  {
+    id: 'log',
+    label: 'Log',
+    href: '/log/',
+    summary: 'Review dated learning entries and quick-capture field notes in chronological order.',
+  },
+  {
+    id: 'notes',
+    label: 'Notes',
+    href: '/notes/',
+    summary: 'Access evergreen references and short explanatory notes that support active study.',
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    href: '/projects/',
+    summary: 'Inspect tools, deployment records, experiments, and implementation status in one place.',
+  },
+] as const
+---
+
+<section class="section-shell knowledge-surfaces" aria-labelledby="knowledge-surfaces-heading">
+  <div class="section-shell__intro" data-reveal>
+    <SectionEyebrow label="OPS.MAP // KNOWLEDGE SURFACES" />
+    <div class="section-shell__heading">
+      <h2 id="knowledge-surfaces-heading">Operate the site through durable content surfaces instead of one-off homepage blocks.</h2>
+      <p>
+        The homepage remains the entry point, but the long-term value now lives in searchable notes, topic hubs, logs, and project records that can be edited quickly.
+      </p>
+    </div>
+  </div>
+
+  <div class="knowledge-surfaces__grid">
+    {
+      surfaces.map((surface) => (
+        <a class="knowledge-surfaces__card" href={surface.href} data-reveal>
+          <span>{surface.label}</span>
+          <p>{surface.summary}</p>
+        </a>
+      ))
+    }
+  </div>
+</section>

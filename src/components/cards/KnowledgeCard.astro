@@ -1,0 +1,38 @@
+---
+import StatusPill from '../ui/StatusPill.astro'
+import { formatDate, formatStatus } from '../../lib/format'
+import { getTopicHref } from '../../lib/content'
+
+const {
+  href,
+  kind,
+  title,
+  summary,
+  updated,
+  status,
+  topics = [],
+} = Astro.props as {
+  href: string
+  kind: string
+  title: string
+  summary: string
+  updated: Date
+  status: string
+  topics?: string[]
+}
+---
+
+<article class="knowledge-card" data-reveal>
+  <div class="knowledge-card__meta">
+    <span>{kind}</span>
+    <StatusPill status={formatStatus(status)} />
+  </div>
+  <h3><a href={href}>{title}</a></h3>
+  <p class="knowledge-card__summary">{summary}</p>
+  <div class="knowledge-card__footer">
+    <time datetime={updated.toISOString()}>{formatDate(updated)}</time>
+    <ul class="knowledge-card__topics">
+      {topics.map((topic) => <li><a href={getTopicHref(topic)}>{topic}</a></li>)}
+    </ul>
+  </div>
+</article>

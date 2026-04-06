@@ -6,20 +6,20 @@ import { siteMeta } from '../../data/site'
 import {
   getCollectionLabel,
   getEntryHref,
-  sortByUpdatedDesc,
+  sortByCreatedDesc,
   getVisibleCollection,
 } from '../../lib/content'
 
-const entries = sortByUpdatedDesc(await getVisibleCollection('blog'))
+const entries = sortByCreatedDesc(await getVisibleCollection('logs'))
 ---
 
-<SiteLayout title={`Blog | ${siteMeta.domain}`} description="Blog posts from danyel-ii.xyz." canonical="/blog/">
+<SiteLayout title={`Log | ${siteMeta.domain}`} description="Chronological learning logs from danyel-ii.xyz." canonical="/log/">
   <section class="section-shell content-index">
     <div class="section-shell__intro" data-reveal>
-      <SectionEyebrow label="BLOG.LOG // ALL POSTS" />
+      <SectionEyebrow label="LOG.RUN // LEARNING JOURNAL" />
       <div class="section-shell__heading">
-        <h1>Blog posts and progress notes.</h1>
-        <p>Newest entries are listed first. Drafts stay visible locally and are excluded from production builds.</p>
+        <h1>Dated entries optimized for quick capture.</h1>
+        <p>The log is the fastest writing surface on the site. Newest entries stay first and the required structure stays intentionally small.</p>
       </div>
     </div>
     <div class="knowledge-grid">
@@ -30,7 +30,7 @@ const entries = sortByUpdatedDesc(await getVisibleCollection('blog'))
             kind={getCollectionLabel(entry.collection)}
             title={entry.data.title}
             summary={entry.data.summary}
-            updated={entry.data.updated}
+            updated={entry.data.created}
             status={entry.data.status}
             topics={entry.data.topics}
           />

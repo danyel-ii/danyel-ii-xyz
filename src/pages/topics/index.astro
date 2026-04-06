@@ -1,0 +1,43 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+import TopicCard from '../../components/cards/TopicCard.astro'
+import SectionEyebrow from '../../components/ui/SectionEyebrow.astro'
+import { siteMeta } from '../../data/site'
+import { getTopicContext, getVisibleCollection, sortTopics } from '../../lib/content'
+
+const topicEntries = sortTopics(await getVisibleCollection('topics'))
+const topicCards = await Promise.all(
+  topicEntries.map(async (entry) => {
+    const context = await getTopicContext(entry.slug)
+    return {
+      entry,
+      count: context.entries.length,
+    }
+  }),
+)
+---
+
+<SiteLayout title={`Topics | ${siteMeta.domain}`} description="Curated topic hubs aggregating notes, logs, projects, blog posts, and research." canonical="/topics/">
+  <section class="section-shell content-index">
+    <div class="section-shell__intro" data-reveal>
+      <SectionEyebrow label="TOPIC.MAP // CURATED HUBS" />
+      <div class="section-shell__heading">
+        <h1>Topic hubs collect related material across the site.</h1>
+        <p>Use topics when you want retrieval by subject rather than by publishing surface or date.</p>
+      </div>
+    </div>
+    <div class="topic-grid">
+      {
+        topicCards.map(({ entry, count }) => (
+          <TopicCard
+            href={`/topics/${entry.slug}/`}
+            title={entry.data.title}
+            summary={entry.data.summary}
+            status={entry.data.status}
+            count={count}
+          />
+        ))
+      }
+    </div>
+  </section>
+</SiteLayout>

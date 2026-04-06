@@ -1,14 +1,19 @@
 ---
 title: "Documenting the Path"
-description: "Why I am treating this site as a public logbook instead of a polished personal brand surface."
-pubDate: 2026-04-01
-topic: "Documentation"
+summary: "Why I am treating this site as a public logbook instead of a polished personal brand surface."
+status: active
+topics:
+  - Documentation
 tags:
   - Process
   - Notes
   - Learning
+created: 2026-04-01
+updated: 2026-04-01
 featured: true
 draft: false
+related:
+  - /topics/documentation/
 ---
 
 This site is meant to function as a working record.

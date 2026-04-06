@@ -1,17 +1,13 @@
 ---
-import { getCollection } from 'astro:content'
 import PostCard from '../cards/PostCard.astro'
 import SectionEyebrow from '../ui/SectionEyebrow.astro'
+import { getVisibleCollection } from '../../lib/content'
 
-const isDraftVisible = !import.meta.env.PROD
-
-const blogEntries = (await getCollection('blog'))
-  .filter((entry) => isDraftVisible || !entry.data.draft)
-const researchEntries = (await getCollection('research'))
-  .filter((entry) => isDraftVisible || !entry.data.draft)
+const blogEntries = await getVisibleCollection('blog')
+const researchEntries = await getVisibleCollection('research')
 
 const latestEntries = [...blogEntries, ...researchEntries]
-  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+  .sort((a, b) => b.data.updated.getTime() - a.data.updated.getTime())
   .slice(0, 4)
 ---
 

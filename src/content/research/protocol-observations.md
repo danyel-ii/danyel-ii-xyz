@@ -1,14 +1,20 @@
 ---
 title: "Protocol Observations"
-description: "Short-form notes on recurring protocol behaviors that are worth documenting for later comparison."
-pubDate: 2026-03-30
-topic: "Systems"
+summary: "Short-form notes on recurring protocol behaviors that are worth documenting for later comparison."
+status: active
+topics:
+  - Systems
+  - Networking
 tags:
   - Protocols
   - Notes
   - Analysis
+created: 2026-03-30
+updated: 2026-03-30
 draft: false
 featured: false
+related:
+  - /topics/systems/
 ---
 
 Protocols become easier to understand when they are treated as administrative systems rather than abstract diagrams.

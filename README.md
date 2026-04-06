@@ -2,11 +2,12 @@
 
 This repo is a non-commercial personal adaptation of [AntoineW/AW-2025-Portfolio](https://github.com/AntoineW/AW-2025-Portfolio), rebuilt as the first draft of `danyel-ii.xyz`.
 
-The current site is a clean, academic cyber-security homepage focused on:
+The current site is a calm public operating system for learning, built around:
 
 - learning tracks
 - apps, tools, and experiments
 - blog posts and research notes
+- notes, logs, projects, and topic hubs
 - GitHub and social links
 - an NFT archive / collected works section
 
@@ -19,8 +20,11 @@ The stack remains intentionally close to the original fork:
 
 ## Content Model
 
-- `src/data` contains structured section data such as apps, learning tracks, links, and archive items.
-- `src/content` contains longform writing for blog posts and research notes through Astro content collections.
+- `src/data` contains configuration and legacy homepage section data.
+- `src/content` contains the durable content layer.
+- Collections now include `blog`, `research`, `notes`, `logs`, `projects`, and `topics`.
+- `/search` is powered by Pagefind.
+- `/admin` is powered by Decap CMS with a local backend workflow.
 
 ## Run Locally
 
@@ -29,11 +33,22 @@ npm install
 npm run dev
 ```
 
+For local CMS authoring, run a second terminal:
+
+```bash
+npm run cms
+```
+
 Build for production:
 
 ```bash
 npm run build
 ```
+
+Additional docs:
+
+- `docs/content-ops.md`
+- `docs/admin-auth.md`
 
 ## Attribution
 

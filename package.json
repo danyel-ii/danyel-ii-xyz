@@ -5,9 +5,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "cms": "decap-server"
   },
   "dependencies": {
     "astro": "^5.7.13",
@@ -16,5 +17,9 @@
     "lenis": "^1.3.3",
     "modern-normalize": "^3.0.1",
     "sass": "^1.89.0"
+  },
+  "devDependencies": {
+    "decap-server": "^3.6.0",
+    "pagefind": "^1.5.0"
   }
 }

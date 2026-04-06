@@ -1,0 +1,28 @@
+---
+import StatusPill from '../ui/StatusPill.astro'
+import { formatStatus } from '../../lib/format'
+
+const {
+  href,
+  title,
+  summary,
+  status,
+  count,
+} = Astro.props as {
+  href: string
+  title: string
+  summary: string
+  status: string
+  count: number
+}
+---
+
+<article class="topic-card" data-reveal>
+  <div class="topic-card__meta">
+    <span>Topic Hub</span>
+    <StatusPill status={formatStatus(status)} />
+  </div>
+  <h3><a href={href}>{title}</a></h3>
+  <p>{summary}</p>
+  <div class="topic-card__count">{count} linked item{count === 1 ? '' : 's'}</div>
+</article>

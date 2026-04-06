@@ -1,0 +1,71 @@
+---
+import { render } from 'astro:content'
+import SiteLayout from '../../layouts/SiteLayout.astro'
+import KnowledgeCard from '../../components/cards/KnowledgeCard.astro'
+import SectionEyebrow from '../../components/ui/SectionEyebrow.astro'
+import PagefindMeta from '../../components/content/PagefindMeta.astro'
+import { siteMeta } from '../../data/site'
+import {
+  getAllTopicSlugs,
+  getCollectionLabel,
+  getEntryHref,
+  getTopicContext,
+} from '../../lib/content'
+
+export async function getStaticPaths() {
+  const slugs = await getAllTopicSlugs()
+  return slugs.map((slug) => ({ params: { slug } }))
+}
+
+const { slug } = Astro.params
+const context = await getTopicContext(slug ?? '')
+const renderedTopic = context.topicEntry ? await render(context.topicEntry) : null
+const TopicContent = renderedTopic?.Content
+---
+
+<SiteLayout
+  title={`${context.title} | ${siteMeta.domain}`}
+  description={context.summary}
+  canonical={`/topics/${context.topicSlug}/`}
+>
+  <section class="section-shell content-index">
+    <div data-pagefind-body>
+      <PagefindMeta
+        kind="topic"
+        status={context.topicEntry?.data.status ?? 'stable'}
+        topics={[context.title]}
+        updated={context.topicEntry?.data.updated ?? new Date()}
+        summary={context.summary}
+      />
+    </div>
+    <div class="section-shell__intro" data-reveal>
+      <SectionEyebrow label="TOPIC.HUB // AGGREGATED MATERIAL" />
+      <div class="section-shell__heading">
+        <h1>{context.title}</h1>
+        <p>{context.summary}</p>
+      </div>
+    </div>
+    {
+      TopicContent && (
+        <article class="content-detail__body prose content-topic-body" data-reveal>
+          <TopicContent />
+        </article>
+      )
+    }
+    <div class="knowledge-grid">
+      {
+        context.entries.map((entry) => (
+          <KnowledgeCard
+            href={getEntryHref(entry)}
+            kind={getCollectionLabel(entry.collection)}
+            title={entry.data.title}
+            summary={entry.data.summary}
+            updated={entry.data.updated}
+            status={entry.data.status}
+            topics={entry.data.topics}
+          />
+        ))
+      }
+    </div>
+  </section>
+</SiteLayout>

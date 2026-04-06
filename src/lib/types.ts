@@ -8,6 +8,8 @@ export type SiteMeta = {
   focus: string[]
 }
 
+export type ContentStatus = 'seed' | 'active' | 'stable' | 'archived'
+
 export type AppItem = {
   id: string
   title: string
@@ -55,10 +57,20 @@ export type NftItem = {
 
 export type ContentMeta = {
   title: string
-  description: string
-  pubDate: Date
-  topic: string
+  summary: string
+  created: Date
+  updated: Date
+  status: ContentStatus
+  topics: string[]
   tags: string[]
   draft?: boolean
   featured?: boolean
+  related?: string[]
+}
+
+export type KnowledgeSurfaceLink = {
+  id: string
+  label: string
+  href: string
+  summary: string
 }

@@ -1,0 +1,145 @@
+backend:
+  name: github
+  repo: danyel-ii/danyel-ii-xyz
+  branch: main
+  use_graphql: true
+
+local_backend: true
+publish_mode: simple
+site_url: https://danyel-ii.xyz
+display_url: https://danyel-ii.xyz
+logo:
+  src: /icons/favicon.svg
+  show_in_header: true
+media_folder: public/uploads
+public_folder: /uploads
+search: true
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: notes
+    label: Notes
+    label_singular: Note
+    folder: src/content/notes
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: ["updated", "title", "status", "commit_date"]
+    view_filters:
+      - label: Active
+        field: status
+        pattern: active
+    fields: &base_fields
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: text }
+      - { label: Status, name: status, widget: select, default: seed, options: [seed, active, stable, archived] }
+      - { label: Topics, name: topics, widget: list, required: false }
+      - { label: Created, name: created, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Updated, name: updated, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Draft, name: draft, widget: boolean, default: false, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false, required: false }
+      - { label: Related Links, name: related, widget: list, required: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: logs
+    label: Logs
+    label_singular: Log
+    folder: src/content/logs
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    summary: "{{created}} — {{title}}"
+    sortable_fields: ["created", "updated", "title", "status", "commit_date"]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: text, hint: "Keep this short so logs remain quick to capture." }
+      - { label: Status, name: status, widget: select, default: active, options: [seed, active, stable, archived], required: false }
+      - { label: Topics, name: topics, widget: list, required: false }
+      - { label: Created, name: created, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Updated, name: updated, widget: datetime, date_format: YYYY-MM-DD, time_format: false, required: false }
+      - { label: Draft, name: draft, widget: boolean, default: false, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false, required: false }
+      - { label: Related Links, name: related, widget: list, required: false }
+      - { label: Tags, name: tags, widget: list, required: false }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: projects
+    label: Projects
+    label_singular: Project
+    folder: src/content/projects
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: ["updated", "title", "status", "commit_date"]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: text }
+      - { label: Status, name: status, widget: select, default: seed, options: [seed, active, stable, archived] }
+      - { label: Topics, name: topics, widget: list, required: false }
+      - { label: Created, name: created, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Updated, name: updated, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Draft, name: draft, widget: boolean, default: false, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false, required: false }
+      - { label: Related Links, name: related, widget: list, required: false }
+      - { label: Stack, name: stack, widget: list, required: false }
+      - { label: Repository URL, name: repoUrl, widget: string, required: false }
+      - { label: Live URL, name: liveUrl, widget: string, required: false }
+      - { label: Cover Image, name: cover, widget: image, required: false }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: topics
+    label: Topics
+    label_singular: Topic
+    folder: src/content/topics
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: ["order", "updated", "title"]
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: text }
+      - { label: Status, name: status, widget: select, default: stable, options: [seed, active, stable, archived] }
+      - { label: Created, name: created, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Updated, name: updated, widget: datetime, date_format: YYYY-MM-DD, time_format: false }
+      - { label: Draft, name: draft, widget: boolean, default: false, required: false }
+      - { label: Featured, name: featured, widget: boolean, default: false, required: false }
+      - { label: Related Links, name: related, widget: list, required: false }
+      - { label: Aliases, name: aliases, widget: list, required: false }
+      - { label: Order, name: order, widget: number, required: false, value_type: int }
+      - { label: Body, name: body, widget: markdown, required: false }
+
+  - name: blog
+    label: Blog
+    label_singular: Blog Post
+    folder: src/content/blog
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: ["updated", "title", "status", "commit_date"]
+    fields: *base_fields
+
+  - name: research
+    label: Research
+    label_singular: Research Note
+    folder: src/content/research
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{slug}}"
+    summary: "{{title}}"
+    sortable_fields: ["updated", "title", "status", "commit_date"]
+    fields: *base_fields
