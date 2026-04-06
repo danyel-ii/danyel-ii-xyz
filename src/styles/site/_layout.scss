@@ -56,6 +56,8 @@ video {
   transform: rotate(32deg);
   transform-origin: center;
   pointer-events: none;
+  animation: construction-wave-top 7.2s ease-in-out infinite;
+  will-change: transform;
 
   span {
     font-family: var(--mono-font);
@@ -83,6 +85,7 @@ video {
     padding: 12px 28px;
     transform: rotate(-2.75deg);
     opacity: 0.98;
+    animation-name: construction-wave-bottom;
   }
 
   @include mq(phone) {
@@ -104,6 +107,50 @@ video {
     span {
       font-size: 0.64rem;
     }
+  }
+}
+
+@keyframes construction-wave-top {
+  0%,
+  100% {
+    transform: rotate(32deg) translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: rotate(31.2deg) translate3d(-2px, 1px, 0);
+  }
+
+  50% {
+    transform: rotate(32.7deg) translate3d(1px, -1px, 0);
+  }
+
+  75% {
+    transform: rotate(31.7deg) translate3d(-1px, 1px, 0);
+  }
+}
+
+@keyframes construction-wave-bottom {
+  0%,
+  100% {
+    transform: rotate(-2.75deg) translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: rotate(-2.1deg) translate3d(2px, -1px, 0);
+  }
+
+  50% {
+    transform: rotate(-3.35deg) translate3d(-1px, 1px, 0);
+  }
+
+  75% {
+    transform: rotate(-2.45deg) translate3d(1px, -1px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .construction-ribbon {
+    animation: none;
   }
 }
 

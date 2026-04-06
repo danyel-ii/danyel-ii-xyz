@@ -247,7 +247,7 @@
 .app-card {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: rgba(21, 31, 43, 0.88);
+  background: var(--panel-bg);
 }
 
 .hero-section__panel {
@@ -278,7 +278,7 @@
   background:
     linear-gradient(var(--line), var(--line)) 0 27% / 100% 1px no-repeat,
     linear-gradient(90deg, var(--line), var(--line)) 58% 0 / 1px 100% no-repeat,
-    rgba(15, 23, 33, 0.92);
+    var(--panel-alt-bg);
 }
 
 .protocol-waves {
