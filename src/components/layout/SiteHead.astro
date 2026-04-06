@@ -16,6 +16,9 @@ import { siteMeta } from '../../data/site'
   </nav>
 
   <div class="site-head__utilities">
+    <button class="site-head__theme js-banner-toggle" type="button" aria-label="Toggle construction banners">
+      Banners
+    </button>
     <button class="site-head__theme js-contrast-toggle" type="button" aria-label="Toggle contrast">
       Contrast
     </button>
@@ -25,6 +28,27 @@ import { siteMeta } from '../../data/site'
 </header>
 
 <script>
+  const initBannerToggle = () => {
+    const button = document.querySelector('.js-banner-toggle')
+    if (!(button instanceof HTMLButtonElement) || button.dataset.ready === 'true') return
+
+    const root = document.documentElement
+    const storageKey = 'danyel-ii-banners'
+
+    const applyState = (state) => {
+      root.classList.toggle('construction-hidden', state === 'hidden')
+    }
+
+    applyState(localStorage.getItem(storageKey) ?? 'visible')
+    button.dataset.ready = 'true'
+
+    button.addEventListener('click', () => {
+      const next = root.classList.contains('construction-hidden') ? 'visible' : 'hidden'
+      applyState(next)
+      localStorage.setItem(storageKey, next)
+    })
+  }
+
   const initContrastToggle = () => {
     const button = document.querySelector('.js-contrast-toggle')
     if (!(button instanceof HTMLButtonElement) || button.dataset.ready === 'true') return
@@ -47,8 +71,12 @@ import { siteMeta } from '../../data/site'
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initContrastToggle, { once: true })
+    document.addEventListener('DOMContentLoaded', () => {
+      initBannerToggle()
+      initContrastToggle()
+    }, { once: true })
   } else {
+    initBannerToggle()
     initContrastToggle()
   }
 </script>

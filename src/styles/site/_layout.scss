@@ -38,13 +38,10 @@ video {
 
 .construction-ribbon {
   position: fixed;
-  top: 54px;
-  right: -88px;
   z-index: 40;
   display: flex;
   align-items: center;
   gap: 22px;
-  min-width: 420px;
   padding: 10px 26px;
   border-top: 2px solid rgba(0, 0, 0, 0.78);
   border-bottom: 2px solid rgba(0, 0, 0, 0.78);
@@ -71,15 +68,48 @@ video {
     padding: 2px 6px;
   }
 
+  &--top {
+    top: 54px;
+    right: -88px;
+    min-width: 420px;
+  }
+
+  &--bottom {
+    left: -4%;
+    right: -4%;
+    bottom: 22px;
+    justify-content: center;
+    gap: 28px;
+    padding: 12px 28px;
+    transform: rotate(-2.75deg);
+    opacity: 0.98;
+  }
+
   @include mq(phone) {
-    top: 68px;
-    right: -132px;
-    min-width: 360px;
-    padding: 8px 20px;
+    &--top {
+      top: 68px;
+      right: -132px;
+      min-width: 360px;
+      padding: 8px 20px;
+    }
+
+    &--bottom {
+      left: -8%;
+      right: -8%;
+      bottom: 14px;
+      gap: 18px;
+      padding: 9px 18px;
+    }
 
     span {
       font-size: 0.64rem;
     }
+  }
+}
+
+.construction-hidden {
+  .construction-ribbon {
+    display: none;
   }
 }
 
