@@ -26,8 +26,13 @@ const canonicalHref = canonical.startsWith('http')
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalHref} />
+    <link rel="manifest" href="/icons/site.webmanifest" />
     <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Danyel II" />
     <meta name="theme-color" content="#050505" />
   </head>
   <body class={pageClass}>
@@ -44,4 +49,12 @@ const canonicalHref = canonical.startsWith('http')
 <script>
   import { initSiteMotion } from '../lib/motion'
   initSiteMotion()
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((error) => {
+        console.error('Service worker registration failed', error)
+      })
+    })
+  }
 </script>
