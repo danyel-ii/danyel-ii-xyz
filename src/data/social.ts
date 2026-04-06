@@ -10,8 +10,8 @@ export const socialLinks: SocialLink[] = [
   {
     id: 'twitter',
     label: 'X / Twitter',
-    href: 'https://x.com/danyel_ii',
-    value: '@danyel_ii',
+    href: 'https://x.com/3141007R',
+    value: '@3141007R',
   },
   {
     id: 'warpcast',
@@ -22,8 +22,14 @@ export const socialLinks: SocialLink[] = [
   {
     id: 'email',
     label: 'Email',
-    href: 'mailto:initialize@danyel-ii.xyz',
-    value: 'initialize@danyel-ii.xyz',
+    href: 'mailto:danyel-ii@proton.me',
+    value: 'danyel-ii@proton.me',
+  },
+  {
+    id: 'matrix',
+    label: 'Matrix / FluffyChat',
+    href: 'https://matrix.to/#/%40danyel-ii%3Amatrix.org',
+    value: '@danyel-ii:matrix.org',
   },
   {
     id: 'rss',
