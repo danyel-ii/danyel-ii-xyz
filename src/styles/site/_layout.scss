@@ -39,10 +39,7 @@ video {
 .construction-ribbon {
   position: fixed;
   z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  padding: 10px 26px;
+  padding: 10px 18px;
   border-top: 2px solid rgba(0, 0, 0, 0.78);
   border-bottom: 2px solid rgba(0, 0, 0, 0.78);
   background:
@@ -59,33 +56,99 @@ video {
   animation: construction-wave-top 7.2s ease-in-out infinite;
   will-change: transform;
 
-  span {
-    font-family: var(--mono-font);
-    font-size: 0.76rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #111114;
-    background: rgba(246, 216, 96, 0.94);
-    padding: 2px 6px;
-  }
-
   &--top {
     top: 54px;
     right: -88px;
-    min-width: 420px;
+    min-width: 456px;
   }
 
   &--bottom {
     left: -4%;
     right: -4%;
     bottom: 22px;
-    justify-content: center;
-    gap: 28px;
-    padding: 12px 28px;
+    padding: 8px 18px;
     transform: rotate(-2.75deg);
     opacity: 0.98;
     animation-name: construction-wave-bottom;
+  }
+
+  &__plate {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 88px;
+    padding: 0.75rem;
+    background: rgba(246, 216, 96, 0.34);
+    border: 1px solid rgba(17, 17, 20, 0.62);
+    box-shadow: inset 0 0 0 1px rgba(246, 216, 96, 0.32);
+  }
+
+  &__copy {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  &__tag {
+    display: inline-block;
+    width: fit-content;
+    padding: 3px 7px;
+    background: rgba(246, 216, 96, 0.96);
+    color: #111114;
+    font-family: var(--mono-font);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  &__track,
+  &__rail {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  &__track span,
+  &__rail span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 3px 8px 2px;
+    background: rgba(246, 216, 96, 0.96);
+    color: #111114;
+    font-family: var(--mono-font);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  &__qr {
+    position: relative;
+    flex: 0 0 auto;
+    display: block;
+    padding: 0.5rem;
+    border: 1px solid rgba(17, 17, 20, 0.62);
+    background:
+      linear-gradient(
+        180deg,
+        transparent,
+        transparent 58%,
+        rgba(17, 17, 20, 0.88) 58%,
+        rgba(17, 17, 20, 0.88)
+      )
+      top / 100% 16% repeat;
+    pointer-events: auto;
+
+    img {
+      display: block;
+      width: 64px;
+      height: 64px;
+      background: #f8f2e7;
+    }
   }
 
   @include mq(phone) {
@@ -93,19 +156,36 @@ video {
       top: 68px;
       right: -132px;
       min-width: 360px;
-      padding: 8px 20px;
+      padding: 8px 14px;
     }
 
     &--bottom {
       left: -8%;
       right: -8%;
       bottom: 14px;
-      gap: 18px;
-      padding: 9px 18px;
+      padding: 8px 12px;
     }
 
-    span {
-      font-size: 0.64rem;
+    &__plate {
+      min-height: 72px;
+      gap: 8px;
+      padding: 0.5rem;
+    }
+
+    &__tag {
+      font-size: 0.5rem;
+    }
+
+    &__track span,
+    &__rail span {
+      font-size: 0.58rem;
+      min-height: 20px;
+      padding: 2px 6px;
+    }
+
+    &__qr img {
+      width: 48px;
+      height: 48px;
     }
   }
 }

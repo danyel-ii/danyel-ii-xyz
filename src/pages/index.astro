@@ -29,16 +29,36 @@ import '../styles/global.scss'
   </head>
   <body>
     <div class="construction-ribbon construction-ribbon--top" aria-label="Under construction notice">
-      <span>UNDER CONSTRUCTION</span>
-      <span>UNDER CONSTRUCTION</span>
-      <span>UNDER CONSTRUCTION</span>
+      <div class="construction-ribbon__plate">
+        <div class="construction-ribbon__copy">
+          <span class="construction-ribbon__tag">PROTO // SITE STATE</span>
+          <div class="construction-ribbon__track">
+            <span>UNDER CONSTRUCTION</span>
+            <span>UNDER CONSTRUCTION</span>
+          </div>
+        </div>
+        <a
+          class="construction-ribbon__qr"
+          href="https://danyel-ii.xyz"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Open danyel-ii.xyz"
+        >
+          <img src="/images/danyel-ii-qr.svg" alt="QR code linking to danyel-ii.xyz" width="72" height="72" />
+        </a>
+      </div>
     </div>
     <div class="construction-ribbon construction-ribbon--bottom" aria-hidden="true">
-      <span>UNDER CONSTRUCTION</span>
-      <span>SITE IN PROGRESS</span>
-      <span>UNDER CONSTRUCTION</span>
-      <span>SITE IN PROGRESS</span>
-      <span>UNDER CONSTRUCTION</span>
+      <div class="construction-ribbon__plate">
+        <div class="construction-ribbon__rail">
+          <span>UNDER CONSTRUCTION</span>
+          <span>SITE IN PROGRESS</span>
+          <span>UNDER CONSTRUCTION</span>
+          <span>SITE IN PROGRESS</span>
+          <span>UNDER CONSTRUCTION</span>
+          <span>PROTOCOL 002-B</span>
+        </div>
+      </div>
     </div>
     <SiteHead />
     <SiteScrollbar />
