@@ -61,6 +61,15 @@ export const apps: AppItem[] = [
     repoUrl: 'https://github.com/danyel-ii/hash-playground', // TODO: replace with real repository
   },
   {
+    id: 'cyber-research-wiki',
+    title: 'Cyber Research Wiki',
+    kind: 'tool',
+    status: 'LIVE',
+    excerpt: 'A public notes surface for cyber-security study topics, quick references, and linked research paths.',
+    tags: ['Wiki', 'Notes', 'Research', 'Reference'],
+    liveUrl: 'https://danyel-ii.github.io/cyber-research-wiki/',
+  },
+  {
     id: 'lab-journal-cli',
     title: 'Lab Journal CLI',
     kind: 'script',
