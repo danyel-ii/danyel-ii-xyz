@@ -7,6 +7,13 @@ import { siteMeta } from '../../data/site'
     <a href="#hero">{siteMeta.domain}</a>
   </div>
 
+  <div class="site-head__console" aria-hidden="true">
+    <div class="site-head__console-inner">
+      <span>SYS.CONSOLE // PUBLIC NODE</span>
+      <span>OPEN FOR STUDY GROUPS AND RESEARCH DIALOGUE</span>
+    </div>
+  </div>
+
   <nav class="site-head__nav" aria-label="Primary">
     <a href="#learning">Learning</a>
     <a href="#apps">Apps</a>
@@ -25,6 +32,16 @@ import { siteMeta } from '../../data/site'
     <span class="status-pill status-pill--accent">{siteMeta.status}</span>
     <span class="site-head__domain">{siteMeta.domain}</span>
   </div>
+
+  <a
+    class="site-head__qr"
+    href="https://danyel-ii.xyz"
+    target="_blank"
+    rel="noreferrer"
+    aria-label="Open danyel-ii.xyz"
+  >
+    <img src="/images/danyel-ii-qr.svg" alt="QR code linking to danyel-ii.xyz" width="72" height="72" />
+  </a>
 </header>
 
 <script>

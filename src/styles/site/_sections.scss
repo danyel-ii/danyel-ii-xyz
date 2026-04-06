@@ -5,15 +5,24 @@
   top: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(180px, 0.8fr) 1fr auto auto;
   align-items: center;
-  gap: 24px;
-  padding: 20px 0;
+  gap: 0;
+  min-height: 96px;
+  border-bottom: 1px solid var(--line);
   backdrop-filter: blur(10px);
   background: linear-gradient(to bottom, rgba(11, 17, 23, 0.88), rgba(11, 17, 23, 0.45), transparent);
 
+  @include mq(tablet) {
+    grid-template-columns: auto 1fr auto;
+  }
+
   @include mq(tablet-sm) {
     grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 10px;
+    padding: 14px 0 18px;
+    border-bottom: 0;
   }
 }
 
@@ -46,15 +55,65 @@
   font-size: 0.8rem;
 }
 
+.site-head__brand,
+.site-head__console,
+.site-head__nav,
+.site-head__utilities,
+.site-head__qr {
+  min-height: 96px;
+  border-left: 1px solid var(--line);
+
+  @include mq(tablet-sm) {
+    min-height: auto;
+    border-left: 0;
+  }
+}
+
+.site-head__brand {
+  display: flex;
+  align-items: center;
+  padding: 0 18px 0 0;
+  border-left: 0;
+}
+
+.site-head__console {
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+
+  @include mq(tablet) {
+    display: none;
+  }
+}
+
+.site-head__console-inner {
+  display: grid;
+  gap: 4px;
+  max-width: 24ch;
+  white-space: pre-line;
+  font-family: var(--mono-font);
+  font-size: 0.58rem;
+  line-height: 1.45;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
 .site-head__nav {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
   gap: 18px;
+  min-width: 0;
+  padding: 0 18px;
 
   a {
     color: var(--text);
     font-size: 0.78rem;
+  }
+
+  @include mq(tablet) {
+    justify-content: flex-start;
   }
 }
 
@@ -64,6 +123,7 @@
   justify-content: flex-end;
   gap: 12px;
   flex-wrap: wrap;
+  padding: 0 18px;
 }
 
 .site-head__theme {
@@ -77,6 +137,43 @@
   color: var(--text);
   border-radius: var(--radius-sm);
   cursor: pointer;
+}
+
+.site-head__qr {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+
+  img {
+    display: block;
+    width: 58px;
+    height: 58px;
+    background: color-mix(in srgb, var(--panel-bg) 10%, var(--text-strong) 90%);
+    border: 1px solid var(--line);
+    padding: 6px;
+  }
+
+  &:before {
+    position: absolute;
+    inset: 12px;
+    background:
+      linear-gradient(
+        180deg,
+        transparent,
+        transparent 58%,
+        var(--line-strong) 58%,
+        var(--line-strong)
+      )
+      top / 100% 16% repeat;
+    opacity: 0.65;
+    content: '';
+  }
+
+  @include mq(tablet) {
+    display: none;
+  }
 }
 
 .site-scrollbar {
