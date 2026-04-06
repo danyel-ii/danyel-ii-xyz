@@ -292,7 +292,7 @@
 
 .protocol-waves__path {
   fill: none;
-  stroke: rgba(121, 198, 216, 0.16);
+  stroke: var(--wave-line);
   stroke-width: 1;
 }
 

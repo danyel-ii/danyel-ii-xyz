@@ -16,6 +16,7 @@
   --yellow: #f6d860;
   --green: #8fbf8f;
   --focus: #f6d860;
+  --wave-line: rgba(121, 198, 216, 0.16);
   --radius-sm: 4px;
   --radius-md: 8px;
   --site-width: min(1240px, calc(100vw - 48px));
@@ -44,5 +45,6 @@
   --yellow: #b98939;
   --green: #6f8f67;
   --focus: #b98939;
+  --wave-line: rgba(53, 42, 33, 0.3);
   color-scheme: light;
 }
