@@ -88,7 +88,7 @@ const sendConfirmationEmail = async (name: string, email: string) => {
         '',
         `Questions? Reply to ${supportEmail}.`,
         '',
-        'Daniel Hawes',
+        'danyel-ii.eth',
       ].join('\n'),
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #171320;">
@@ -97,7 +97,7 @@ const sendConfirmationEmail = async (name: string, email: string) => {
           <p>We will email you when early Android access opens.</p>
           <p style="color: #5f586a;">Ono Sideboard is for reflection and creative journaling. It is not medical, legal, financial, or mental-health advice.</p>
           <p>Questions? Reply to <a href="mailto:${supportEmail}">${supportEmail}</a>.</p>
-          <p>Daniel Hawes</p>
+          <p>danyel-ii.eth</p>
         </div>
       `,
     }),
