@@ -145,17 +145,20 @@ const email = socialLinks.find((link) => link.id === 'email')
 
   .public-home__identity {
     display: grid;
-    gap: 14px;
+    gap: 16px;
   }
 
   .public-home h1 {
     margin: 0;
-    color: var(--text);
+    color: #ffffff;
     font-family: var(--display-font);
-    font-size: clamp(4rem, 18vw, 9rem);
-    font-weight: 400;
-    letter-spacing: -0.03em;
-    line-height: 0.86;
+    font-size: clamp(4.2rem, 17vw, 9rem);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 0.9;
+    text-shadow:
+      0 0 22px rgba(246, 216, 96, 0.18),
+      0 10px 42px rgba(0, 0, 0, 0.64);
   }
 
   .public-home__email {
@@ -208,19 +211,47 @@ const email = socialLinks.find((link) => link.id === 'email')
   @media (max-width: 680px) {
     .public-home {
       align-items: center;
-      padding: 78px 14px;
+      padding: 76px 14px 82px;
     }
 
     .public-home__panel {
-      gap: 30px;
+      gap: 28px;
+    }
+
+    .public-home__identity {
+      gap: 12px;
+    }
+
+    .public-home h1 {
+      max-width: 100%;
+      font-size: clamp(4.1rem, 20vw, 5.7rem);
+      line-height: 0.92;
+    }
+
+    .public-home__email {
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      font-size: 1rem;
     }
 
     .public-home__links {
       grid-template-columns: 1fr;
+      gap: 8px;
     }
 
     .public-home__links a {
-      min-height: 78px;
+      min-height: 72px;
+      padding: 14px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .public-home {
+      padding-inline: 12px;
+    }
+
+    .public-home h1 {
+      font-size: clamp(3.65rem, 19vw, 4.7rem);
     }
   }
 </style>

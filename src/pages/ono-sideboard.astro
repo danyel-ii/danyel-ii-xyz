@@ -44,7 +44,7 @@ const deckPreviews = [
   },
 ]
 
-const initialDeckPreview = deckPreviews[0]
+const initialDeckPreviews = deckPreviews.slice(0, 3)
 
 const features = [
   ['Read', 'Daily cards and spreads.'],
@@ -152,20 +152,24 @@ const appSchema = {
           <div class="section-intro">
             <p class="eyebrow">Deck rotation</p>
             <h2 id="decks-title">A different deck on each refresh.</h2>
-            <p class="deck-section__note" data-deck-note>Showing a preview from {initialDeckPreview.title}.</p>
+            <p class="deck-section__note" data-deck-note>
+              Showing previews from {initialDeckPreviews.map((deck) => deck.title).join(', ')}.
+            </p>
           </div>
-          <div class="deck-strip deck-strip--single" data-random-deck>
-            <figure class="deck-card deck-card--featured">
-              <img
-                src={initialDeckPreview.src}
-                alt={initialDeckPreview.alt}
-                width="371"
-                height="620"
-                loading="lazy"
-                decoding="async"
-              />
-              <figcaption>{initialDeckPreview.title}</figcaption>
-            </figure>
+          <div class="deck-strip deck-strip--sample" data-random-decks>
+            {initialDeckPreviews.map((deck) => (
+              <figure class="deck-card">
+                <img
+                  src={deck.src}
+                  alt={deck.alt}
+                  width="371"
+                  height="620"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>{deck.title}</figcaption>
+              </figure>
+            ))}
           </div>
         </section>
 
@@ -194,34 +198,46 @@ const appSchema = {
     <script type="application/json" id="ono-deck-pool" set:html={JSON.stringify(deckPreviews)} />
     <script>
       const deckPoolElement = document.querySelector('#ono-deck-pool')
-      const deckStage = document.querySelector('[data-random-deck]')
+      const deckStage = document.querySelector('[data-random-decks]')
       const deckNote = document.querySelector('[data-deck-note]')
       const form = document.querySelector('.whitelist-form')
 
       if (deckPoolElement && deckStage instanceof HTMLElement) {
         try {
           const decks = JSON.parse(deckPoolElement.textContent || '[]')
-          const storageKey = 'ono-sideboard-last-preview-deck'
-          const lastDeckId = window.localStorage?.getItem(storageKey)
-          const candidates = decks.filter((deck) => deck.deckId !== lastDeckId)
-          const previewPool = candidates.length ? candidates : decks
-          const selectedDeck = previewPool[Math.floor(Math.random() * previewPool.length)]
-          const image = deckStage.querySelector('img')
-          const caption = deckStage.querySelector('figcaption')
+          const storageKey = 'ono-sideboard-last-preview-decks'
+          const parsedDeckIds = JSON.parse(window.localStorage?.getItem(storageKey) || '[]')
+          const lastDeckIds = Array.isArray(parsedDeckIds) ? parsedDeckIds : []
+          const shuffledDecks = [...decks]
 
-          if (selectedDeck && image instanceof HTMLImageElement && caption) {
-            image.src = selectedDeck.src
-            image.alt = selectedDeck.alt
-            caption.textContent = selectedDeck.title
-
-            if (deckNote) {
-              deckNote.textContent = `Showing a preview from ${selectedDeck.title}.`
-            }
-
-            window.localStorage?.setItem(storageKey, selectedDeck.deckId)
+          for (let index = shuffledDecks.length - 1; index > 0; index -= 1) {
+            const swapIndex = Math.floor(Math.random() * (index + 1))
+            ;[shuffledDecks[index], shuffledDecks[swapIndex]] = [shuffledDecks[swapIndex], shuffledDecks[index]]
           }
+
+          const freshDecks = shuffledDecks.filter((deck) => !lastDeckIds.includes(deck.deckId))
+          const selectedDecks = [...freshDecks, ...shuffledDecks.filter((deck) => lastDeckIds.includes(deck.deckId))].slice(0, 3)
+          const slots = Array.from(deckStage.querySelectorAll('.deck-card'))
+
+          slots.forEach((slot, index) => {
+            const deck = selectedDecks[index]
+            const image = slot.querySelector('img')
+            const caption = slot.querySelector('figcaption')
+
+            if (!deck || !(image instanceof HTMLImageElement) || !caption) return
+
+            image.src = deck.src
+            image.alt = deck.alt
+            caption.textContent = deck.title
+          })
+
+          if (selectedDecks.length && deckNote) {
+            deckNote.textContent = `Showing previews from ${selectedDecks.map((deck) => deck.title).join(', ')}.`
+          }
+
+          window.localStorage?.setItem(storageKey, JSON.stringify(selectedDecks.map((deck) => deck.deckId)))
         } catch {
-          // Keep the server-rendered fallback deck if the pool cannot be parsed.
+          // Keep the server-rendered fallback decks if the pool cannot be parsed.
         }
       }
 
@@ -620,8 +636,8 @@ const appSchema = {
     align-items: end;
   }
 
-  .deck-strip--single {
-    grid-template-columns: minmax(220px, 340px);
+  .deck-strip--sample {
+    grid-template-columns: repeat(3, minmax(0, 260px));
     justify-content: center;
   }
 
@@ -643,8 +659,8 @@ const appSchema = {
     transform: translateY(28px);
   }
 
-  .deck-strip--single .deck-card {
-    transform: none;
+  .deck-strip--sample .deck-card:nth-child(2) {
+    transform: translateY(24px);
   }
 
   .deck-card figcaption {
@@ -849,16 +865,6 @@ const appSchema = {
       scrollbar-width: none;
     }
 
-    .deck-strip--single {
-      display: grid;
-      width: 100%;
-      margin: 0;
-      padding: 2px 0 0;
-      grid-template-columns: minmax(0, 255px);
-      justify-content: center;
-      overflow: visible;
-    }
-
     .deck-strip::-webkit-scrollbar {
       display: none;
     }
@@ -867,11 +873,6 @@ const appSchema = {
       flex: 0 0 46%;
       min-width: 148px;
       scroll-snap-align: start;
-    }
-
-    .deck-card--featured {
-      flex: none;
-      min-width: 0;
     }
 
     .deck-card:nth-child(2),
