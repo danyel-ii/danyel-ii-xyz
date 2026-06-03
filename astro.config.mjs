@@ -1,4 +1,5 @@
 import { defineConfig } from 'astro/config';
+import vercel from '@astrojs/vercel';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 
@@ -8,6 +9,8 @@ const __dirname = dirname(__filename);
 // https://astro.build/config
 export default defineConfig({
   site: 'https://danyel-ii.xyz',
+  output: 'server',
+  adapter: vercel(),
 
   scopedStyleStrategy: 'class',
 

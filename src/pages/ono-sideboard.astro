@@ -1,9 +1,9 @@
 ---
-const waitlistEndpoint = import.meta.env.PUBLIC_WAITLIST_ENDPOINT ?? import.meta.env.VITE_WAITLIST_ENDPOINT ?? ''
+export const prerender = true
+const waitlistEndpoint = '/api/waitlist'
 const pageUrl = 'https://danyel-ii.xyz/ono-sideboard'
 const supportBase = 'https://tarot.danyel-ii.xyz'
 const supportEmail = 'support@danyel-ii.xyz'
-const mailtoHref = `mailto:${supportEmail}?subject=Ono%20Sideboard%20whitelist`
 
 const legalLinks = [
   { label: 'Privacy', href: `${supportBase}/privacy` },
@@ -135,16 +135,23 @@ const appSchema = {
             </p>
           </div>
 
-          <form class="whitelist-form" data-endpoint={waitlistEndpoint} data-mailto={mailtoHref} novalidate>
+          <form class="whitelist-form" data-endpoint={waitlistEndpoint} novalidate>
+            <label>
+              <span>Name</span>
+              <input name="name" type="text" autocomplete="name" placeholder="Your name" required />
+            </label>
             <label>
               <span>Email address</span>
               <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
             </label>
+            <label class="whitelist-form__trap" aria-hidden="true">
+              <span>Website</span>
+              <input name="website" type="text" tabindex="-1" autocomplete="off" />
+            </label>
             <button class="button" type="submit">Join the whitelist</button>
             <p class="whitelist-form__message" role="status" aria-live="polite">
-              No whitelist endpoint is configured yet. Submitting will open an email to support.
+              We will store your name and email only for Ono Sideboard launch updates.
             </p>
-            <!-- TODO: Wire this form to a production whitelist endpoint when email compliance and deletion workflow are ready. -->
           </form>
         </section>
 
@@ -245,15 +252,21 @@ const appSchema = {
         const message = form.querySelector('.whitelist-form__message')
         const button = form.querySelector('button[type="submit"]')
         const endpoint = form.dataset.endpoint || ''
-        const mailto = form.dataset.mailto || 'mailto:support@danyel-ii.xyz'
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
         form.addEventListener('submit', async (event) => {
           event.preventDefault()
           const formData = new FormData(form)
+          const name = String(formData.get('name') || '').trim().replace(/\s+/g, ' ')
           const email = String(formData.get('email') || '').trim().toLowerCase()
+          const website = String(formData.get('website') || '').trim()
 
           if (!message || !(button instanceof HTMLButtonElement)) return
+
+          if (!name) {
+            message.textContent = 'Enter your name before joining the whitelist.'
+            return
+          }
 
           if (!emailPattern.test(email)) {
             message.textContent = 'Enter a valid email address before joining the whitelist.'
@@ -261,8 +274,7 @@ const appSchema = {
           }
 
           if (!endpoint) {
-            message.textContent = 'Opening your email app so you can ask to join the whitelist.'
-            window.location.href = `${mailto}&body=${encodeURIComponent(`Please add ${email} to the Ono Sideboard whitelist.`)}`
+            message.textContent = 'The whitelist form is temporarily unavailable.'
             return
           }
 
@@ -274,22 +286,24 @@ const appSchema = {
             const response = await fetch(endpoint, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, interestType: 'both', source: 'whitelist-invitation' }),
+              body: JSON.stringify({ name, email, website, source: 'ono-sideboard-whitelist' }),
             })
             const data = await response.json().catch(() => ({}))
 
             if (!response.ok) {
-              throw new Error(data?.status === 'already_joined' ? 'already_joined' : 'error')
+              throw new Error(data?.status || 'error')
             }
 
-            message.textContent = data?.status === 'already_joined'
-              ? 'You are already on the Ono Sideboard whitelist.'
+            message.textContent = data?.status === 'updated'
+              ? 'Your whitelist details have been updated.'
               : 'You are on the Ono Sideboard whitelist.'
             form.reset()
           } catch (error) {
-            message.textContent = error instanceof Error && error.message === 'already_joined'
-              ? 'You are already on the Ono Sideboard whitelist.'
-              : 'The whitelist request could not be saved. You can contact support@danyel-ii.xyz instead.'
+            if (error instanceof Error && error.message === 'database_not_configured') {
+              message.textContent = 'The whitelist database is not configured yet. Please try again later.'
+            } else {
+              message.textContent = 'The whitelist request could not be saved. Please try again later.'
+            }
           } finally {
             button.disabled = false
             button.textContent = 'Join the whitelist'
@@ -609,6 +623,16 @@ const appSchema = {
     background: rgba(12, 9, 18, 0.86);
     color: var(--text);
     padding: 0 12px;
+  }
+
+  .whitelist-form__trap {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .whitelist-form__message {

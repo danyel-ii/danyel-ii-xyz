@@ -5,12 +5,15 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build && pagefind --site .vercel/output/static",
     "preview": "astro preview",
     "astro": "astro",
-    "cms": "decap-server"
+    "cms": "decap-server",
+    "waitlist:list": "node --env-file-if-exists=.env.local scripts/waitlist-list.mjs"
   },
   "dependencies": {
+    "@astrojs/vercel": "^9.0.5",
+    "@neondatabase/serverless": "^1.1.0",
     "astro": "^5.7.13",
     "autoprefixer": "^10.4.21",
     "gsap": "^3.13.0",
