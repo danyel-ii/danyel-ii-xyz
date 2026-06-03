@@ -1,15 +1,15 @@
 ---
-import { readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 
 export const prerender = true
 const waitlistEndpoint = '/api/waitlist'
 const pageUrl = 'https://danyel-ii.xyz/ono-sideboard'
 const supportBase = 'https://tarot.danyel-ii.xyz'
 const supportEmail = 'support@danyel-ii.xyz'
-const cardDirectory = 'public/images/ono-sideboard/cards'
-const titleCaseCard = (fileName: string) =>
-  fileName
-    .replace(/\.jpg$/, '')
+const deckDirectory = 'public/images/ono-sideboard/decks'
+const titleCaseSlug = (slug: string) =>
+  slug
+    .replace(/\.(jpg|jpeg|png)$/i, '')
     .split('-')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
@@ -20,21 +20,64 @@ const legalLinks = [
   { label: 'Support', href: `${supportBase}/support` },
 ]
 
-const cardPreviews = readdirSync(cardDirectory)
-  .filter((fileName) => fileName.endsWith('.jpg'))
-  .sort()
-  .map((fileName) => {
-    const title = titleCaseCard(fileName)
+const preferredDeckOrder = ['gold-leaf', 'encryptas', 'marta', 'quatre-gats', 'sgt-pepper', 'maskless']
+const deckIds = existsSync(deckDirectory)
+  ? readdirSync(deckDirectory, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => entry.name)
+      .sort((left, right) => {
+        const leftIndex = preferredDeckOrder.indexOf(left)
+        const rightIndex = preferredDeckOrder.indexOf(right)
+
+        if (leftIndex === -1 && rightIndex === -1) return left.localeCompare(right)
+        if (leftIndex === -1) return 1
+        if (rightIndex === -1) return -1
+        return leftIndex - rightIndex
+      })
+  : []
+
+const cardDecks = deckIds
+  .map((deckId) => {
+    const manifestPath = `${deckDirectory}/${deckId}/deck.json`
+    const manifest = existsSync(manifestPath)
+      ? JSON.parse(readFileSync(manifestPath, 'utf8'))
+      : {}
+    const availableCardFiles = readdirSync(`${deckDirectory}/${deckId}`)
+      .filter((fileName) => /\.(jpg|jpeg|png)$/i.test(fileName))
+      .sort()
+    const title = typeof manifest.title === 'string' ? manifest.title : titleCaseSlug(deckId)
+    const manifestCards = Array.isArray(manifest.cards) ? manifest.cards : []
+    const cards = manifestCards.length
+      ? manifestCards
+          .filter((card) => typeof card.image === 'string' && availableCardFiles.includes(card.image))
+          .map((card) => ({
+            slug: typeof card.slug === 'string' ? card.slug : card.image.replace(/\.(jpg|jpeg|png)$/i, ''),
+            title: typeof card.title === 'string' ? card.title : titleCaseSlug(card.image),
+            image: card.image,
+          }))
+      : availableCardFiles.map((fileName) => ({
+          slug: fileName.replace(/\.(jpg|jpeg|png)$/i, ''),
+          title: titleCaseSlug(fileName),
+          image: fileName,
+        }))
 
     return {
-      cardId: fileName.replace(/\.jpg$/, ''),
+      deckId,
       title,
-      src: `/images/ono-sideboard/cards/${fileName}`,
-      alt: `${title} tarot card from Ono Sideboard.`,
+      cards: cards.map((card) => {
+        return {
+          cardId: `${deckId}:${card.slug}`,
+          deckId,
+          title: card.title,
+          src: `/images/ono-sideboard/decks/${deckId}/${card.image}`,
+          alt: `${card.title} tarot card from the ${title} deck in Ono Sideboard.`,
+        }
+      }),
     }
   })
+  .filter((deck) => deck.cards.length >= 5)
 
-const initialCardPreviews = cardPreviews.slice(0, 5)
+const initialCardPreviews = cardDecks[0]?.cards.slice(0, 5) ?? []
 
 const features = [
   ['Read', 'Daily cards and spreads.'],
@@ -182,7 +225,7 @@ const appSchema = {
       </footer>
     </div>
 
-    <script type="application/json" id="ono-card-pool" set:html={JSON.stringify(cardPreviews)} />
+    <script type="application/json" id="ono-card-pool" set:html={JSON.stringify(cardDecks)} />
     <script>
       const cardPoolElement = document.querySelector('#ono-card-pool')
       const deckStage = document.querySelector('[data-random-cards]')
@@ -190,11 +233,24 @@ const appSchema = {
 
       if (cardPoolElement && deckStage instanceof HTMLElement) {
         try {
-          const cards = JSON.parse(cardPoolElement.textContent || '[]')
-          const storageKey = 'ono-sideboard-last-preview-cards'
-          const parsedCardIds = JSON.parse(window.localStorage?.getItem(storageKey) || '[]')
+          const decks = JSON.parse(cardPoolElement.textContent || '[]')
+          const cardsStorageKey = 'ono-sideboard-last-preview-cards'
+          const deckStorageKey = 'ono-sideboard-last-preview-deck'
+          const lastDeckId = window.localStorage?.getItem(deckStorageKey) || ''
+          const parsedCardIds = JSON.parse(window.localStorage?.getItem(cardsStorageKey) || '[]')
           const lastCardIds = Array.isArray(parsedCardIds) ? parsedCardIds : []
-          const shuffledCards = [...cards]
+          const availableDecks = decks.filter((deck) => Array.isArray(deck.cards) && deck.cards.length >= 5)
+          const shuffledDecks = [...availableDecks]
+
+          for (let index = shuffledDecks.length - 1; index > 0; index -= 1) {
+            const swapIndex = Math.floor(Math.random() * (index + 1))
+            ;[shuffledDecks[index], shuffledDecks[swapIndex]] = [shuffledDecks[swapIndex], shuffledDecks[index]]
+          }
+
+          const selectedDeck = shuffledDecks.find((deck) => deck.deckId !== lastDeckId) || shuffledDecks[0]
+          if (!selectedDeck) throw new Error('No preview decks are available')
+
+          const shuffledCards = [...selectedDeck.cards]
 
           for (let index = shuffledCards.length - 1; index > 0; index -= 1) {
             const swapIndex = Math.floor(Math.random() * (index + 1))
@@ -217,7 +273,8 @@ const appSchema = {
             caption.textContent = card.title
           })
 
-          window.localStorage?.setItem(storageKey, JSON.stringify(selectedCards.map((card) => card.cardId)))
+          window.localStorage?.setItem(deckStorageKey, selectedDeck.deckId)
+          window.localStorage?.setItem(cardsStorageKey, JSON.stringify(selectedCards.map((card) => card.cardId)))
         } catch {
           // Keep the server-rendered fallback cards if the pool cannot be parsed.
         }

@@ -9,6 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "cms": "decap-server",
+    "ono:decks": "node scripts/prepare-ono-deck-previews.mjs",
     "waitlist:list": "node --env-file-if-exists=.env.local scripts/waitlist-list.mjs"
   },
   "dependencies": {
