@@ -1,0 +1,81 @@
+---
+import SiteHead from '../components/layout/SiteHead.astro'
+import SiteFoot from '../components/layout/SiteFoot.astro'
+import SiteScrollbar from '../components/layout/SiteScrollbar.astro'
+import SHero from '../components/sections/SHero.astro'
+import ProtocolSeparator from '../components/ui/ProtocolSeparator.astro'
+import SLearning from '../components/sections/SLearning.astro'
+import SApps from '../components/sections/SApps.astro'
+import SResearch from '../components/sections/SResearch.astro'
+import SNftArchive from '../components/sections/SNftArchive.astro'
+import SLinks from '../components/sections/SLinks.astro'
+import SCTA from '../components/sections/SCTA.astro'
+import SKnowledgeSurfaces from '../components/sections/SKnowledgeSurfaces.astro'
+import { siteMeta } from '../data/site'
+
+import '../styles/global.scss'
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{siteMeta.name} | {siteMeta.title}</title>
+    <meta name="description" content={siteMeta.subtitle} />
+    <link rel="canonical" href={`https://${siteMeta.domain}/`} />
+    <link rel="manifest" href="/icons/site.webmanifest" />
+    <link rel="icon" type="image/png" href="/icons/favicon-48x48.png" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Danyel II" />
+    <meta name="theme-color" content="#050505" />
+  </head>
+  <body>
+    <div class="construction-ribbon construction-ribbon--top" aria-label="Under construction notice">
+      <span>UNDER CONSTRUCTION</span>
+      <span>UNDER CONSTRUCTION</span>
+      <span>UNDER CONSTRUCTION</span>
+    </div>
+    <div class="construction-ribbon construction-ribbon--bottom" aria-hidden="true">
+      <span>UNDER CONSTRUCTION</span>
+      <span>SITE IN PROGRESS</span>
+      <span>UNDER CONSTRUCTION</span>
+      <span>SITE IN PROGRESS</span>
+      <span>UNDER CONSTRUCTION</span>
+    </div>
+    <SiteHead />
+    <SiteScrollbar />
+    <main class="site-main">
+      <SHero />
+      <SKnowledgeSurfaces />
+      <ProtocolSeparator mode="protocol" tokens={['AUTH', 'SEC', 'ADMIN', 'ACTIVE']} />
+      <SLearning />
+      <ProtocolSeparator mode="hex" tokens={['0x41', '0x55', '0x54', '0x48']} />
+      <SApps />
+      <ProtocolSeparator mode="binary" tokens={['RESEARCH', 'BLOG']} />
+      <SResearch />
+      <ProtocolSeparator mode="protocol" tokens={['NFT', 'ARCHIVE', 'LEDGER']} />
+      <SNftArchive />
+      <ProtocolSeparator mode="protocol" tokens={['COMMS', 'LINKS', 'GITHUB']} />
+      <SLinks />
+      <SCTA />
+    </main>
+    <SiteFoot />
+  </body>
+</html>
+
+<script>
+  import { initSiteMotion } from '../lib/motion'
+  initSiteMotion()
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch((error) => {
+        console.error('Service worker registration failed', error)
+      })
+    })
+  }
+</script>
