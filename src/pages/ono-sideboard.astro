@@ -392,12 +392,14 @@ const appSchema = {
   html {
     background: var(--bg);
     color: var(--text);
+    overflow-x: hidden;
     scroll-behavior: smooth;
   }
 
   body {
     min-width: 320px;
     margin: 0;
+    overflow-x: hidden;
     background:
       radial-gradient(circle at 17% 8%, rgba(216, 183, 106, 0.18), transparent 28rem),
       radial-gradient(circle at 76% 18%, rgba(143, 123, 217, 0.16), transparent 30rem),
@@ -1008,20 +1010,20 @@ const appSchema = {
 
     .deck-card {
       grid-area: 1 / 1;
-      width: clamp(74px, 23vw, 98px);
+      width: clamp(72px, 21vw, 92px);
       min-width: 0;
       transform-origin: 50% 88%;
     }
 
     .deck-card:first-child {
-      --card-x: -164%;
+      --card-x: -148%;
       --card-y: 22px;
       --card-rotate: -13deg;
       z-index: 1;
     }
 
     .deck-card:nth-child(2) {
-      --card-x: -82%;
+      --card-x: -76%;
       --card-y: 7px;
       --card-rotate: -5deg;
       z-index: 2;
@@ -1035,14 +1037,14 @@ const appSchema = {
     }
 
     .deck-card:nth-child(4) {
-      --card-x: 84%;
+      --card-x: 78%;
       --card-y: 10px;
       --card-rotate: 6deg;
       z-index: 4;
     }
 
     .deck-card:nth-child(5) {
-      --card-x: 166%;
+      --card-x: 150%;
       --card-y: 24px;
       --card-rotate: 15deg;
       z-index: 3;
@@ -1109,7 +1111,7 @@ const appSchema = {
 
   @media (max-width: 420px) {
     .deck-card {
-      width: clamp(70px, 22.5vw, 92px);
+      width: clamp(70px, 20.5vw, 86px);
     }
 
     .splash {
