@@ -146,7 +146,7 @@ const appSchema = {
         <section id="decks" class="deck-section" aria-label="Ono Sideboard card previews">
           <div class="deck-strip deck-strip--sample" data-random-cards>
             {initialCardPreviews.map((card) => (
-              <figure class="deck-card">
+              <figure class="deck-card" tabindex="0">
                 <img
                   src={card.src}
                   alt={card.alt}
@@ -757,9 +757,24 @@ const appSchema = {
   }
 
   .deck-card {
+    --card-x: 0%;
+    --card-y: 0px;
+    --card-rotate: 0deg;
+    --card-scale: 1;
+    position: relative;
     display: grid;
     gap: 12px;
     margin: 0;
+    transform: translateX(var(--card-x)) translateY(var(--card-y)) rotate(var(--card-rotate)) scale(var(--card-scale));
+    transition:
+      transform 180ms ease,
+      filter 180ms ease;
+    will-change: transform;
+  }
+
+  .deck-card:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 6px;
   }
 
   .deck-card img {
@@ -771,11 +786,21 @@ const appSchema = {
 
   .deck-card:nth-child(2),
   .deck-card:nth-child(4) {
-    transform: translateY(28px);
+    --card-y: 28px;
   }
 
   .deck-strip--sample .deck-card:nth-child(2) {
-    transform: translateY(24px);
+    --card-y: 24px;
+  }
+
+  .deck-card:hover,
+  .deck-card:focus-visible,
+  .deck-card:focus-within {
+    --card-y: -16px;
+    --card-rotate: 0deg;
+    --card-scale: 1.06;
+    z-index: 30 !important;
+    filter: saturate(1.05);
   }
 
   .deck-card figcaption {
@@ -989,28 +1014,46 @@ const appSchema = {
     }
 
     .deck-card:first-child {
-      transform: translateX(-150%) translateY(20px) rotate(-14deg);
+      --card-x: -164%;
+      --card-y: 22px;
+      --card-rotate: -13deg;
       z-index: 1;
     }
 
     .deck-card:nth-child(2) {
-      transform: translateX(-74%) translateY(8px) rotate(-7deg);
+      --card-x: -82%;
+      --card-y: 7px;
+      --card-rotate: -5deg;
       z-index: 2;
     }
 
     .deck-card:nth-child(3) {
-      transform: translateY(0) rotate(0deg);
+      --card-x: 0%;
+      --card-y: 0px;
+      --card-rotate: 1deg;
       z-index: 5;
     }
 
     .deck-card:nth-child(4) {
-      transform: translateX(74%) translateY(8px) rotate(7deg);
+      --card-x: 84%;
+      --card-y: 10px;
+      --card-rotate: 6deg;
       z-index: 4;
     }
 
     .deck-card:nth-child(5) {
-      transform: translateX(150%) translateY(20px) rotate(14deg);
+      --card-x: 166%;
+      --card-y: 24px;
+      --card-rotate: 15deg;
       z-index: 3;
+    }
+
+    .deck-card:hover,
+    .deck-card:focus-visible,
+    .deck-card:focus-within {
+      --card-y: -14px;
+      --card-rotate: 0deg;
+      --card-scale: 1.08;
     }
 
     .deck-card img {
