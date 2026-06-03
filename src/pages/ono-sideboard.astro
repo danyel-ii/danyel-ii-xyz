@@ -3,46 +3,42 @@ const waitlistEndpoint = import.meta.env.PUBLIC_WAITLIST_ENDPOINT ?? import.meta
 const pageUrl = 'https://danyel-ii.xyz/ono-sideboard'
 const supportBase = 'https://tarot.danyel-ii.xyz'
 const supportEmail = 'support@danyel-ii.xyz'
-const mailtoHref = `mailto:${supportEmail}?subject=Ono%20Sideboard%20launch%20list`
+const mailtoHref = `mailto:${supportEmail}?subject=Ono%20Sideboard%20whitelist`
+
 const legalLinks = [
   { label: 'Privacy', href: `${supportBase}/privacy` },
   { label: 'Terms', href: `${supportBase}/terms` },
-  { label: 'Account deletion', href: `${supportBase}/account/delete` },
   { label: 'Support', href: `${supportBase}/support` },
 ]
 
+const deckCards = [
+  {
+    title: 'The Star',
+    src: '/images/ono-sideboard/decks/the-star.jpg',
+    alt: 'The Star tarot card from an Ono Sideboard sample deck.',
+  },
+  {
+    title: 'The Fool',
+    src: '/images/ono-sideboard/decks/the-fool.jpg',
+    alt: 'The Fool tarot card from an Ono Sideboard sample deck.',
+  },
+  {
+    title: 'Six of Cups',
+    src: '/images/ono-sideboard/decks/six-of-cups.jpg',
+    alt: 'Six of Cups tarot card from an Ono Sideboard sample deck.',
+  },
+  {
+    title: 'The Moon',
+    src: '/images/ono-sideboard/decks/the-moon.jpg',
+    alt: 'The Moon tarot card from an Ono Sideboard sample deck.',
+  },
+]
+
 const features = [
-  {
-    title: 'Private readings',
-    body: 'Draw daily cards or full spreads, then keep the interpretation and notes close to you.',
-  },
-  {
-    title: 'Journal and patterns',
-    body: 'Save readings, tag moments, and return to the cards that keep appearing.',
-  },
-  {
-    title: 'AI-assisted reflection',
-    body: 'Optional AI interpretation can help summarize a spread, surface patterns, and suggest reflection questions.',
-  },
-  {
-    title: 'Personal deck creation',
-    body: 'Upload a small set of visual references, generate a custom deck in the cloud, and download it into Ono Sideboard when it is ready.',
-  },
-]
-
-const steps = [
-  ['Draw', 'Choose a daily card or a spread.'],
-  ['Reflect', 'Add notes, tags, context, and optional AI interpretation.'],
-  ['Create', 'When available, purchase a custom deck credit and upload your visual references.'],
-  ['Return', 'Download your completed deck and use it for future readings.'],
-]
-
-const statuses = [
-  ['Google Play Console account', 'in verification'],
-  ['Android app', 'in preparation'],
-  ['Billing', 'planned via Google Play Billing'],
-  ['Custom deck generation', 'hosted backend in progress'],
-  ['Public launch', 'not yet announced'],
+  ['Read', 'Draw daily cards or spreads and keep the interpretation with your notes.'],
+  ['Remember', 'Save readings, tags, and patterns without turning reflection into a feed.'],
+  ['Create', 'Build a personal deck from your own visual references when deck creation opens.'],
+  ['Reflect', 'Use optional AI-assisted prompts when you want a second lens on a spread.'],
 ]
 
 const appSchema = {
@@ -60,165 +56,115 @@ const appSchema = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ono Sideboard - Coming Soon</title>
+    <title>Ono Sideboard - Whitelist Invitation</title>
     <meta
       name="description"
-      content="A private tarot journal and custom deck creator for Android. Draw cards, save reflections, explore patterns, and create a personal tarot deck from your own references."
+      content="Join the Ono Sideboard whitelist. A private tarot journal and custom deck creator for Android."
     />
     <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#100d18" />
     <link rel="canonical" href={pageUrl} />
-    <meta property="og:title" content="Ono Sideboard - Coming Soon" />
+    <link rel="icon" type="image/png" href="/images/ono-sideboard/logo-favicon.png" />
+    <link rel="apple-touch-icon" href="/images/ono-sideboard/logo-touch.png" />
+    <meta property="og:title" content="Ono Sideboard - Whitelist Invitation" />
     <meta property="og:description" content="A private tarot journal and custom deck creator for Android." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content="https://danyel-ii.xyz/images/ono-sideboard/splash.jpg" />
     <script type="application/ld+json" set:html={JSON.stringify(appSchema)} />
   </head>
   <body>
     <div class="ono-page">
       <header class="ono-header" aria-label="Ono Sideboard">
         <a class="ono-brand" href="/ono-sideboard" aria-label="Ono Sideboard home">
-          <span class="ono-brand__mark" aria-hidden="true"></span>
+          <img src="/images/ono-sideboard/logo.jpg" alt="" width="52" height="52" />
           <span>Ono Sideboard</span>
         </a>
-        <nav class="ono-nav" aria-label="Legal and support">
-          <span>Coming soon</span>
+        <nav class="ono-nav" aria-label="Page links">
+          <a href="#whitelist">Whitelist</a>
+          <a href="#decks">Decks</a>
           {legalLinks.map((link) => <a href={link.href}>{link.label}</a>)}
         </nav>
       </header>
 
       <main>
-        <section class="ono-hero" aria-labelledby="ono-title">
-          <div class="ono-hero__copy">
-            <p class="ono-eyebrow">Coming soon to Android</p>
-            <h1 id="ono-title">A private tarot journal for the deck you have &mdash; and the deck you create.</h1>
-            <p class="ono-lede">
-              Ono Sideboard helps you draw, reflect, journal, and return to your readings over time. Soon, you will also be able to create a personal tarot deck from your own visual references and use it inside the app.
+        <section class="hero" aria-labelledby="ono-title">
+          <div class="hero__copy">
+            <img class="hero__logo" src="/images/ono-sideboard/logo.jpg" alt="Ono Sideboard logo" width="160" height="160" />
+            <p class="eyebrow">Private Android beta</p>
+            <h1 id="ono-title">A quiet invitation to Ono Sideboard.</h1>
+            <p class="lede">
+              A private tarot journal for drawing cards, saving reflections, noticing patterns, and creating a personal deck from your own references.
             </p>
-            <div class="ono-actions">
-              <a class="ono-button" href="#launch-list">Join the launch list</a>
-              <a class="ono-button ono-button--ghost" href={`${supportBase}/privacy`}>Read the privacy promise</a>
-            </div>
-            <div class="ono-status-card" aria-label="Launch status">
-              <p>Android app in preparation</p>
-              <p>Google Play account verification in progress</p>
-              <p>Private deck creation planned after launch</p>
-              <p class="ono-status-card__note">Coming soon to Google Play. No Play badge is shown until a live listing or pre-registration page exists.</p>
+            <div class="actions">
+              <a class="button" href="#whitelist">Join the whitelist</a>
+              <a class="button button--ghost" href={`${supportBase}/privacy`}>Privacy</a>
             </div>
           </div>
 
-          <div class="ono-hero__visual">
-            <figure class="ono-splash">
-              <img
-                class="ono-splash__image"
-                src="/images/ono-sideboard/splash.jpg"
-                alt="Ono Sideboard splash artwork with tarot symbols, mountains, and a winding river."
-                width="733"
-                height="1100"
-                loading="eager"
-                decoding="async"
-              />
-            </figure>
-          </div>
+          <figure class="splash">
+            <img
+              src="/images/ono-sideboard/splash.jpg"
+              alt="Ono Sideboard splash artwork with tarot symbols, mountains, and a winding river."
+              width="733"
+              height="1100"
+              loading="eager"
+              decoding="async"
+            />
+          </figure>
         </section>
 
-        <section id="launch-list" class="ono-panel ono-waitlist" aria-labelledby="waitlist-title">
+        <section id="whitelist" class="panel whitelist" aria-labelledby="whitelist-title">
           <div>
-            <p class="ono-eyebrow">Launch interest</p>
-            <h2 id="waitlist-title">Get a note when Ono Sideboard opens for early Android testing.</h2>
+            <p class="eyebrow">Whitelist</p>
+            <h2 id="whitelist-title">Join for early access notes.</h2>
             <p>
-              We will use your email only for Ono Sideboard launch updates. You can unsubscribe or request deletion at any time.
+              We will use your email only for Ono Sideboard updates. You can unsubscribe or request deletion at any time.
             </p>
           </div>
-          <form class="waitlist-form" data-endpoint={waitlistEndpoint} data-mailto={mailtoHref} novalidate>
-            <div class="waitlist-form__fields">
-              <label>
-                <span>Email address</span>
-                <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
-              </label>
-              <label>
-                <span>Interest</span>
-                <select name="interestType">
-                  <option value="both">Both</option>
-                  <option value="reader-app">Reader app</option>
-                  <option value="custom-deck-creation">Custom deck creation</option>
-                </select>
-              </label>
-            </div>
-            <button class="ono-button" type="submit">Join the launch list</button>
-            <p class="waitlist-form__message" role="status" aria-live="polite">
-              No backend waitlist endpoint is configured yet. Submitting will open an email to support.
+
+          <form class="whitelist-form" data-endpoint={waitlistEndpoint} data-mailto={mailtoHref} novalidate>
+            <label>
+              <span>Email address</span>
+              <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+            </label>
+            <button class="button" type="submit">Join the whitelist</button>
+            <p class="whitelist-form__message" role="status" aria-live="polite">
+              No whitelist endpoint is configured yet. Submitting will open an email to support.
             </p>
-            <!-- TODO: Wire this form to a production waitlist endpoint when email compliance and deletion workflow are ready. -->
+            <!-- TODO: Wire this form to a production whitelist endpoint when email compliance and deletion workflow are ready. -->
           </form>
         </section>
 
-        <section class="ono-section" aria-labelledby="features-title">
-          <div class="ono-section__intro">
-            <p class="ono-eyebrow">What it is</p>
-            <h2 id="features-title">Quiet tools for readings, memory, and personal symbolism.</h2>
+        <section id="decks" class="deck-section" aria-labelledby="decks-title">
+          <div class="section-intro">
+            <p class="eyebrow">Decks</p>
+            <h2 id="decks-title">A few cards from the sideboard.</h2>
           </div>
-          <div class="ono-grid">
-            {features.map((feature) => (
-              <article class="ono-feature-card">
-                <h3>{feature.title}</h3>
-                <p>{feature.body}</p>
-              </article>
+          <div class="deck-strip">
+            {deckCards.map((card) => (
+              <figure class="deck-card">
+                <img src={card.src} alt={card.alt} width="312" height="520" loading="lazy" decoding="async" />
+                <figcaption>{card.title}</figcaption>
+              </figure>
             ))}
           </div>
         </section>
 
-        <section class="ono-section ono-steps" aria-labelledby="steps-title">
-          <div class="ono-section__intro">
-            <p class="ono-eyebrow">How it works</p>
-            <h2 id="steps-title">A simple loop for daily practice and future deck creation.</h2>
-          </div>
-          <ol class="ono-step-list">
-            {steps.map(([title, body], index) => (
-              <li>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section id="privacy-promise" class="ono-panel ono-privacy" aria-labelledby="privacy-title">
-          <div>
-            <p class="ono-eyebrow">Privacy promise</p>
-            <h2 id="privacy-title">Built for private reflection.</h2>
-            <p>
-              Your readings and reference images can be personal. Ono Sideboard is being designed around clear consent, account deletion, private storage, and server-side AI processing. API keys and generation credentials never belong in the Android app.
-            </p>
-          </div>
-          <ul>
-            <li>No public deck sharing by default.</li>
-            <li>Reference images are used for deck creation.</li>
-            <li>Generated decks are private to your account unless you export them.</li>
-            <li>Account deletion and data deletion controls are part of the launch plan.</li>
-          </ul>
-        </section>
-
-        <section class="ono-section" aria-labelledby="status-title">
-          <div class="ono-section__intro">
-            <p class="ono-eyebrow">Development status</p>
-            <h2 id="status-title">In preparation, without a public launch date yet.</h2>
-          </div>
-          <div class="ono-status-grid">
-            {statuses.map(([label, value]) => (
-              <div class="ono-chip">
-                <span>{label}</span>
-                <strong>{value}</strong>
-              </div>
-            ))}
-          </div>
+        <section class="feature-grid" aria-label="Ono Sideboard features">
+          {features.map(([title, body]) => (
+            <article>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </article>
+          ))}
         </section>
       </main>
 
       <footer class="ono-footer">
         <nav aria-label="Footer">
           {legalLinks.map((link) => <a href={link.href}>{link.label}</a>)}
+          <a href={`${supportBase}/account/delete`}>Account deletion</a>
           <a href={`mailto:${supportEmail}`}>Contact</a>
         </nav>
         <p>
@@ -228,10 +174,10 @@ const appSchema = {
     </div>
 
     <script>
-      const form = document.querySelector('.waitlist-form')
+      const form = document.querySelector('.whitelist-form')
 
       if (form instanceof HTMLFormElement) {
-        const message = form.querySelector('.waitlist-form__message')
+        const message = form.querySelector('.whitelist-form__message')
         const button = form.querySelector('button[type="submit"]')
         const endpoint = form.dataset.endpoint || ''
         const mailto = form.dataset.mailto || 'mailto:support@danyel-ii.xyz'
@@ -241,30 +187,29 @@ const appSchema = {
           event.preventDefault()
           const formData = new FormData(form)
           const email = String(formData.get('email') || '').trim().toLowerCase()
-          const interestType = String(formData.get('interestType') || 'both')
 
           if (!message || !(button instanceof HTMLButtonElement)) return
 
           if (!emailPattern.test(email)) {
-            message.textContent = 'Enter a valid email address before joining the launch list.'
+            message.textContent = 'Enter a valid email address before joining the whitelist.'
             return
           }
 
           if (!endpoint) {
-            message.textContent = 'Opening your email app so you can ask to join the launch list.'
-            window.location.href = `${mailto}&body=${encodeURIComponent(`Please add ${email} to the Ono Sideboard launch list. Interest: ${interestType}.`)}`
+            message.textContent = 'Opening your email app so you can ask to join the whitelist.'
+            window.location.href = `${mailto}&body=${encodeURIComponent(`Please add ${email} to the Ono Sideboard whitelist.`)}`
             return
           }
 
           button.disabled = true
           button.textContent = 'Joining...'
-          message.textContent = 'Submitting your launch interest.'
+          message.textContent = 'Submitting your whitelist request.'
 
           try {
             const response = await fetch(endpoint, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email, interestType, source: 'coming-soon-page' }),
+              body: JSON.stringify({ email, interestType: 'both', source: 'whitelist-invitation' }),
             })
             const data = await response.json().catch(() => ({}))
 
@@ -273,16 +218,16 @@ const appSchema = {
             }
 
             message.textContent = data?.status === 'already_joined'
-              ? 'You are already on the Ono Sideboard launch list.'
-              : 'You are on the launch list. Thank you.'
+              ? 'You are already on the Ono Sideboard whitelist.'
+              : 'You are on the Ono Sideboard whitelist.'
             form.reset()
           } catch (error) {
             message.textContent = error instanceof Error && error.message === 'already_joined'
-              ? 'You are already on the Ono Sideboard launch list.'
-              : 'The launch list could not be saved. You can contact support@danyel-ii.xyz instead.'
+              ? 'You are already on the Ono Sideboard whitelist.'
+              : 'The whitelist request could not be saved. You can contact support@danyel-ii.xyz instead.'
           } finally {
             button.disabled = false
-            button.textContent = 'Join the launch list'
+            button.textContent = 'Join the whitelist'
           }
         })
       }
@@ -317,10 +262,11 @@ const appSchema = {
   }
 
   body {
+    min-width: 320px;
     margin: 0;
     background:
-      radial-gradient(circle at 18% 12%, rgba(216, 183, 106, 0.18), transparent 30rem),
-      radial-gradient(circle at 82% 22%, rgba(143, 123, 217, 0.2), transparent 28rem),
+      radial-gradient(circle at 17% 8%, rgba(216, 183, 106, 0.18), transparent 28rem),
+      radial-gradient(circle at 76% 18%, rgba(143, 123, 217, 0.16), transparent 30rem),
       linear-gradient(180deg, var(--bg), #0b0810 72%, var(--ink));
     color: var(--text);
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -330,11 +276,11 @@ const appSchema = {
     position: fixed;
     inset: 0;
     z-index: -1;
-    opacity: 0.24;
+    opacity: 0.2;
     background-image:
-      linear-gradient(rgba(255, 247, 232, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 247, 232, 0.03) 1px, transparent 1px);
-    background-size: 44px 44px;
+      linear-gradient(rgba(255, 247, 232, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 247, 232, 0.025) 1px, transparent 1px);
+    background-size: 46px 46px;
     content: "";
   }
 
@@ -343,16 +289,19 @@ const appSchema = {
     text-decoration: none;
   }
 
+  img {
+    max-width: 100%;
+  }
+
   a:focus-visible,
   button:focus-visible,
-  input:focus-visible,
-  select:focus-visible {
+  input:focus-visible {
     outline: 2px solid var(--gold);
     outline-offset: 4px;
   }
 
   .ono-page {
-    width: min(100% - 32px, 1180px);
+    width: min(100% - 32px, 1160px);
     margin: 0 auto;
   }
 
@@ -364,16 +313,14 @@ const appSchema = {
     align-items: center;
     justify-content: space-between;
     gap: 18px;
-    padding: 18px 0;
-    background: linear-gradient(180deg, rgba(16, 13, 24, 0.94), rgba(16, 13, 24, 0.74));
+    padding: 16px 0;
+    background: linear-gradient(180deg, rgba(16, 13, 24, 0.94), rgba(16, 13, 24, 0.72));
     backdrop-filter: blur(14px);
   }
 
   .ono-brand,
   .ono-nav,
-  .ono-eyebrow,
-  .ono-chip,
-  .ono-status-card {
+  .eyebrow {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   }
 
@@ -381,28 +328,24 @@ const appSchema = {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    color: var(--text);
     font-weight: 700;
   }
 
-  .ono-brand__mark {
-    width: 18px;
-    height: 18px;
-    border: 1px solid var(--gold);
-    border-radius: 50%;
-    background:
-      linear-gradient(90deg, transparent 48%, var(--gold) 48% 52%, transparent 52%),
-      radial-gradient(circle at 50% 50%, rgba(216, 183, 106, 0.36), transparent 60%);
+  .ono-brand img {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    object-fit: cover;
   }
 
-  .ono-nav {
+  .ono-nav,
+  .ono-footer nav {
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 14px;
     flex-wrap: wrap;
+    gap: 14px;
     color: var(--muted);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
   }
 
   .ono-nav a,
@@ -415,23 +358,37 @@ const appSchema = {
     border-bottom-color: currentColor;
   }
 
-  .ono-hero {
+  main {
     display: grid;
-    grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.98fr);
-    gap: 54px;
-    align-items: center;
-    min-height: 720px;
-    padding: 72px 0 64px;
+    gap: 72px;
   }
 
-  .ono-hero__copy,
-  .ono-section__intro,
-  .ono-panel {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(330px, 0.82fr);
+    gap: 56px;
+    align-items: center;
+    min-height: 720px;
+    padding: 60px 0 18px;
+  }
+
+  .hero__copy,
+  .section-intro,
+  .panel {
     display: grid;
     gap: 18px;
   }
 
-  .ono-eyebrow {
+  .hero__logo {
+    width: 112px;
+    height: 112px;
+    border: 1px solid rgba(216, 183, 106, 0.34);
+    border-radius: 18px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+    object-fit: cover;
+  }
+
+  .eyebrow {
     margin: 0;
     color: var(--gold);
     font-size: 0.78rem;
@@ -447,27 +404,29 @@ const appSchema = {
     margin: 0;
   }
 
-  h1 {
-    max-width: 12ch;
+  h1,
+  h2 {
     color: var(--text);
     font-family: Georgia, "Times New Roman", serif;
-    font-size: 4.5rem;
     font-weight: 400;
-    line-height: 0.94;
+    letter-spacing: 0;
+  }
+
+  h1 {
+    max-width: 11ch;
+    font-size: clamp(3.2rem, 8vw, 6.6rem);
+    line-height: 0.9;
   }
 
   h2 {
-    max-width: 18ch;
-    color: var(--text);
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 2.45rem;
-    font-weight: 400;
-    line-height: 1.04;
+    max-width: 14ch;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
   }
 
   h3 {
     color: var(--text);
-    font-size: 1.08rem;
+    font-size: 1.05rem;
     line-height: 1.3;
   }
 
@@ -478,26 +437,26 @@ const appSchema = {
     line-height: 1.68;
   }
 
-  .ono-lede {
-    max-width: 63ch;
+  .lede {
+    max-width: 54ch;
     color: #eee2cd;
     font-size: 1.12rem;
   }
 
-  .ono-actions {
+  .actions {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     margin-top: 8px;
   }
 
-  .ono-button {
+  .button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     min-height: 46px;
     padding: 0 18px;
-    border: 1px solid color-mix(in srgb, var(--gold) 72%, white 28%);
+    border: 1px solid var(--gold);
     border-radius: 6px;
     background: var(--gold);
     color: var(--ink);
@@ -505,209 +464,79 @@ const appSchema = {
     font-weight: 700;
   }
 
-  .ono-button--ghost {
+  .button--ghost {
     background: rgba(255, 248, 232, 0.04);
     color: var(--text);
   }
 
-  .ono-status-card,
-  .ono-panel,
-  .ono-feature-card,
-  .ono-step-list li,
-  .ono-chip {
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--panel);
-    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.2);
+  .button:disabled {
+    cursor: wait;
+    opacity: 0.72;
   }
 
-  .ono-status-card {
-    gap: 10px;
-    max-width: 560px;
-    padding: 18px;
-    color: var(--muted);
-    display: grid;
-  }
-
-  .ono-status-card p {
-    padding-left: 18px;
+  .splash {
     position: relative;
-    font-size: 0.88rem;
-  }
-
-  .ono-status-card p:before {
-    position: absolute;
-    top: 0.7em;
-    left: 0;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--success);
-    content: "";
-  }
-
-  .ono-status-card__note {
-    border-top: 1px solid var(--line);
-    margin-top: 4px;
-    padding-top: 12px;
-  }
-
-  .ono-hero__visual {
-    position: relative;
-    display: grid;
-    place-items: center;
-    min-height: 620px;
-  }
-
-  .ono-hero__visual:before {
-    position: absolute;
-    inset: 12% 2% 8%;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 42% 34%, rgba(216, 183, 106, 0.32), transparent 42%),
-      radial-gradient(circle at 70% 72%, rgba(143, 123, 217, 0.26), transparent 48%);
-    content: "";
-    filter: blur(12px);
-    opacity: 0.86;
-  }
-
-  .ono-splash {
-    position: relative;
-    width: min(430px, 92%);
+    width: min(390px, 100%);
     aspect-ratio: 2 / 3;
+    justify-self: center;
     margin: 0;
     overflow: hidden;
-    border: 1px solid rgba(216, 183, 106, 0.46);
+    border: 1px solid rgba(216, 183, 106, 0.44);
     border-radius: 8px;
-    background: rgba(255, 248, 232, 0.06);
+    background: var(--panel);
     box-shadow:
-      0 42px 100px rgba(0, 0, 0, 0.46),
+      0 46px 120px rgba(0, 0, 0, 0.48),
       0 0 0 10px rgba(255, 248, 232, 0.04),
-      0 0 90px rgba(216, 183, 106, 0.16);
+      0 0 100px rgba(216, 183, 106, 0.18);
     transform: rotate(1deg);
   }
 
-  .ono-splash:after {
+  .splash:before {
     position: absolute;
-    inset: 0;
-    border: 1px solid rgba(255, 247, 232, 0.18);
-    border-radius: inherit;
-    box-shadow: inset 0 1px 0 rgba(255, 247, 232, 0.16);
+    inset: -24%;
+    z-index: -1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(216, 183, 106, 0.32), transparent 58%);
     content: "";
-    pointer-events: none;
+    filter: blur(14px);
   }
 
-  .ono-splash__image {
+  .splash img,
+  .deck-card img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .ono-panel {
-    grid-template-columns: minmax(0, 0.85fr) minmax(280px, 1.15fr);
+  .panel,
+  .feature-grid article {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+  }
+
+  .whitelist {
+    grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1fr);
     align-items: start;
     padding: 28px;
     background: var(--panel-strong);
   }
 
-  .ono-section {
-    display: grid;
-    gap: 28px;
-    padding: 72px 0 0;
-  }
-
-  .ono-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-  }
-
-  .ono-feature-card {
-    min-height: 210px;
-    padding: 20px;
-  }
-
-  .ono-feature-card h3,
-  .ono-step-list h3 {
-    margin-bottom: 12px;
-  }
-
-  .ono-step-list {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .ono-step-list li {
-    padding: 20px;
-  }
-
-  .ono-step-list span {
-    display: inline-flex;
-    margin-bottom: 24px;
-    color: var(--gold);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-    font-size: 0.82rem;
-  }
-
-  .ono-privacy ul {
-    display: grid;
-    gap: 10px;
-    margin: 0;
-    padding-left: 18px;
-  }
-
-  .ono-status-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .ono-chip {
-    display: grid;
-    gap: 6px;
-    padding: 12px 14px;
-  }
-
-  .ono-chip span {
-    color: var(--muted);
-    font-size: 0.74rem;
-  }
-
-  .ono-chip strong {
-    color: var(--text);
-    font-size: 0.84rem;
-    font-weight: 700;
-  }
-
-  .waitlist-form {
+  .whitelist-form {
     display: grid;
     gap: 14px;
   }
 
-  .waitlist-form__fields {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 220px;
-    gap: 12px;
-  }
-
-  .waitlist-form label {
+  .whitelist-form label {
     display: grid;
     gap: 8px;
     color: var(--text);
     font-weight: 700;
   }
 
-  .waitlist-form label span {
-    font-size: 0.88rem;
-  }
-
-  .waitlist-form input,
-  .waitlist-form select {
+  .whitelist-form input {
     width: 100%;
     min-height: 46px;
     border: 1px solid var(--line);
@@ -717,23 +546,67 @@ const appSchema = {
     padding: 0 12px;
   }
 
-  .waitlist-form__message {
+  .whitelist-form__message {
     min-height: 1.7em;
     color: var(--success);
     font-size: 0.92rem;
   }
 
+  .deck-section {
+    display: grid;
+    gap: 28px;
+  }
+
+  .deck-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    align-items: end;
+  }
+
+  .deck-card {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .deck-card img {
+    aspect-ratio: 3 / 5;
+    border: 1px solid rgba(216, 183, 106, 0.38);
+    border-radius: 7px;
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.34);
+  }
+
+  .deck-card:nth-child(2),
+  .deck-card:nth-child(4) {
+    transform: translateY(28px);
+  }
+
+  .deck-card figcaption {
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .feature-grid article {
+    min-height: 150px;
+    padding: 20px;
+  }
+
+  .feature-grid h3 {
+    margin-bottom: 10px;
+  }
+
   .ono-footer {
     display: grid;
     gap: 16px;
-    padding: 72px 0 38px;
-  }
-
-  .ono-footer nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    color: var(--text);
+    padding: 20px 0 38px;
   }
 
   .ono-footer p {
@@ -742,26 +615,25 @@ const appSchema = {
   }
 
   @media (max-width: 1023px) {
-    .ono-hero {
+    .hero {
       grid-template-columns: 1fr;
       min-height: auto;
-      padding-top: 48px;
+      padding-top: 42px;
     }
 
-    .ono-hero__visual {
-      min-height: 520px;
-      order: 2;
+    .splash {
+      width: min(340px, 88%);
+      transform: none;
     }
 
-    .ono-grid,
-    .ono-step-list {
-      grid-template-columns: repeat(2, 1fr);
+    .feature-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   @media (max-width: 767px) {
     .ono-page {
-      width: min(100% - 24px, 1180px);
+      width: min(100% - 24px, 1160px);
     }
 
     .ono-header {
@@ -774,52 +646,45 @@ const appSchema = {
       justify-content: flex-start;
     }
 
-    h1 {
-      max-width: 100%;
-      font-size: 2.8rem;
-      line-height: 1;
+    main {
+      gap: 54px;
     }
 
-    h2 {
-      max-width: 100%;
-      font-size: 2rem;
+    .hero {
+      gap: 38px;
+      padding-top: 34px;
     }
 
-    .ono-actions,
-    .ono-actions .ono-button,
-    .waitlist-form .ono-button {
+    .hero__logo {
+      width: 86px;
+      height: 86px;
+      border-radius: 14px;
+    }
+
+    .actions,
+    .actions .button,
+    .whitelist-form .button {
       width: 100%;
     }
 
-    .ono-hero__visual {
-      min-height: 420px;
-      opacity: 0.9;
-    }
-
-    .ono-splash {
-      width: min(330px, 92%);
-      transform: none;
-    }
-
-    .ono-panel,
-    .ono-grid,
-    .ono-step-list,
-    .waitlist-form__fields {
+    .whitelist,
+    .deck-strip,
+    .feature-grid {
       grid-template-columns: 1fr;
     }
 
-    .ono-panel {
+    .whitelist {
       padding: 20px;
     }
 
-    .ono-feature-card {
-      min-height: auto;
+    .deck-strip {
+      width: min(320px, 100%);
+      margin: 0 auto;
     }
-  }
 
-  @media (max-width: 420px) {
-    .ono-hero__visual {
-      min-height: 390px;
+    .deck-card:nth-child(2),
+    .deck-card:nth-child(4) {
+      transform: none;
     }
   }
 
