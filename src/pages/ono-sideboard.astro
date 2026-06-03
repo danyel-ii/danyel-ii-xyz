@@ -1,9 +1,18 @@
 ---
+import { readdirSync } from 'node:fs'
+
 const waitlistEndpoint = import.meta.env.PUBLIC_WAITLIST_ENDPOINT ?? import.meta.env.VITE_WAITLIST_ENDPOINT ?? ''
 const pageUrl = 'https://danyel-ii.xyz/ono-sideboard'
 const supportBase = 'https://tarot.danyel-ii.xyz'
 const supportEmail = 'support@danyel-ii.xyz'
 const mailtoHref = `mailto:${supportEmail}?subject=Ono%20Sideboard%20whitelist`
+const cardDirectory = new URL('../../public/images/ono-sideboard/cards/', import.meta.url)
+const titleCaseCard = (fileName: string) =>
+  fileName
+    .replace(/\.jpg$/, '')
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 
 const legalLinks = [
   { label: 'Privacy', href: `${supportBase}/privacy` },
@@ -11,34 +20,23 @@ const legalLinks = [
   { label: 'Support', href: `${supportBase}/support` },
 ]
 
-const deckCards = [
-  {
-    title: 'The Star',
-    src: '/images/ono-sideboard/decks/the-star.jpg',
-    alt: 'The Star tarot card from an Ono Sideboard sample deck.',
-  },
-  {
-    title: 'The Fool',
-    src: '/images/ono-sideboard/decks/the-fool.jpg',
-    alt: 'The Fool tarot card from an Ono Sideboard sample deck.',
-  },
-  {
-    title: 'Six of Cups',
-    src: '/images/ono-sideboard/decks/six-of-cups.jpg',
-    alt: 'Six of Cups tarot card from an Ono Sideboard sample deck.',
-  },
-  {
-    title: 'The Moon',
-    src: '/images/ono-sideboard/decks/the-moon.jpg',
-    alt: 'The Moon tarot card from an Ono Sideboard sample deck.',
-  },
-]
+const deckCards = readdirSync(cardDirectory)
+  .filter((fileName) => fileName.endsWith('.jpg'))
+  .sort()
+  .map((fileName) => {
+    const title = titleCaseCard(fileName)
+    return {
+      title,
+      src: `/images/ono-sideboard/cards/${fileName}`,
+      alt: `${title} tarot card from an Ono Sideboard sample deck.`,
+    }
+  })
 
 const features = [
-  ['Read', 'Draw daily cards or spreads and keep the interpretation with your notes.'],
-  ['Remember', 'Save readings, tags, and patterns without turning reflection into a feed.'],
-  ['Create', 'Build a personal deck from your own visual references when deck creation opens.'],
-  ['Reflect', 'Use optional AI-assisted prompts when you want a second lens on a spread.'],
+  ['Read', 'Daily cards and spreads.'],
+  ['Remember', 'Private notes and patterns.'],
+  ['Create', 'Decks from your references.'],
+  ['Reflect', 'Optional AI prompts.'],
 ]
 
 const appSchema = {
@@ -91,10 +89,10 @@ const appSchema = {
         <section class="hero" aria-labelledby="ono-title">
           <div class="hero__copy">
             <img class="hero__logo" src="/images/ono-sideboard/logo.jpg" alt="Ono Sideboard logo" width="160" height="160" />
-            <p class="eyebrow">Private Android beta</p>
-            <h1 id="ono-title">A quiet invitation to Ono Sideboard.</h1>
+            <p class="eyebrow">Whitelist invitation</p>
+            <h1 id="ono-title">Ono Sideboard</h1>
             <p class="lede">
-              A private tarot journal for drawing cards, saving reflections, noticing patterns, and creating a personal deck from your own references.
+              Private tarot journaling. Custom decks. Early Android access.
             </p>
             <div class="actions">
               <a class="button" href="#whitelist">Join the whitelist</a>
@@ -117,9 +115,9 @@ const appSchema = {
         <section id="whitelist" class="panel whitelist" aria-labelledby="whitelist-title">
           <div>
             <p class="eyebrow">Whitelist</p>
-            <h2 id="whitelist-title">Join for early access notes.</h2>
+            <h2 id="whitelist-title">Join the whitelist.</h2>
             <p>
-              We will use your email only for Ono Sideboard updates. You can unsubscribe or request deletion at any time.
+              One email when early access opens. No noise.
             </p>
           </div>
 
@@ -139,10 +137,10 @@ const appSchema = {
         <section id="decks" class="deck-section" aria-labelledby="decks-title">
           <div class="section-intro">
             <p class="eyebrow">Decks</p>
-            <h2 id="decks-title">A few cards from the sideboard.</h2>
+            <h2 id="decks-title">A fresh pull on every visit.</h2>
           </div>
-          <div class="deck-strip">
-            {deckCards.map((card) => (
+          <div class="deck-strip" data-random-cards>
+            {deckCards.slice(0, 4).map((card) => (
               <figure class="deck-card">
                 <img src={card.src} alt={card.alt} width="312" height="520" loading="lazy" decoding="async" />
                 <figcaption>{card.title}</figcaption>
@@ -173,8 +171,38 @@ const appSchema = {
       </footer>
     </div>
 
+    <script type="application/json" id="ono-card-pool" set:html={JSON.stringify(deckCards)} />
     <script>
+      const cardPoolElement = document.querySelector('#ono-card-pool')
+      const deckStrip = document.querySelector('[data-random-cards]')
       const form = document.querySelector('.whitelist-form')
+
+      if (cardPoolElement && deckStrip instanceof HTMLElement) {
+        try {
+          const cards = JSON.parse(cardPoolElement.textContent || '[]')
+          const slots = Array.from(deckStrip.querySelectorAll('.deck-card'))
+          const shuffledCards = [...cards]
+
+          for (let index = shuffledCards.length - 1; index > 0; index -= 1) {
+            const swapIndex = Math.floor(Math.random() * (index + 1))
+            ;[shuffledCards[index], shuffledCards[swapIndex]] = [shuffledCards[swapIndex], shuffledCards[index]]
+          }
+
+          slots.forEach((slot, index) => {
+            const card = shuffledCards[index]
+            const image = slot.querySelector('img')
+            const caption = slot.querySelector('figcaption')
+
+            if (!card || !(image instanceof HTMLImageElement) || !caption) return
+
+            image.src = card.src
+            image.alt = card.alt
+            caption.textContent = card.title
+          })
+        } catch {
+          // Keep the server-rendered fallback cards if the pool cannot be parsed.
+        }
+      }
 
       if (form instanceof HTMLFormElement) {
         const message = form.querySelector('.whitelist-form__message')
@@ -637,28 +665,87 @@ const appSchema = {
     }
 
     .ono-header {
-      align-items: flex-start;
-      flex-direction: column;
+      align-items: center;
+      flex-direction: row;
       position: static;
+      padding: 12px 0 8px;
     }
 
     .ono-nav {
       justify-content: flex-start;
+      gap: 10px;
+      font-size: 0.76rem;
+    }
+
+    .ono-nav a:nth-child(n + 3) {
+      display: none;
+    }
+
+    .ono-brand {
+      gap: 8px;
+    }
+
+    .ono-brand img {
+      width: 34px;
+      height: 34px;
+      border-radius: 7px;
+    }
+
+    .ono-brand span {
+      max-width: 9ch;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     main {
-      gap: 54px;
+      gap: 42px;
     }
 
     .hero {
-      gap: 38px;
-      padding-top: 34px;
+      gap: 22px;
+      padding-top: 18px;
+    }
+
+    .splash {
+      order: 1;
+      width: min(285px, 78vw);
+      box-shadow:
+        0 34px 90px rgba(0, 0, 0, 0.48),
+        0 0 0 8px rgba(255, 248, 232, 0.035),
+        0 0 80px rgba(216, 183, 106, 0.16);
+    }
+
+    .hero__copy {
+      order: 2;
+      gap: 12px;
+      justify-items: start;
     }
 
     .hero__logo {
-      width: 86px;
-      height: 86px;
-      border-radius: 14px;
+      display: none;
+    }
+
+    .eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+    }
+
+    h1 {
+      max-width: 100%;
+      font-size: clamp(3rem, 17vw, 4.9rem);
+      line-height: 0.86;
+    }
+
+    h2 {
+      max-width: 11ch;
+      font-size: clamp(2rem, 10vw, 2.7rem);
+    }
+
+    .lede {
+      max-width: 28ch;
+      font-size: 1rem;
+      line-height: 1.45;
     }
 
     .actions,
@@ -668,23 +755,120 @@ const appSchema = {
     }
 
     .whitelist,
-    .deck-strip,
     .feature-grid {
       grid-template-columns: 1fr;
     }
 
     .whitelist {
-      padding: 20px;
+      gap: 16px;
+      padding: 18px;
+    }
+
+    .whitelist p {
+      font-size: 0.94rem;
+      line-height: 1.45;
+    }
+
+    .whitelist-form {
+      gap: 10px;
+    }
+
+    .whitelist-form label span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .whitelist-form__message {
+      min-height: auto;
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .deck-section {
+      gap: 16px;
+    }
+
+    .deck-section .section-intro {
+      gap: 10px;
     }
 
     .deck-strip {
-      width: min(320px, 100%);
-      margin: 0 auto;
+      display: flex;
+      width: calc(100% + 24px);
+      margin: 0 -12px;
+      padding: 4px 12px 18px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .deck-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .deck-card {
+      flex: 0 0 46%;
+      min-width: 148px;
+      scroll-snap-align: start;
     }
 
     .deck-card:nth-child(2),
     .deck-card:nth-child(4) {
       transform: none;
+    }
+
+    .deck-card figcaption {
+      font-size: 0.78rem;
+    }
+
+    .feature-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .feature-grid article {
+      min-height: 92px;
+      padding: 14px;
+    }
+
+    .feature-grid h3 {
+      margin-bottom: 6px;
+      font-size: 0.96rem;
+    }
+
+    .feature-grid p {
+      font-size: 0.84rem;
+      line-height: 1.38;
+    }
+
+    .ono-footer {
+      gap: 12px;
+      padding-top: 4px;
+    }
+
+    .ono-footer nav {
+      gap: 10px 12px;
+      font-size: 0.78rem;
+    }
+
+    .ono-footer p {
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .deck-card {
+      flex-basis: 52%;
+    }
+
+    .splash {
+      width: min(255px, 76vw);
     }
   }
 
