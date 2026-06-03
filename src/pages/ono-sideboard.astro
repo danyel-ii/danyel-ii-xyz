@@ -967,12 +967,18 @@ const appSchema = {
 
     .deck-strip {
       display: grid;
-      width: min(calc(100vw - 16px), 440px);
+      grid-template-columns: 1fr;
+      width: 100%;
       min-height: clamp(176px, 52vw, 250px);
       margin: 4px auto 0;
       padding: 10px 0 8px;
       place-items: center;
       overflow: visible;
+    }
+
+    .deck-strip--sample {
+      grid-template-columns: 1fr;
+      justify-content: center;
     }
 
     .deck-card {
