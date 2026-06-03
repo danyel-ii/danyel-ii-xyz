@@ -22,8 +22,8 @@ export const socialLinks: SocialLink[] = [
   {
     id: 'email',
     label: 'Email',
-    href: 'mailto:danyel-ii@proton.me',
-    value: 'danyel-ii@proton.me',
+    href: 'mailto:devs@danyel-ii.xyz',
+    value: 'devs@danyel-ii.xyz',
   },
   {
     id: 'matrix',
