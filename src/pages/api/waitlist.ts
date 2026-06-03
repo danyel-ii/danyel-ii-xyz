@@ -7,6 +7,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const maxNameLength = 120
 const maxEmailLength = 254
 const maxSourceLength = 80
+const supportEmail = 'support@danyel-ii.xyz'
 
 type WaitlistPayload = {
   name?: unknown
@@ -46,6 +47,63 @@ const ensureWaitlistTable = async (sql: ReturnType<typeof neon>) => {
       deleted_at timestamptz
     )
   `
+}
+
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+
+const sendConfirmationEmail = async (name: string, email: string) => {
+  const apiKey = import.meta.env.RESEND_API_KEY
+
+  if (!apiKey) {
+    return false
+  }
+
+  const firstName = name.split(' ')[0] || 'there'
+  const escapedFirstName = escapeHtml(firstName)
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: `Ono Sideboard <${supportEmail}>`,
+      to: [email],
+      reply_to: supportEmail,
+      subject: 'You are on the Ono Sideboard whitelist',
+      text: [
+        `Hi ${firstName},`,
+        '',
+        'You are on the Ono Sideboard whitelist.',
+        '',
+        'We will email you when early Android access opens.',
+        '',
+        'Ono Sideboard is for reflection and creative journaling. It is not medical, legal, financial, or mental-health advice.',
+        '',
+        `Questions? Reply to ${supportEmail}.`,
+        '',
+        'Daniel Hawes',
+      ].join('\n'),
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #171320;">
+          <p>Hi ${escapedFirstName},</p>
+          <p>You are on the Ono Sideboard whitelist.</p>
+          <p>We will email you when early Android access opens.</p>
+          <p style="color: #5f586a;">Ono Sideboard is for reflection and creative journaling. It is not medical, legal, financial, or mental-health advice.</p>
+          <p>Questions? Reply to <a href="mailto:${supportEmail}">${supportEmail}</a>.</p>
+          <p>Daniel Hawes</p>
+        </div>
+      `,
+    }),
+  })
+
+  return response.ok
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -89,7 +147,14 @@ export const POST: APIRoute = async ({ request }) => {
       RETURNING created_at = updated_at AS joined
     `
 
-    return json({ ok: true, status: result[0]?.joined ? 'joined' : 'updated' })
+    const joined = Boolean(result[0]?.joined)
+    const emailSent = joined ? await sendConfirmationEmail(name, email).catch(() => false) : false
+
+    return json({
+      ok: true,
+      status: joined ? 'joined' : 'updated',
+      emailSent,
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown waitlist error.'
 

@@ -18,6 +18,24 @@ The API stores entries in Postgres using the `DATABASE_URL` environment variable
 
 The API creates the `waitlist_signups` table on the first valid signup.
 
+## Optional Confirmation Email
+
+The API can send a first-join confirmation email from:
+
+```text
+Ono Sideboard <support@danyel-ii.xyz>
+```
+
+Set up Resend or another Vercel-compatible email provider, verify `danyel-ii.xyz` for sending, then add this Vercel environment variable:
+
+```text
+RESEND_API_KEY
+```
+
+When `RESEND_API_KEY` is present, the API sends the confirmation email after a new whitelist entry is saved. Duplicate submissions update the database entry but do not send another confirmation email.
+
+If email sending fails, the database save still succeeds and the page still shows the on-screen confirmation.
+
 ## View Entries Locally
 
 Pull Vercel environment variables:

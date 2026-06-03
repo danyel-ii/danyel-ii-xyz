@@ -188,6 +188,14 @@ const appSchema = {
               We will store your name and email only for Ono Sideboard launch updates.
             </p>
           </form>
+
+          <div class="whitelist-confirmation" data-whitelist-confirmation hidden>
+            <p class="eyebrow">Confirmed</p>
+            <h3>You're on the whitelist.</h3>
+            <p>
+              We saved your details. We'll email you when early access opens.
+            </p>
+          </div>
         </section>
 
         <section class="splash-section" aria-label="Ono Sideboard splash artwork">
@@ -283,8 +291,14 @@ const appSchema = {
       if (form instanceof HTMLFormElement) {
         const message = form.querySelector('.whitelist-form__message')
         const button = form.querySelector('button[type="submit"]')
+        const confirmation = document.querySelector('[data-whitelist-confirmation]')
         const endpoint = form.dataset.endpoint || ''
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+        const setFormState = (state) => {
+          form.dataset.state = state
+          if (message) message.dataset.state = state
+        }
 
         form.addEventListener('submit', async (event) => {
           event.preventDefault()
@@ -294,22 +308,28 @@ const appSchema = {
           const website = String(formData.get('website') || '').trim()
 
           if (!message || !(button instanceof HTMLButtonElement)) return
+          setFormState('idle')
+          if (confirmation instanceof HTMLElement) confirmation.hidden = true
 
           if (!name) {
+            setFormState('error')
             message.textContent = 'Enter your name before joining the whitelist.'
             return
           }
 
           if (!emailPattern.test(email)) {
+            setFormState('error')
             message.textContent = 'Enter a valid email address before joining the whitelist.'
             return
           }
 
           if (!endpoint) {
+            setFormState('error')
             message.textContent = 'The whitelist form is temporarily unavailable.'
             return
           }
 
+          setFormState('submitting')
           button.disabled = true
           button.textContent = 'Joining...'
           message.textContent = 'Submitting your whitelist request.'
@@ -326,11 +346,14 @@ const appSchema = {
               throw new Error(data?.status || 'error')
             }
 
+            setFormState('success')
             message.textContent = data?.status === 'updated'
               ? 'Your whitelist details have been updated.'
               : 'You are on the Ono Sideboard whitelist.'
+            if (confirmation instanceof HTMLElement) confirmation.hidden = false
             form.reset()
           } catch (error) {
+            setFormState('error')
             if (error instanceof Error && error.message === 'database_not_configured') {
               message.textContent = 'The whitelist database is not configured yet. Please try again later.'
             } else {
@@ -678,6 +701,37 @@ const appSchema = {
     font-size: 0.92rem;
   }
 
+  .whitelist-form__message[data-state="error"] {
+    color: #f0b5aa;
+  }
+
+  .whitelist-form__message[data-state="submitting"] {
+    color: var(--gold);
+  }
+
+  .whitelist-confirmation {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid rgba(185, 230, 201, 0.36);
+    border-radius: 8px;
+    background: rgba(185, 230, 201, 0.08);
+  }
+
+  .whitelist-confirmation[hidden] {
+    display: none;
+  }
+
+  .whitelist-confirmation h3 {
+    font-size: 1.1rem;
+  }
+
+  .whitelist-confirmation p:not(.eyebrow) {
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
   .deck-section {
     display: grid;
     gap: 28px;
@@ -914,8 +968,8 @@ const appSchema = {
     .deck-strip {
       display: grid;
       width: 100%;
-      min-height: clamp(220px, 64vw, 300px);
-      margin: 0;
+      min-height: clamp(205px, 58vw, 278px);
+      margin: 2px 0 0;
       padding: 8px 0 4px;
       place-items: center;
       overflow: visible;
@@ -923,33 +977,33 @@ const appSchema = {
 
     .deck-card {
       grid-area: 1 / 1;
-      width: min(32vw, 128px);
+      width: min(25.5vw, 104px);
       min-width: 0;
       transform-origin: 50% 88%;
     }
 
     .deck-card:first-child {
-      transform: translateX(-72%) rotate(-12deg);
+      transform: translateX(-154%) translateY(18px) rotate(-15deg);
       z-index: 1;
     }
 
     .deck-card:nth-child(2) {
-      transform: translateX(-36%) translateY(5px) rotate(-6deg);
+      transform: translateX(-78%) translateY(6px) rotate(-8deg);
       z-index: 2;
     }
 
     .deck-card:nth-child(3) {
-      transform: translateY(12px) rotate(1deg);
+      transform: translateY(0) rotate(1deg);
       z-index: 5;
     }
 
     .deck-card:nth-child(4) {
-      transform: translateX(36%) translateY(5px) rotate(6deg);
+      transform: translateX(78%) translateY(6px) rotate(8deg);
       z-index: 4;
     }
 
     .deck-card:nth-child(5) {
-      transform: translateX(72%) rotate(12deg);
+      transform: translateX(154%) translateY(18px) rotate(15deg);
       z-index: 3;
     }
 
@@ -1006,7 +1060,7 @@ const appSchema = {
 
   @media (max-width: 420px) {
     .deck-card {
-      width: min(30vw, 116px);
+      width: min(24.5vw, 96px);
     }
 
     .splash {
