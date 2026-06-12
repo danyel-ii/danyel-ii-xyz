@@ -23,7 +23,7 @@ const legalLinks = [
 ]
 
 const appDeckOrder = ['gold-leaf', 'marta', 'quatre-gats', 'sgt-pepper', 'maskless']
-const representativeCardSlug = 'the-high-priestess'
+const representativeCardSlugs = ['the-fool', 'the-high-priestess']
 const deckIds = existsSync(deckDirectory)
   ? readdirSync(deckDirectory, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
@@ -77,6 +77,8 @@ const cardDecks = deckIds
       alt: `${card.title} tarot card from the ${title} deck in Ono Sideboard.`,
     }))
 
+    const deckIndex = appDeckOrder.indexOf(deckId)
+    const representativeCardSlug = representativeCardSlugs[Math.max(deckIndex, 0) % representativeCardSlugs.length]
     const representativeCard = mappedCards.find((card) => card.slug === representativeCardSlug) ?? mappedCards[0]
 
     return {
@@ -814,8 +816,8 @@ const appSchema = {
   }
 
   h1 {
-    font-size: clamp(2.85rem, 6vw, 6.1rem);
-    line-height: 0.88;
+    font-size: clamp(2.7rem, 5.35vw, 5.55rem);
+    line-height: 0.9;
   }
 
   h2 {
