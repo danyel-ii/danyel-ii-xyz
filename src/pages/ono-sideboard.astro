@@ -25,6 +25,7 @@ const legalLinks = [
 const appDeckOrder = ['gold-leaf', 'marta', 'quatre-gats', 'sgt-pepper', 'maskless']
 const representativeCardSlug = 'the-high-priestess'
 const foolCardSlug = 'the-fool'
+const fixedPreviewSlugs = ['the-fool', 'seven-of-cups', 'seven-of-wands']
 const deckIds = existsSync(deckDirectory)
   ? readdirSync(deckDirectory, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
@@ -97,7 +98,9 @@ const heroCardPreviews = representativeDeckCards.slice(0, 3)
 const foolPreviewCards = cardDecks
   .map((deck) => deck.cards.find((card) => card.slug === foolCardSlug))
   .filter(Boolean)
-const initialRandomPreviewCards = cardDecks[0]?.cards.slice(0, 3) ?? []
+const initialFixedPreviewCards = fixedPreviewSlugs
+  .map((slug) => cardDecks[0]?.cards.find((card) => card.slug === slug))
+  .filter(Boolean)
 
 const featureAreas = [
   {
@@ -327,8 +330,8 @@ const appSchema = {
                   </button>
                 ))}
               </div>
-              <div class="deck-stage deck-stage--random" data-random-preview>
-                {initialRandomPreviewCards.map((card) => (
+              <div class="deck-stage deck-stage--fixed" data-fixed-preview>
+                {initialFixedPreviewCards.map((card) => (
                   <figure class="deck-card">
                     <img src={card.src} alt={card.alt} width="371" height="620" loading="lazy" decoding="async" />
                     <figcaption>{card.title}</figcaption>
@@ -426,7 +429,7 @@ const appSchema = {
       const panels = Array.from(document.querySelectorAll('[data-panel]'))
       const cardPoolElement = document.querySelector('#ono-card-pool')
       const previewButtons = Array.from(document.querySelectorAll('[data-preview-deck-id]'))
-      const randomPreview = document.querySelector('[data-random-preview]')
+      const fixedPreview = document.querySelector('[data-fixed-preview]')
       const form = document.querySelector('.whitelist-form')
 
       const showPanel = (panelName) => {
@@ -450,25 +453,19 @@ const appSchema = {
         })
       })
 
-      if (cardPoolElement && randomPreview instanceof HTMLElement) {
+      if (cardPoolElement && fixedPreview instanceof HTMLElement) {
         try {
           const decks = JSON.parse(cardPoolElement.textContent || '[]')
+          const fixedPreviewSlugs = ['the-fool', 'seven-of-cups', 'seven-of-wands']
 
-          const shuffleCards = (cards) => {
-            const shuffled = [...cards]
-            for (let index = shuffled.length - 1; index > 0; index -= 1) {
-              const swapIndex = Math.floor(Math.random() * (index + 1))
-              ;[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]]
-            }
-            return shuffled
-          }
-
-          const renderRandomPreview = (deckId) => {
+          const renderFixedPreview = (deckId) => {
             const deck = decks.find((item) => item.deckId === deckId)
             if (!deck || !Array.isArray(deck.cards)) return
 
-            const selectedCards = shuffleCards(deck.cards).slice(0, 3)
-            const slots = Array.from(randomPreview.querySelectorAll('.deck-card'))
+            const selectedCards = fixedPreviewSlugs
+              .map((slug) => deck.cards.find((card) => card.slug === slug))
+              .filter(Boolean)
+            const slots = Array.from(fixedPreview.querySelectorAll('.deck-card'))
 
             slots.forEach((slot, index) => {
               const card = selectedCards[index]
@@ -490,7 +487,7 @@ const appSchema = {
           previewButtons.forEach((button) => {
             button.addEventListener('click', () => {
               if (!(button instanceof HTMLElement) || !button.dataset.previewDeckId) return
-              renderRandomPreview(button.dataset.previewDeckId)
+              renderFixedPreview(button.dataset.previewDeckId)
             })
           })
         } catch {
@@ -1085,7 +1082,7 @@ const appSchema = {
     min-height: 0;
   }
 
-  .deck-stage--random {
+  .deck-stage--fixed {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
