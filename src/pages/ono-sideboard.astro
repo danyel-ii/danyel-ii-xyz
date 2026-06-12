@@ -310,7 +310,7 @@ const appSchema = {
                 {cardDecks.map((deck, index) => (
                   <button class:list={['deck-choice', { 'is-active': index === 0 }]} type="button" data-deck-id={deck.deckId}>
                     <img
-                      src={deck.preview || deck.representativeCard.src}
+                      src={deck.representativeCard.src}
                       alt=""
                       width="371"
                       height="620"
