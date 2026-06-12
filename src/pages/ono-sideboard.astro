@@ -1039,7 +1039,7 @@ const appSchema = {
   .deck-stage {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
+    gap: 10px;
     align-items: end;
     min-height: 0;
   }
@@ -1052,11 +1052,32 @@ const appSchema = {
 
   .deck-card img {
     width: 100%;
-    aspect-ratio: 3 / 5;
+    height: clamp(340px, 44vh, 520px);
     border: 1px solid var(--line-strong);
     border-radius: 7px;
     object-fit: cover;
+    object-position: 50% 50%;
     box-shadow: 0 18px 40px rgba(28, 24, 16, 0.2);
+  }
+
+  .deck-card:nth-child(1) img {
+    object-position: 42% 50%;
+  }
+
+  .deck-card:nth-child(2) img {
+    object-position: 54% 50%;
+  }
+
+  .deck-card:nth-child(3) img {
+    object-position: 48% 50%;
+  }
+
+  .deck-card:nth-child(4) img {
+    object-position: 52% 50%;
+  }
+
+  .deck-card:nth-child(5) img {
+    object-position: 50% 50%;
   }
 
   .deck-card.is-active img {
@@ -1516,6 +1537,10 @@ const appSchema = {
 
     .deck-stage {
       gap: 8px;
+    }
+
+    .deck-card img {
+      height: clamp(230px, 62vw, 360px);
     }
 
     .deck-card figcaption {
