@@ -223,6 +223,10 @@ const appSchema = {
       <symbol id="icon-check" viewBox="0 0 24 24">
         <path d="m5 13 4 4L19 7"></path>
       </symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24">
+        <path d="M6 6l12 12"></path>
+        <path d="M18 6 6 18"></path>
+      </symbol>
     </svg>
 
     <div class="ono-shell">
@@ -332,10 +336,18 @@ const appSchema = {
               </div>
               <div class="deck-stage deck-stage--fixed" data-fixed-preview>
                 {initialFixedPreviewCards.map((card) => (
-                  <figure class="deck-card">
+                  <button
+                    class="deck-card"
+                    type="button"
+                    data-card-preview-button
+                    data-card-src={card.src}
+                    data-card-alt={card.alt}
+                    data-card-title={card.title}
+                    aria-label={`Open ${card.title} fullscreen preview`}
+                  >
                     <img src={card.src} alt={card.alt} width="371" height="620" loading="lazy" decoding="async" />
-                    <figcaption>{card.title}</figcaption>
-                  </figure>
+                    <span class="deck-card__caption">{card.title}</span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -423,6 +435,17 @@ const appSchema = {
       </footer>
     </div>
 
+    <div class="card-lightbox" data-card-lightbox role="dialog" aria-modal="true" aria-labelledby="card-lightbox-title" hidden>
+      <button class="card-lightbox__backdrop" type="button" data-card-lightbox-close aria-label="Close fullscreen card preview"></button>
+      <figure class="card-lightbox__figure">
+        <button class="card-lightbox__close" type="button" data-card-lightbox-close aria-label="Close fullscreen card preview">
+          <svg aria-hidden="true"><use href="#icon-close"></use></svg>
+        </button>
+        <img data-card-lightbox-image src="" alt="" width="371" height="620" decoding="async" />
+        <figcaption id="card-lightbox-title" data-card-lightbox-title></figcaption>
+      </figure>
+    </div>
+
     <script type="application/json" id="ono-card-pool" set:html={JSON.stringify(cardDecks)} />
     <script>
       const navButtons = Array.from(document.querySelectorAll('[data-panel-target]'))
@@ -430,7 +453,12 @@ const appSchema = {
       const cardPoolElement = document.querySelector('#ono-card-pool')
       const previewButtons = Array.from(document.querySelectorAll('[data-preview-deck-id]'))
       const fixedPreview = document.querySelector('[data-fixed-preview]')
+      const lightbox = document.querySelector('[data-card-lightbox]')
+      const lightboxImage = document.querySelector('[data-card-lightbox-image]')
+      const lightboxTitle = document.querySelector('[data-card-lightbox-title]')
+      const lightboxCloseButtons = Array.from(document.querySelectorAll('[data-card-lightbox-close]'))
       const form = document.querySelector('.whitelist-form')
+      let lastLightboxTrigger = null
 
       const showPanel = (panelName) => {
         panels.forEach((panel) => {
@@ -458,6 +486,20 @@ const appSchema = {
           const decks = JSON.parse(cardPoolElement.textContent || '[]')
           const fixedPreviewSlugs = ['the-fool', 'seven-of-cups', 'seven-of-wands']
 
+          const updatePreviewSlot = (slot, card) => {
+            const image = slot.querySelector('img')
+            const caption = slot.querySelector('.deck-card__caption')
+            if (!card || !(slot instanceof HTMLElement) || !(image instanceof HTMLImageElement) || !caption) return
+
+            image.src = card.src
+            image.alt = card.alt
+            caption.textContent = card.title
+            slot.dataset.cardSrc = card.src
+            slot.dataset.cardAlt = card.alt
+            slot.dataset.cardTitle = card.title
+            slot.setAttribute('aria-label', `Open ${card.title} fullscreen preview`)
+          }
+
           const renderFixedPreview = (deckId) => {
             const deck = decks.find((item) => item.deckId === deckId)
             if (!deck || !Array.isArray(deck.cards)) return
@@ -468,14 +510,7 @@ const appSchema = {
             const slots = Array.from(fixedPreview.querySelectorAll('.deck-card'))
 
             slots.forEach((slot, index) => {
-              const card = selectedCards[index]
-              const image = slot.querySelector('img')
-              const caption = slot.querySelector('figcaption')
-              if (!card || !(image instanceof HTMLImageElement) || !caption) return
-
-              image.src = card.src
-              image.alt = card.alt
-              caption.textContent = card.title
+              updatePreviewSlot(slot, selectedCards[index])
             })
 
             previewButtons.forEach((button) => {
@@ -493,6 +528,46 @@ const appSchema = {
         } catch {
           // Keep the server-rendered fallback cards if the deck pool cannot be parsed.
         }
+      }
+
+      if (lightbox instanceof HTMLElement && lightboxImage instanceof HTMLImageElement && lightboxTitle) {
+        const openLightbox = (button) => {
+          const src = button.dataset.cardSrc || ''
+          const alt = button.dataset.cardAlt || ''
+          const title = button.dataset.cardTitle || ''
+          if (!src || !title) return
+
+          lastLightboxTrigger = button
+          lightboxImage.src = src
+          lightboxImage.alt = alt || title
+          lightboxTitle.textContent = title
+          lightbox.hidden = false
+          document.body.classList.add('is-card-lightbox-open')
+          const closeButton = lightbox.querySelector('.card-lightbox__close')
+          if (closeButton instanceof HTMLButtonElement) closeButton.focus()
+        }
+
+        const closeLightbox = () => {
+          if (lightbox.hidden) return
+          lightbox.hidden = true
+          lightboxImage.removeAttribute('src')
+          document.body.classList.remove('is-card-lightbox-open')
+          if (lastLightboxTrigger instanceof HTMLButtonElement) lastLightboxTrigger.focus()
+        }
+
+        document.querySelectorAll('[data-card-preview-button]').forEach((button) => {
+          button.addEventListener('click', () => {
+            if (button instanceof HTMLButtonElement) openLightbox(button)
+          })
+        })
+
+        lightboxCloseButtons.forEach((button) => {
+          button.addEventListener('click', closeLightbox)
+        })
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') closeLightbox()
+        })
       }
 
       if (form instanceof HTMLFormElement) {
@@ -1090,6 +1165,11 @@ const appSchema = {
     display: grid;
     gap: 10px;
     min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: zoom-in;
   }
 
   .deck-card img {
@@ -1129,13 +1209,106 @@ const appSchema = {
       0 0 0 2px rgba(44, 110, 104, 0.18);
   }
 
-  .deck-card figcaption {
+  .deck-card:hover img,
+  .deck-card:focus-visible img {
+    border-color: var(--teal);
+    transform: translateY(-2px);
+  }
+
+  .deck-card:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 4px;
+    border-radius: 8px;
+  }
+
+  .deck-card__caption {
     overflow: hidden;
     color: var(--muted);
     font-size: 0.78rem;
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .is-card-lightbox-open {
+    overflow: hidden;
+  }
+
+  .card-lightbox[hidden] {
+    display: none;
+  }
+
+  .card-lightbox {
+    position: fixed;
+    z-index: 80;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(18px, 4vw, 48px);
+  }
+
+  .card-lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background:
+      radial-gradient(circle at 50% 42%, rgba(244, 239, 228, 0.28), transparent 42%),
+      rgba(16, 16, 12, 0.82);
+    cursor: zoom-out;
+  }
+
+  .card-lightbox__figure {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    width: min(86vw, 460px);
+    margin: 0;
+  }
+
+  .card-lightbox__figure img {
+    display: block;
+    width: auto;
+    max-width: min(86vw, 460px);
+    max-height: min(82vh, 760px);
+    border: 1px solid rgba(255, 251, 241, 0.44);
+    border-radius: 10px;
+    background: var(--paper-strong);
+    box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);
+  }
+
+  .card-lightbox__figure figcaption {
+    color: rgba(255, 251, 241, 0.9);
+    font-size: 0.86rem;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .card-lightbox__close {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255, 251, 241, 0.32);
+    border-radius: 999px;
+    background: rgba(16, 16, 12, 0.92);
+    color: var(--paper-strong);
+    cursor: pointer;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+  }
+
+  .card-lightbox__close svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
   }
 
   .docs-list,
@@ -1585,8 +1758,28 @@ const appSchema = {
       height: clamp(230px, 62vw, 360px);
     }
 
-    .deck-card figcaption {
+    .deck-card__caption {
       font-size: 0.68rem;
+    }
+
+    .card-lightbox {
+      padding: 14px;
+    }
+
+    .card-lightbox__figure {
+      width: min(88vw, 360px);
+    }
+
+    .card-lightbox__figure img {
+      max-width: min(88vw, 360px);
+      max-height: 78vh;
+    }
+
+    .card-lightbox__close {
+      top: -10px;
+      right: -10px;
+      width: 40px;
+      height: 40px;
     }
 
     .whitelist-form {
