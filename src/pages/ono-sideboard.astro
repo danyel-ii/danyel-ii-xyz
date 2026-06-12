@@ -22,14 +22,16 @@ const legalLinks = [
   { label: 'Support', href: `${supportBase}/support` },
 ]
 
-const preferredDeckOrder = ['gold-leaf', 'encryptas', 'marta', 'quatre-gats', 'sgt-pepper', 'maskless']
+const appDeckOrder = ['gold-leaf', 'marta', 'quatre-gats', 'sgt-pepper', 'maskless']
+const representativeCardSlug = 'the-high-priestess'
 const deckIds = existsSync(deckDirectory)
   ? readdirSync(deckDirectory, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
+      .filter((deckId) => appDeckOrder.includes(deckId))
       .sort((left, right) => {
-        const leftIndex = preferredDeckOrder.indexOf(left)
-        const rightIndex = preferredDeckOrder.indexOf(right)
+        const leftIndex = appDeckOrder.indexOf(left)
+        const rightIndex = appDeckOrder.indexOf(right)
 
         if (leftIndex === -1 && rightIndex === -1) return left.localeCompare(right)
         if (leftIndex === -1) return 1
@@ -65,23 +67,32 @@ const cardDecks = deckIds
 
     const previewPath = `public/images/ono-sideboard/deck-previews/${deckId}.jpg`
 
+    const mappedCards = cards.map((card) => ({
+      cardId: `${deckId}:${card.slug}`,
+      deckId,
+      deckTitle: title,
+      slug: card.slug,
+      title: card.title,
+      src: `/images/ono-sideboard/decks/${deckId}/${card.image}`,
+      alt: `${card.title} tarot card from the ${title} deck in Ono Sideboard.`,
+    }))
+
+    const representativeCard = mappedCards.find((card) => card.slug === representativeCardSlug) ?? mappedCards[0]
+
     return {
       deckId,
       title,
       preview: existsSync(previewPath) ? `/images/ono-sideboard/deck-previews/${deckId}.jpg` : '',
-      cards: cards.map((card) => ({
-        cardId: `${deckId}:${card.slug}`,
-        deckId,
-        title: card.title,
-        src: `/images/ono-sideboard/decks/${deckId}/${card.image}`,
-        alt: `${card.title} tarot card from the ${title} deck in Ono Sideboard.`,
-      })),
+      representativeCard,
+      cards: mappedCards,
     }
   })
   .filter((deck) => deck.cards.length >= 5)
 
-const initialDeck = cardDecks[0]
-const initialCardPreviews = initialDeck?.cards.slice(0, 3) ?? []
+const representativeDeckCards = cardDecks
+  .map((deck) => deck.representativeCard)
+  .filter(Boolean)
+const heroCardPreviews = representativeDeckCards.slice(0, 3)
 
 const featureAreas = [
   {
@@ -260,7 +271,7 @@ const appSchema = {
               />
             </figure>
             <div class="card-stack" aria-label="Deck preview cards">
-              {initialCardPreviews.map((card) => (
+              {heroCardPreviews.map((card) => (
                 <figure class="stack-card">
                   <img src={card.src} alt={card.alt} width="371" height="620" loading="eager" decoding="async" />
                 </figure>
@@ -298,16 +309,23 @@ const appSchema = {
               <div class="deck-list" aria-label="Choose a deck">
                 {cardDecks.map((deck, index) => (
                   <button class:list={['deck-choice', { 'is-active': index === 0 }]} type="button" data-deck-id={deck.deckId}>
-                    {deck.preview && <img src={deck.preview} alt="" width="371" height="620" loading="lazy" decoding="async" />}
+                    <img
+                      src={deck.preview || deck.representativeCard.src}
+                      alt=""
+                      width="371"
+                      height="620"
+                      loading="lazy"
+                      decoding="async"
+                    />
                     <span>{deck.title}</span>
                   </button>
                 ))}
               </div>
               <div class="deck-stage" data-deck-stage>
-                {initialCardPreviews.map((card) => (
-                  <figure class="deck-card">
+                {representativeDeckCards.map((card, index) => (
+                  <figure class:list={['deck-card', { 'is-active': index === 0 }]} data-deck-card-id={card.deckId}>
                     <img src={card.src} alt={card.alt} width="371" height="620" loading="lazy" decoding="async" />
-                    <figcaption>{card.title}</figcaption>
+                    <figcaption>{card.deckTitle}</figcaption>
                   </figure>
                 ))}
               </div>
@@ -396,13 +414,11 @@ const appSchema = {
       </footer>
     </div>
 
-    <script type="application/json" id="ono-card-pool" set:html={JSON.stringify(cardDecks)} />
     <script>
       const navButtons = Array.from(document.querySelectorAll('[data-panel-target]'))
       const panels = Array.from(document.querySelectorAll('[data-panel]'))
-      const deckPoolElement = document.querySelector('#ono-card-pool')
-      const deckStage = document.querySelector('[data-deck-stage]')
       const deckChoices = Array.from(document.querySelectorAll('[data-deck-id]'))
+      const deckCards = Array.from(document.querySelectorAll('[data-deck-card-id]'))
       const form = document.querySelector('.whitelist-form')
 
       const showPanel = (panelName) => {
@@ -426,43 +442,21 @@ const appSchema = {
         })
       })
 
-      if (deckPoolElement && deckStage instanceof HTMLElement) {
-        try {
-          const decks = JSON.parse(deckPoolElement.textContent || '[]')
+      deckChoices.forEach((choice) => {
+        choice.addEventListener('click', () => {
+          if (!(choice instanceof HTMLElement) || !choice.dataset.deckId) return
 
-          const renderDeck = (deckId) => {
-            const deck = decks.find((item) => item.deckId === deckId) || decks[0]
-            if (!deck || !Array.isArray(deck.cards)) return
-            const selectedCards = deck.cards.slice(0, 3)
-            const slots = Array.from(deckStage.querySelectorAll('.deck-card'))
-
-            slots.forEach((slot, index) => {
-              const card = selectedCards[index]
-              const image = slot.querySelector('img')
-              const caption = slot.querySelector('figcaption')
-              if (!card || !(image instanceof HTMLImageElement) || !caption) return
-
-              image.src = card.src
-              image.alt = card.alt
-              caption.textContent = card.title
-            })
-
-            deckChoices.forEach((choice) => {
-              if (!(choice instanceof HTMLElement)) return
-              choice.classList.toggle('is-active', choice.dataset.deckId === deck.deckId)
-            })
-          }
-
-          deckChoices.forEach((choice) => {
-            choice.addEventListener('click', () => {
-              if (!(choice instanceof HTMLElement) || !choice.dataset.deckId) return
-              renderDeck(choice.dataset.deckId)
-            })
+          deckChoices.forEach((item) => {
+            if (!(item instanceof HTMLElement)) return
+            item.classList.toggle('is-active', item.dataset.deckId === choice.dataset.deckId)
           })
-        } catch {
-          // Keep the server-rendered fallback cards if the pool cannot be parsed.
-        }
-      }
+
+          deckCards.forEach((card) => {
+            if (!(card instanceof HTMLElement)) return
+            card.classList.toggle('is-active', card.dataset.deckCardId === choice.dataset.deckId)
+          })
+        })
+      })
 
       if (form instanceof HTMLFormElement) {
         const message = form.querySelector('.whitelist-form__message')
@@ -995,7 +989,7 @@ const appSchema = {
 
   .deck-list {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 8px;
   }
 
@@ -1044,8 +1038,8 @@ const appSchema = {
 
   .deck-stage {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
     align-items: end;
     min-height: 0;
   }
@@ -1065,8 +1059,11 @@ const appSchema = {
     box-shadow: 0 18px 40px rgba(28, 24, 16, 0.2);
   }
 
-  .deck-card:nth-child(2) {
-    transform: translateY(-18px);
+  .deck-card.is-active img {
+    border-color: var(--teal);
+    box-shadow:
+      0 18px 40px rgba(28, 24, 16, 0.2),
+      0 0 0 2px rgba(44, 110, 104, 0.18);
   }
 
   .deck-card figcaption {
@@ -1519,10 +1516,6 @@ const appSchema = {
 
     .deck-stage {
       gap: 8px;
-    }
-
-    .deck-card:nth-child(2) {
-      transform: translateY(-10px);
     }
 
     .deck-card figcaption {
