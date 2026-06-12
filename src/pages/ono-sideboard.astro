@@ -6,7 +6,8 @@ export const prerender = true
 const waitlistEndpoint = '/api/waitlist'
 const pageUrl = 'https://danyel-ii.xyz/ono-sideboard'
 const shareImageUrl = 'https://danyel-ii.xyz/images/ono-sideboard/social-card-ono-20260612.png'
-const shareDescription = 'A private tarot journal for readings, spreads, and custom decks.'
+const shareTitle = 'Ono-Sideboard'
+const imageDescription = 'A private tarot journal for readings, spreads, and custom decks.'
 const supportBase = 'https://tarot.danyel-ii.xyz'
 const supportEmail = 'support@danyel-ii.xyz'
 const deckDirectory = 'public/images/ono-sideboard/decks'
@@ -147,7 +148,7 @@ const appSchema = {
   name: 'Ono Sideboard',
   operatingSystem: 'Android',
   applicationCategory: 'LifestyleApplication',
-  description: shareDescription,
+  description: imageDescription,
   image: shareImageUrl,
 }
 ---
@@ -158,14 +159,14 @@ const appSchema = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Ono Sideboard - Private Tarot Journal for Android</title>
-    <meta name="description" content={`${shareDescription} Join the early access whitelist.`} />
+    <meta name="description" content={shareTitle} />
     <meta name="robots" content="index,follow" />
     <meta name="theme-color" content="#f4efe4" />
     <link rel="canonical" href={pageUrl} />
     <link rel="icon" type="image/png" href="/images/ono-sideboard/logo-favicon.png" />
     <link rel="apple-touch-icon" href="/images/ono-sideboard/logo-touch.png" />
-    <meta property="og:title" content="Ono Sideboard" />
-    <meta property="og:description" content={shareDescription} />
+    <meta property="og:title" content={shareTitle} />
+    <meta property="og:description" content={shareTitle} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:image" content={shareImageUrl} />
@@ -173,12 +174,12 @@ const appSchema = {
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={shareDescription} />
+    <meta property="og:image:alt" content={imageDescription} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Ono Sideboard" />
-    <meta name="twitter:description" content={shareDescription} />
+    <meta name="twitter:title" content={shareTitle} />
+    <meta name="twitter:description" content={shareTitle} />
     <meta name="twitter:image" content={shareImageUrl} />
-    <meta name="twitter:image:alt" content={shareDescription} />
+    <meta name="twitter:image:alt" content={imageDescription} />
     <script type="application/ld+json" set:html={JSON.stringify(appSchema)} />
   </head>
   <body>
