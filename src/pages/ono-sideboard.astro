@@ -24,6 +24,15 @@ const legalLinks = [
 
 const appDeckOrder = ['gold-leaf', 'marta', 'quatre-gats', 'sgt-pepper', 'maskless']
 const representativeCardSlug = 'the-high-priestess'
+const previewSamplerSlugs = [
+  'the-fool',
+  'the-fool',
+  'the-fool',
+  'seven-of-cups',
+  'seven-of-pentacles',
+  'seven-of-swords',
+  'seven-of-wands',
+]
 const deckIds = existsSync(deckDirectory)
   ? readdirSync(deckDirectory, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
@@ -93,6 +102,12 @@ const representativeDeckCards = cardDecks
   .map((deck) => deck.representativeCard)
   .filter(Boolean)
 const heroCardPreviews = representativeDeckCards.slice(0, 3)
+const previewSamplerCards = previewSamplerSlugs
+  .map((slug, index) => {
+    const deck = cardDecks[index % cardDecks.length]
+    return deck?.cards.find((card) => card.slug === slug)
+  })
+  .filter(Boolean)
 
 const featureAreas = [
   {
@@ -306,19 +321,12 @@ const appSchema = {
               <p class="deck-note">{cardDecks.length} deck families loaded from the app image library.</p>
             </div>
             <div class="deck-browser">
-              <div class="deck-list" aria-label="Choose a deck">
-                {cardDecks.map((deck, index) => (
-                  <button class:list={['deck-choice', { 'is-active': index === 0 }]} type="button" data-deck-id={deck.deckId}>
-                    <img
-                      src={deck.preview || deck.representativeCard.src}
-                      alt=""
-                      width="371"
-                      height="620"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span>{deck.title}</span>
-                  </button>
+              <div class="deck-list" aria-label="Preview cards from available app decks">
+                {previewSamplerCards.map((card) => (
+                  <figure class="deck-choice">
+                    <img src={card.src} alt={card.alt} width="371" height="620" loading="lazy" decoding="async" />
+                    <figcaption>{card.title}</figcaption>
+                  </figure>
                 ))}
               </div>
               <div class="deck-stage" data-deck-stage>
@@ -417,8 +425,6 @@ const appSchema = {
     <script>
       const navButtons = Array.from(document.querySelectorAll('[data-panel-target]'))
       const panels = Array.from(document.querySelectorAll('[data-panel]'))
-      const deckChoices = Array.from(document.querySelectorAll('[data-deck-id]'))
-      const deckCards = Array.from(document.querySelectorAll('[data-deck-card-id]'))
       const form = document.querySelector('.whitelist-form')
 
       const showPanel = (panelName) => {
@@ -439,22 +445,6 @@ const appSchema = {
         button.addEventListener('click', () => {
           if (!(button instanceof HTMLElement) || !button.dataset.panelTarget) return
           showPanel(button.dataset.panelTarget)
-        })
-      })
-
-      deckChoices.forEach((choice) => {
-        choice.addEventListener('click', () => {
-          if (!(choice instanceof HTMLElement) || !choice.dataset.deckId) return
-
-          deckChoices.forEach((item) => {
-            if (!(item instanceof HTMLElement)) return
-            item.classList.toggle('is-active', item.dataset.deckId === choice.dataset.deckId)
-          })
-
-          deckCards.forEach((card) => {
-            if (!(card instanceof HTMLElement)) return
-            card.classList.toggle('is-active', card.dataset.deckCardId === choice.dataset.deckId)
-          })
         })
       })
 
@@ -982,41 +972,42 @@ const appSchema = {
 
   .deck-browser {
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
     gap: 16px;
+    align-content: start;
     min-height: 0;
   }
 
   .deck-list {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 8px;
   }
 
   .deck-choice {
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto auto;
     gap: 7px;
     min-width: 0;
     padding: 0;
     border: 0;
     background: transparent;
     color: var(--muted);
-    cursor: pointer;
   }
 
   .deck-choice img {
     width: 100%;
-    aspect-ratio: 3 / 5;
+    height: clamp(118px, 14vh, 150px);
     border: 2px solid transparent;
     border-radius: 5px;
     object-fit: cover;
+    object-position: 50% 50%;
     transition:
       border-color 160ms ease,
       transform 160ms ease;
   }
 
-  .deck-choice span {
+  .deck-choice figcaption {
     overflow: hidden;
     color: inherit;
     font-size: 0.66rem;
@@ -1024,16 +1015,6 @@ const appSchema = {
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  .deck-choice:hover img,
-  .deck-choice.is-active img {
-    border-color: var(--teal);
-    transform: translateY(-2px);
-  }
-
-  .deck-choice.is-active {
-    color: var(--ink);
   }
 
   .deck-stage {
@@ -1532,7 +1513,7 @@ const appSchema = {
     }
 
     .deck-list {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
     .deck-stage {
