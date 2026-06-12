@@ -249,25 +249,29 @@ const appSchema = {
         </a>
 
         <nav class="icon-nav" aria-label="Explore Ono Sideboard">
-          <button class="icon-button" type="button" data-panel-target="overview" aria-label="Overview" title="Overview">
+          <button class="icon-button" type="button" data-panel-target="overview" data-i18n-aria-label="nav.overview" data-i18n-title="nav.overview" aria-label="Overview" title="Overview">
             <svg><use href="#icon-compass"></use></svg>
           </button>
-          <button class="icon-button is-active" type="button" data-panel-target="decks" aria-label="Decks" title="Decks">
+          <button class="icon-button is-active" type="button" data-panel-target="decks" data-i18n-aria-label="nav.decks" data-i18n-title="nav.decks" aria-label="Decks" title="Decks">
             <svg><use href="#icon-layers"></use></svg>
           </button>
-          <button class="icon-button" type="button" data-panel-target="docs" aria-label="Docs" title="Docs">
+          <button class="icon-button" type="button" data-panel-target="docs" data-i18n-aria-label="nav.docs" data-i18n-title="nav.docs" aria-label="Docs" title="Docs">
             <svg><use href="#icon-book"></use></svg>
           </button>
-          <button class="icon-button" type="button" data-panel-target="faq" aria-label="FAQ" title="FAQ">
+          <button class="icon-button" type="button" data-panel-target="faq" data-i18n-aria-label="nav.faq" data-i18n-title="nav.faq" aria-label="FAQ" title="FAQ">
             <svg><use href="#icon-help"></use></svg>
           </button>
         </nav>
 
         <div class="topbar__actions">
-          <a class="icon-link" href="#whitelist" aria-label="Join whitelist" title="Join whitelist">
+          <div class="language-toggle" role="group" aria-label="Language" data-i18n-aria-label="language.group">
+            <button class="language-toggle__button is-active" type="button" data-language-option="en" aria-pressed="true">EN</button>
+            <button class="language-toggle__button" type="button" data-language-option="de" aria-pressed="false">DE</button>
+          </div>
+          <a class="icon-link" href="#whitelist" data-i18n-aria-label="actions.join" data-i18n-title="actions.join" aria-label="Join whitelist" title="Join whitelist">
             <svg><use href="#icon-mail"></use></svg>
           </a>
-          <span class="icon-link is-disabled" aria-label="Android download coming soon" title="Android download coming soon">
+          <span class="icon-link is-disabled" data-i18n-aria-label="actions.download" data-i18n-title="actions.download" aria-label="Android download coming soon" title="Android download coming soon">
             <svg><use href="#icon-android"></use></svg>
           </span>
         </div>
@@ -276,9 +280,9 @@ const appSchema = {
       <main class="experience">
         <section class="hero" aria-labelledby="ono-title">
           <div class="hero__copy">
-            <p class="eyebrow">Android early access</p>
-            <h1 id="ono-title">A private tarot journal for readings, spreads, and custom decks.</h1>
-            <p class="lede">
+            <p class="eyebrow" data-i18n="hero.eyebrow">Android early access</p>
+            <h1 id="ono-title" data-i18n="hero.title">A private tarot journal for readings, spreads, and custom decks.</h1>
+            <p class="lede" data-i18n="hero.lede">
               Ono Sideboard is a tarot journaling app: select a deck, record a spread, write the reflection, and watch patterns emerge over time.
             </p>
           </div>
@@ -307,15 +311,15 @@ const appSchema = {
         <section class="control-plane" aria-label="Ono Sideboard product exploration">
           <div class="panel" data-panel="overview" hidden>
             <div class="panel__head">
-              <p class="eyebrow">Explore</p>
-              <h2>Built for quiet repeat use.</h2>
+              <p class="eyebrow" data-i18n="overview.eyebrow">Explore</p>
+              <h2 data-i18n="overview.title">Built for quiet repeat use.</h2>
             </div>
             <div class="feature-grid">
-              {featureAreas.map((feature) => (
+              {featureAreas.map((feature, index) => (
                 <article class="feature">
                   <svg aria-hidden="true"><use href={`#icon-${feature.icon}`}></use></svg>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.body}</p>
+                  <h3 data-i18n={`feature.${index}.title`}>{feature.title}</h3>
+                  <p data-i18n={`feature.${index}.body`}>{feature.body}</p>
                 </article>
               ))}
             </div>
@@ -324,10 +328,10 @@ const appSchema = {
           <div class="panel is-active" data-panel="decks">
             <div class="panel__head panel__head--inline">
               <div>
-                <p class="eyebrow">Deck system</p>
-                <h2>Preview the visual language.</h2>
+                <p class="eyebrow" data-i18n="decks.eyebrow">Deck system</p>
+                <h2 data-i18n="decks.title">Preview the visual language.</h2>
               </div>
-              <p class="deck-note">{cardDecks.length} deck families loaded from the app image library. Create your own decks inside the app.</p>
+              <p class="deck-note" data-i18n="decks.note" data-deck-count={cardDecks.length}>{cardDecks.length} deck families loaded from the app image library. Create your own decks inside the app.</p>
             </div>
             <div class="deck-browser">
               <div class="deck-list deck-list--five" aria-label="Fool preview cards from available app decks">
@@ -367,16 +371,16 @@ const appSchema = {
 
           <div class="panel" data-panel="docs" hidden>
             <div class="panel__head">
-              <p class="eyebrow">Docs</p>
-              <h2>Simple operating notes.</h2>
+              <p class="eyebrow" data-i18n="docs.eyebrow">Docs</p>
+              <h2 data-i18n="docs.title">Simple operating notes.</h2>
             </div>
             <div class="docs-list">
-              {docs.map(([title, body]) => (
+              {docs.map(([title, body], index) => (
                 <article>
                   <span><svg aria-hidden="true"><use href="#icon-check"></use></svg></span>
                   <div>
-                    <h3>{title}</h3>
-                    <p>{body}</p>
+                    <h3 data-i18n={`docs.${index}.title`}>{title}</h3>
+                    <p data-i18n={`docs.${index}.body`}>{body}</p>
                   </div>
                 </article>
               ))}
@@ -385,14 +389,14 @@ const appSchema = {
 
           <div class="panel" data-panel="faq" hidden>
             <div class="panel__head">
-              <p class="eyebrow">FAQ</p>
-              <h2>Launch details.</h2>
+              <p class="eyebrow" data-i18n="faq.eyebrow">FAQ</p>
+              <h2 data-i18n="faq.title">Launch details.</h2>
             </div>
             <div class="faq-list">
-              {faqs.map(([question, answer]) => (
+              {faqs.map(([question, answer], index) => (
                 <details>
-                  <summary>{question}</summary>
-                  <p>{answer}</p>
+                  <summary data-i18n={`faq.${index}.question`}>{question}</summary>
+                  <p data-i18n={`faq.${index}.answer`}>{answer}</p>
                 </details>
               ))}
             </div>
@@ -401,37 +405,37 @@ const appSchema = {
 
         <aside id="whitelist" class="signup" aria-labelledby="signup-title">
           <div class="signup__head">
-            <p class="eyebrow">Whitelist</p>
-            <h2 id="signup-title">Reserve early Android access.</h2>
-            <p>One launch email. No campaign drip.</p>
+            <p class="eyebrow" data-i18n="signup.eyebrow">Whitelist</p>
+            <h2 id="signup-title" data-i18n="signup.title">Reserve early Android access.</h2>
+            <p data-i18n="signup.body">One launch email. No campaign drip.</p>
           </div>
 
           <form class="whitelist-form" data-endpoint={waitlistEndpoint} novalidate>
             <label>
-              <span>Name</span>
-              <input name="name" type="text" autocomplete="name" placeholder="Name" required />
+              <span data-i18n="form.name">Name</span>
+              <input name="name" type="text" autocomplete="name" data-i18n-placeholder="form.name" placeholder="Name" required />
             </label>
             <label>
-              <span>Email address</span>
-              <input name="email" type="email" autocomplete="email" placeholder="Email" required />
+              <span data-i18n="form.emailLabel">Email address</span>
+              <input name="email" type="email" autocomplete="email" data-i18n-placeholder="form.emailPlaceholder" placeholder="Email" required />
             </label>
             <label class="whitelist-form__trap" aria-hidden="true">
               <span>Website</span>
               <input name="website" type="text" tabindex="-1" autocomplete="off" />
             </label>
-            <button class="submit-button" type="submit" aria-label="Join whitelist">
+            <button class="submit-button" type="submit" data-i18n-aria-label="actions.join" aria-label="Join whitelist">
               <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
             </button>
-            <p class="whitelist-form__message" role="status" aria-live="polite">
+            <p class="whitelist-form__message" data-i18n="form.message.idle" role="status" aria-live="polite">
               We store your name and email only for Ono Sideboard launch updates.
             </p>
           </form>
 
-          <div class="download-placeholder" aria-label="Android download status">
+          <div class="download-placeholder" data-i18n-aria-label="download.status" aria-label="Android download status">
             <svg aria-hidden="true"><use href="#icon-android"></use></svg>
             <div>
-              <strong>Android download</strong>
-              <span>Play Store and beta link placeholder.</span>
+              <strong data-i18n="download.title">Android download</strong>
+              <span data-i18n="download.body">Play Store and beta link placeholder.</span>
             </div>
           </div>
         </aside>
@@ -440,10 +444,10 @@ const appSchema = {
       <footer class="footer">
         <nav aria-label="Footer">
           {legalLinks.map((link) => <a href={link.href}>{link.label}</a>)}
-          <a href={`${supportBase}/account/delete`}>Account deletion</a>
-          <a href={`mailto:${supportEmail}`}>Contact</a>
+          <a href={`${supportBase}/account/delete`} data-i18n="footer.delete">Account deletion</a>
+          <a href={`mailto:${supportEmail}`} data-i18n="footer.contact">Contact</a>
         </nav>
-        <p>&copy; 2026 Daniel Hawes. Ono Sideboard is for reflection and creative journaling.</p>
+        <p data-i18n="footer.note">&copy; 2026 Daniel Hawes. Ono Sideboard is for reflection and creative journaling.</p>
       </footer>
     </div>
 
@@ -470,7 +474,197 @@ const appSchema = {
       const lightboxTitle = document.querySelector('[data-card-lightbox-title]')
       const lightboxCloseButtons = Array.from(document.querySelectorAll('[data-card-lightbox-close]'))
       const form = document.querySelector('.whitelist-form')
+      const languageButtons = Array.from(document.querySelectorAll('[data-language-option]'))
       let lastLightboxTrigger = null
+      let currentLanguage = 'en'
+
+      const translations = {
+        en: {
+          'nav.overview': 'Overview',
+          'nav.decks': 'Decks',
+          'nav.docs': 'Docs',
+          'nav.faq': 'FAQ',
+          'language.group': 'Language',
+          'actions.join': 'Join whitelist',
+          'actions.download': 'Android download coming soon',
+          'hero.eyebrow': 'Android early access',
+          'hero.title': 'A private tarot journal for readings, spreads, and custom decks.',
+          'hero.lede': 'Ono Sideboard is a tarot journaling app: select a deck, record a spread, write the reflection, and watch patterns emerge over time.',
+          'overview.eyebrow': 'Explore',
+          'overview.title': 'Built for quiet repeat use.',
+          'feature.0.title': 'Tarot journaling',
+          'feature.0.body': 'Daily cards, spreads, questions, and reflections become a private journal you can return to over time.',
+          'feature.1.title': 'Custom decks',
+          'feature.1.body': 'Create your own tarot decks, then explore complete deck families with the structure of a familiar tarot system.',
+          'feature.2.title': 'Pattern memory',
+          'feature.2.body': 'Track recurring cards, themes, and readings without turning a reflective practice into a social feed.',
+          'feature.3.title': 'Optional AI prompts',
+          'feature.3.body': 'Guided prompts can help unblock writing while keeping the app centered on your own notes.',
+          'decks.eyebrow': 'Deck system',
+          'decks.title': 'Preview the visual language.',
+          'decks.note': '{count} deck families loaded from the app image library. Create your own decks inside the app.',
+          'docs.eyebrow': 'Docs',
+          'docs.title': 'Simple operating notes.',
+          'docs.0.title': 'Start',
+          'docs.0.body': 'Open a daily card or spread, write the question, then save the reading into your tarot journal.',
+          'docs.1.title': 'Decks',
+          'docs.1.body': 'Browse deck families, create your own decks, preview cards, and keep favorites ready for future readings.',
+          'docs.2.title': 'Journal',
+          'docs.2.body': 'Use tags, reflections, and recurring themes to follow what keeps showing up in your readings.',
+          'docs.3.title': 'Safety',
+          'docs.3.body': 'Ono Sideboard is for reflection and creative journaling, not medical, legal, financial, or mental-health advice.',
+          'faq.eyebrow': 'FAQ',
+          'faq.title': 'Launch details.',
+          'faq.0.question': 'When will Android access open?',
+          'faq.0.answer': 'The whitelist is for early Android access. We will send one email when the first build is ready.',
+          'faq.1.question': 'Is the Play Store link live?',
+          'faq.1.answer': 'Not yet. The Android download area is reserved for the public listing and beta download link.',
+          'faq.2.question': 'Do I need to use AI?',
+          'faq.2.answer': 'No. AI prompts are optional and are treated as a writing aid, not an authority.',
+          'faq.3.question': 'What do you store for the whitelist?',
+          'faq.3.answer': 'Only the name and email submitted for Ono Sideboard launch updates.',
+          'signup.eyebrow': 'Whitelist',
+          'signup.title': 'Reserve early Android access.',
+          'signup.body': 'One launch email. No campaign drip.',
+          'form.name': 'Name',
+          'form.emailLabel': 'Email address',
+          'form.emailPlaceholder': 'Email',
+          'form.message.idle': 'We store your name and email only for Ono Sideboard launch updates.',
+          'form.message.name': 'Enter your name before joining the whitelist.',
+          'form.message.email': 'Enter a valid email address before joining the whitelist.',
+          'form.message.unavailable': 'The whitelist form is temporarily unavailable.',
+          'form.message.submitting': 'Submitting your whitelist request.',
+          'form.message.updated': 'Your whitelist details have been updated.',
+          'form.message.success': 'You are on the Ono Sideboard whitelist.',
+          'form.message.database': 'The whitelist database is not configured yet. Please try again later.',
+          'form.message.error': 'The whitelist request could not be saved. Please try again later.',
+          'download.status': 'Android download status',
+          'download.title': 'Android download',
+          'download.body': 'Play Store and beta link placeholder.',
+          'footer.delete': 'Account deletion',
+          'footer.contact': 'Contact',
+          'footer.note': '© 2026 Daniel Hawes. Ono Sideboard is for reflection and creative journaling.',
+        },
+        de: {
+          'nav.overview': 'Überblick',
+          'nav.decks': 'Decks',
+          'nav.docs': 'Doku',
+          'nav.faq': 'FAQ',
+          'language.group': 'Sprache',
+          'actions.join': 'Zur Warteliste',
+          'actions.download': 'Android-Download kommt bald',
+          'hero.eyebrow': 'Früher Android-Zugang',
+          'hero.title': 'Ein privates Tarot-Journal für Legungen, Spreads und eigene Decks.',
+          'hero.lede': 'Ono Sideboard ist eine Tarot-Journaling-App: Wähle ein Deck, speichere eine Legung, schreibe deine Reflexion und erkenne Muster über die Zeit.',
+          'overview.eyebrow': 'Erkunden',
+          'overview.title': 'Gebaut für ruhige, wiederholte Nutzung.',
+          'feature.0.title': 'Tarot-Journaling',
+          'feature.0.body': 'Tageskarten, Spreads, Fragen und Reflexionen werden zu einem privaten Journal, zu dem du jederzeit zurückkehren kannst.',
+          'feature.1.title': 'Eigene Decks',
+          'feature.1.body': 'Erstelle deine eigenen Tarot-Decks und erkunde vollständige Deck-Familien mit der Struktur eines vertrauten Tarot-Systems.',
+          'feature.2.title': 'Muster-Gedächtnis',
+          'feature.2.body': 'Verfolge wiederkehrende Karten, Themen und Legungen, ohne deine reflektierende Praxis in einen Social Feed zu verwandeln.',
+          'feature.3.title': 'Optionale KI-Impulse',
+          'feature.3.body': 'Geführte Impulse können beim Schreiben helfen, während deine eigenen Notizen im Zentrum bleiben.',
+          'decks.eyebrow': 'Deck-System',
+          'decks.title': 'Die visuelle Sprache ansehen.',
+          'decks.note': '{count} Deck-Familien aus der Bildbibliothek der App geladen. Eigene Decks kannst du direkt in der App erstellen.',
+          'docs.eyebrow': 'Doku',
+          'docs.title': 'Kurze Hinweise zur Nutzung.',
+          'docs.0.title': 'Start',
+          'docs.0.body': 'Öffne eine Tageskarte oder Legung, notiere die Frage und speichere die Lesung in deinem Tarot-Journal.',
+          'docs.1.title': 'Decks',
+          'docs.1.body': 'Durchsuche Deck-Familien, erstelle eigene Decks, sieh dir Karten an und halte Favoriten für spätere Legungen bereit.',
+          'docs.2.title': 'Journal',
+          'docs.2.body': 'Nutze Tags, Reflexionen und wiederkehrende Themen, um zu sehen, was in deinen Legungen immer wieder auftaucht.',
+          'docs.3.title': 'Sicherheit',
+          'docs.3.body': 'Ono Sideboard dient Reflexion und kreativem Journaling, nicht medizinischer, rechtlicher, finanzieller oder psychologischer Beratung.',
+          'faq.eyebrow': 'FAQ',
+          'faq.title': 'Details zum Start.',
+          'faq.0.question': 'Wann öffnet der Android-Zugang?',
+          'faq.0.answer': 'Die Warteliste ist für frühen Android-Zugang. Wir senden eine E-Mail, sobald der erste Build bereit ist.',
+          'faq.1.question': 'Ist der Play-Store-Link schon live?',
+          'faq.1.answer': 'Noch nicht. Der Android-Download-Bereich ist für den öffentlichen Eintrag und den Beta-Link reserviert.',
+          'faq.2.question': 'Muss ich KI verwenden?',
+          'faq.2.answer': 'Nein. KI-Impulse sind optional und dienen als Schreibhilfe, nicht als Autorität.',
+          'faq.3.question': 'Was speichert ihr für die Warteliste?',
+          'faq.3.answer': 'Nur den Namen und die E-Mail-Adresse, die für Updates zum Start von Ono Sideboard eingereicht werden.',
+          'signup.eyebrow': 'Warteliste',
+          'signup.title': 'Frühen Android-Zugang reservieren.',
+          'signup.body': 'Eine Launch-E-Mail. Kein Kampagnen-Drip.',
+          'form.name': 'Name',
+          'form.emailLabel': 'E-Mail-Adresse',
+          'form.emailPlaceholder': 'E-Mail',
+          'form.message.idle': 'Wir speichern deinen Namen und deine E-Mail nur für Launch-Updates zu Ono Sideboard.',
+          'form.message.name': 'Gib deinen Namen ein, bevor du dich einträgst.',
+          'form.message.email': 'Gib eine gültige E-Mail-Adresse ein, bevor du dich einträgst.',
+          'form.message.unavailable': 'Das Wartelistenformular ist vorübergehend nicht verfügbar.',
+          'form.message.submitting': 'Deine Wartelisten-Anfrage wird gesendet.',
+          'form.message.updated': 'Deine Wartelisten-Daten wurden aktualisiert.',
+          'form.message.success': 'Du bist auf der Warteliste für Ono Sideboard.',
+          'form.message.database': 'Die Wartelisten-Datenbank ist noch nicht konfiguriert. Bitte versuche es später erneut.',
+          'form.message.error': 'Die Wartelisten-Anfrage konnte nicht gespeichert werden. Bitte versuche es später erneut.',
+          'download.status': 'Android-Download-Status',
+          'download.title': 'Android-Download',
+          'download.body': 'Platzhalter für Play Store und Beta-Link.',
+          'footer.delete': 'Konto löschen',
+          'footer.contact': 'Kontakt',
+          'footer.note': '© 2026 Daniel Hawes. Ono Sideboard ist für Reflexion und kreatives Journaling gedacht.',
+        },
+      }
+
+      const translate = (key) => {
+        const fallback = translations.en[key] || ''
+        return translations[currentLanguage]?.[key] || fallback
+      }
+
+      const hydrateText = (value, element) => {
+        const count = element instanceof HTMLElement ? element.dataset.deckCount : ''
+        return value.replace('{count}', count || '')
+      }
+
+      const applyLanguage = (language) => {
+        currentLanguage = language === 'de' ? 'de' : 'en'
+        document.documentElement.lang = currentLanguage
+
+        document.querySelectorAll('[data-i18n]').forEach((element) => {
+          if (!(element instanceof HTMLElement) || !element.dataset.i18n) return
+          element.textContent = hydrateText(translate(element.dataset.i18n), element)
+        })
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach((element) => {
+          if (!(element instanceof HTMLInputElement) || !element.dataset.i18nPlaceholder) return
+          element.placeholder = translate(element.dataset.i18nPlaceholder)
+        })
+
+        document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
+          if (!(element instanceof HTMLElement) || !element.dataset.i18nAriaLabel) return
+          element.setAttribute('aria-label', translate(element.dataset.i18nAriaLabel))
+        })
+
+        document.querySelectorAll('[data-i18n-title]').forEach((element) => {
+          if (!(element instanceof HTMLElement) || !element.dataset.i18nTitle) return
+          element.setAttribute('title', translate(element.dataset.i18nTitle))
+        })
+
+        languageButtons.forEach((button) => {
+          if (!(button instanceof HTMLButtonElement)) return
+          const isActive = button.dataset.languageOption === currentLanguage
+          button.classList.toggle('is-active', isActive)
+          button.setAttribute('aria-pressed', String(isActive))
+        })
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          if (!(button instanceof HTMLButtonElement) || !button.dataset.languageOption) return
+          applyLanguage(button.dataset.languageOption)
+          window.localStorage?.setItem('ono-sideboard-language', currentLanguage)
+        })
+      })
+
+      const savedLanguage = window.localStorage?.getItem('ono-sideboard-language')
+      applyLanguage(savedLanguage === 'de' ? 'de' : 'en')
 
       const showPanel = (panelName) => {
         panels.forEach((panel) => {
@@ -605,25 +799,25 @@ const appSchema = {
 
           if (!name) {
             setFormState('error')
-            message.textContent = 'Enter your name before joining the whitelist.'
+            message.textContent = translate('form.message.name')
             return
           }
 
           if (!emailPattern.test(email)) {
             setFormState('error')
-            message.textContent = 'Enter a valid email address before joining the whitelist.'
+            message.textContent = translate('form.message.email')
             return
           }
 
           if (!endpoint) {
             setFormState('error')
-            message.textContent = 'The whitelist form is temporarily unavailable.'
+            message.textContent = translate('form.message.unavailable')
             return
           }
 
           setFormState('submitting')
           button.disabled = true
-          message.textContent = 'Submitting your whitelist request.'
+          message.textContent = translate('form.message.submitting')
 
           try {
             const response = await fetch(endpoint, {
@@ -637,15 +831,15 @@ const appSchema = {
 
             setFormState('success')
             message.textContent = data?.status === 'updated'
-              ? 'Your whitelist details have been updated.'
-              : 'You are on the Ono Sideboard whitelist.'
+              ? translate('form.message.updated')
+              : translate('form.message.success')
             form.reset()
           } catch (error) {
             setFormState('error')
             if (error instanceof Error && error.message === 'database_not_configured') {
-              message.textContent = 'The whitelist database is not configured yet. Please try again later.'
+              message.textContent = translate('form.message.database')
             } else {
-              message.textContent = 'The whitelist request could not be saved. Please try again later.'
+              message.textContent = translate('form.message.error')
             }
           } finally {
             button.disabled = false
@@ -819,6 +1013,44 @@ const appSchema = {
 
   .topbar__actions {
     justify-content: end;
+  }
+
+  .language-toggle {
+    display: inline-grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 72px;
+    height: 44px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 251, 241, 0.64);
+  }
+
+  .language-toggle__button {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    cursor: pointer;
+    transition:
+      background 160ms ease,
+      color 160ms ease;
+  }
+
+  .language-toggle__button + .language-toggle__button {
+    border-left: 1px solid var(--line);
+  }
+
+  .language-toggle__button:hover,
+  .language-toggle__button.is-active {
+    background: #ffffff;
+    color: var(--teal);
   }
 
   .icon-button,
@@ -1590,6 +1822,11 @@ const appSchema = {
       height: 40px;
     }
 
+    .language-toggle {
+      width: 68px;
+      height: 40px;
+    }
+
     .icon-nav {
       justify-content: center;
     }
@@ -1689,6 +1926,15 @@ const appSchema = {
     .submit-button {
       width: 38px;
       height: 38px;
+    }
+
+    .language-toggle {
+      width: 62px;
+      height: 38px;
+    }
+
+    .topbar__actions .icon-link.is-disabled {
+      display: none;
     }
 
     .experience {
