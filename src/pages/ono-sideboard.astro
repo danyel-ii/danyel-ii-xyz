@@ -108,6 +108,8 @@ const previewSamplerCards = previewSamplerSlugs
     return deck?.cards.find((card) => card.slug === slug)
   })
   .filter(Boolean)
+const foolPreviewCards = previewSamplerCards.slice(0, 3)
+const sevenPreviewCards = previewSamplerCards.slice(3)
 
 const featureAreas = [
   {
@@ -321,8 +323,16 @@ const appSchema = {
               <p class="deck-note">{cardDecks.length} deck families loaded from the app image library.</p>
             </div>
             <div class="deck-browser">
-              <div class="deck-list" aria-label="Preview cards from available app decks">
-                {previewSamplerCards.map((card) => (
+              <div class="deck-list deck-list--three" aria-label="Fool preview cards from available app decks">
+                {foolPreviewCards.map((card) => (
+                  <figure class="deck-choice">
+                    <img src={card.src} alt={card.alt} width="371" height="620" loading="lazy" decoding="async" />
+                    <figcaption>{card.title}</figcaption>
+                  </figure>
+                ))}
+              </div>
+              <div class="deck-list deck-list--four" aria-label="Seven suit preview cards from available app decks">
+                {sevenPreviewCards.map((card) => (
                   <figure class="deck-choice">
                     <img src={card.src} alt={card.alt} width="371" height="620" loading="lazy" decoding="async" />
                     <figcaption>{card.title}</figcaption>
@@ -980,8 +990,15 @@ const appSchema = {
 
   .deck-list {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 8px;
+  }
+
+  .deck-list--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .deck-list--four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .deck-choice {
@@ -1512,7 +1529,11 @@ const appSchema = {
       grid-column: 2;
     }
 
-    .deck-list {
+    .deck-list--three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .deck-list--four {
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 
