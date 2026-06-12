@@ -2,11 +2,13 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 
 export const prerender = true
+
 const waitlistEndpoint = '/api/waitlist'
 const pageUrl = 'https://danyel-ii.xyz/ono-sideboard'
 const supportBase = 'https://tarot.danyel-ii.xyz'
 const supportEmail = 'support@danyel-ii.xyz'
 const deckDirectory = 'public/images/ono-sideboard/decks'
+
 const titleCaseSlug = (slug: string) =>
   slug
     .replace(/\.(jpg|jpeg|png)$/i, '')
@@ -45,7 +47,7 @@ const cardDecks = deckIds
     const availableCardFiles = readdirSync(`${deckDirectory}/${deckId}`)
       .filter((fileName) => /\.(jpg|jpeg|png)$/i.test(fileName))
       .sort()
-    const title = typeof manifest.title === 'string' ? manifest.title : titleCaseSlug(deckId)
+    const title = typeof manifest.title === 'string' ? titleCaseSlug(manifest.title) : titleCaseSlug(deckId)
     const manifestCards = Array.isArray(manifest.cards) ? manifest.cards : []
     const cards = manifestCards.length
       ? manifestCards
@@ -61,29 +63,61 @@ const cardDecks = deckIds
           image: fileName,
         }))
 
+    const previewPath = `public/images/ono-sideboard/deck-previews/${deckId}.jpg`
+
     return {
       deckId,
       title,
-      cards: cards.map((card) => {
-        return {
-          cardId: `${deckId}:${card.slug}`,
-          deckId,
-          title: card.title,
-          src: `/images/ono-sideboard/decks/${deckId}/${card.image}`,
-          alt: `${card.title} tarot card from the ${title} deck in Ono Sideboard.`,
-        }
-      }),
+      preview: existsSync(previewPath) ? `/images/ono-sideboard/deck-previews/${deckId}.jpg` : '',
+      cards: cards.map((card) => ({
+        cardId: `${deckId}:${card.slug}`,
+        deckId,
+        title: card.title,
+        src: `/images/ono-sideboard/decks/${deckId}/${card.image}`,
+        alt: `${card.title} tarot card from the ${title} deck in Ono Sideboard.`,
+      })),
     }
   })
   .filter((deck) => deck.cards.length >= 5)
 
-const initialCardPreviews = cardDecks[0]?.cards.slice(0, 5) ?? []
+const initialDeck = cardDecks[0]
+const initialCardPreviews = initialDeck?.cards.slice(0, 3) ?? []
 
-const features = [
-  ['Read', 'Daily cards and spreads.'],
-  ['Remember', 'Private notes and patterns.'],
-  ['Create', 'Decks from your references.'],
-  ['Reflect', 'Optional AI prompts.'],
+const featureAreas = [
+  {
+    icon: 'spark',
+    title: 'Tarot journaling',
+    body: 'Daily cards, spreads, questions, and reflections become a private journal you can return to over time.',
+  },
+  {
+    icon: 'layers',
+    title: 'Custom decks',
+    body: 'Explore complete decks built from visual references, with the structure of a familiar tarot system.',
+  },
+  {
+    icon: 'lock',
+    title: 'Pattern memory',
+    body: 'Track recurring cards, themes, and readings without turning a reflective practice into a social feed.',
+  },
+  {
+    icon: 'bot',
+    title: 'Optional AI prompts',
+    body: 'Guided prompts can help unblock writing while keeping the app centered on your own notes.',
+  },
+]
+
+const docs = [
+  ['Start', 'Open a daily card or spread, write the question, then save the reading into your tarot journal.'],
+  ['Decks', 'Browse deck families, preview cards, and keep favorite decks ready for future readings.'],
+  ['Journal', 'Use tags, reflections, and recurring themes to follow what keeps showing up in your readings.'],
+  ['Safety', 'Ono Sideboard is for reflection and creative journaling, not medical, legal, financial, or mental-health advice.'],
+]
+
+const faqs = [
+  ['When will Android access open?', 'The whitelist is for early Android access. We will send one email when the first build is ready.'],
+  ['Is the Play Store link live?', 'Not yet. The Android download area is reserved for the public listing and beta download link.'],
+  ['Do I need to use AI?', 'No. AI prompts are optional and are treated as a writing aid, not an authority.'],
+  ['What do you store for the whitelist?', 'Only the name and email submitted for Ono Sideboard launch updates.'],
 ]
 
 const appSchema = {
@@ -101,17 +135,17 @@ const appSchema = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ono Sideboard - Whitelist Invitation</title>
+    <title>Ono Sideboard - Private Tarot Journal for Android</title>
     <meta
       name="description"
-      content="Join the Ono Sideboard whitelist. A private tarot journal and custom deck creator for Android."
+      content="Explore Ono Sideboard, a private tarot journal and custom deck creator for Android. Join the early access whitelist."
     />
     <meta name="robots" content="index,follow" />
-    <meta name="theme-color" content="#100d18" />
+    <meta name="theme-color" content="#f4efe4" />
     <link rel="canonical" href={pageUrl} />
     <link rel="icon" type="image/png" href="/images/ono-sideboard/logo-favicon.png" />
     <link rel="apple-touch-icon" href="/images/ono-sideboard/logo-touch.png" />
-    <meta property="og:title" content="Ono Sideboard - Whitelist Invitation" />
+    <meta property="og:title" content="Ono Sideboard" />
     <meta property="og:description" content="A private tarot journal and custom deck creator for Android." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={pageUrl} />
@@ -119,170 +153,312 @@ const appSchema = {
     <script type="application/ld+json" set:html={JSON.stringify(appSchema)} />
   </head>
   <body>
-    <div class="ono-page">
-      <header class="ono-header" aria-label="Ono Sideboard">
-        <a class="ono-brand" href="/ono-sideboard" aria-label="Ono Sideboard home">
-          <img src="/images/ono-sideboard/logo.jpg" alt="" width="52" height="52" />
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-compass" viewBox="0 0 24 24">
+        <path d="m8.7 15.3 2.2-4.4 4.4-2.2-2.2 4.4-4.4 2.2Z"></path>
+        <circle cx="12" cy="12" r="9"></circle>
+      </symbol>
+      <symbol id="icon-layers" viewBox="0 0 24 24">
+        <path d="m12 3 9 5-9 5-9-5 9-5Z"></path>
+        <path d="m3 12 9 5 9-5"></path>
+        <path d="m3 16 9 5 9-5"></path>
+      </symbol>
+      <symbol id="icon-book" viewBox="0 0 24 24">
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H7a3 3 0 0 0-3 3V5.5Z"></path>
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+      </symbol>
+      <symbol id="icon-help" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M9.7 9a2.5 2.5 0 0 1 4.7 1.2c0 2-2.4 2-2.4 4"></path>
+        <path d="M12 18h.01"></path>
+      </symbol>
+      <symbol id="icon-mail" viewBox="0 0 24 24">
+        <path d="M4 6h16v12H4V6Z"></path>
+        <path d="m4 7 8 6 8-6"></path>
+      </symbol>
+      <symbol id="icon-android" viewBox="0 0 24 24">
+        <path d="M7 10h10v8a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2v-8Z"></path>
+        <path d="M8 10a4 4 0 0 1 8 0"></path>
+        <path d="m9 5-1.5-2"></path>
+        <path d="M15 5 16.5 3"></path>
+        <path d="M10 14h.01"></path>
+        <path d="M14 14h.01"></path>
+      </symbol>
+      <symbol id="icon-spark" viewBox="0 0 24 24">
+        <path d="M12 2 9.7 8.7 3 11l6.7 2.3L12 20l2.3-6.7L21 11l-6.7-2.3L12 2Z"></path>
+      </symbol>
+      <symbol id="icon-lock" viewBox="0 0 24 24">
+        <path d="M6 10h12v10H6V10Z"></path>
+        <path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"></path>
+      </symbol>
+      <symbol id="icon-bot" viewBox="0 0 24 24">
+        <path d="M7 9h10a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Z"></path>
+        <path d="M12 9V5"></path>
+        <path d="M9 14h.01"></path>
+        <path d="M15 14h.01"></path>
+      </symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24">
+        <path d="M5 12h14"></path>
+        <path d="m13 6 6 6-6 6"></path>
+      </symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24">
+        <path d="m5 13 4 4L19 7"></path>
+      </symbol>
+    </svg>
+
+    <div class="ono-shell">
+      <header class="topbar" aria-label="Ono Sideboard">
+        <a class="brand" href="/ono-sideboard" aria-label="Ono Sideboard home">
+          <img src="/images/ono-sideboard/logo.jpg" alt="" width="44" height="44" />
           <span>Ono Sideboard</span>
         </a>
-        <nav class="ono-nav" aria-label="Page links">
-          <a href="#whitelist">Whitelist</a>
-          <a href="#decks">Decks</a>
-          {legalLinks.map((link) => <a href={link.href}>{link.label}</a>)}
+
+        <nav class="icon-nav" aria-label="Explore Ono Sideboard">
+          <button class="icon-button" type="button" data-panel-target="overview" aria-label="Overview" title="Overview">
+            <svg><use href="#icon-compass"></use></svg>
+          </button>
+          <button class="icon-button is-active" type="button" data-panel-target="decks" aria-label="Decks" title="Decks">
+            <svg><use href="#icon-layers"></use></svg>
+          </button>
+          <button class="icon-button" type="button" data-panel-target="docs" aria-label="Docs" title="Docs">
+            <svg><use href="#icon-book"></use></svg>
+          </button>
+          <button class="icon-button" type="button" data-panel-target="faq" aria-label="FAQ" title="FAQ">
+            <svg><use href="#icon-help"></use></svg>
+          </button>
         </nav>
+
+        <div class="topbar__actions">
+          <a class="icon-link" href="#whitelist" aria-label="Join whitelist" title="Join whitelist">
+            <svg><use href="#icon-mail"></use></svg>
+          </a>
+          <span class="icon-link is-disabled" aria-label="Android download coming soon" title="Android download coming soon">
+            <svg><use href="#icon-android"></use></svg>
+          </span>
+        </div>
       </header>
 
-      <main>
+      <main class="experience">
         <section class="hero" aria-labelledby="ono-title">
           <div class="hero__copy">
-            <img class="hero__logo" src="/images/ono-sideboard/logo.jpg" alt="Ono Sideboard logo" width="160" height="160" />
-            <h1 id="ono-title">Ono Sideboard</h1>
+            <p class="eyebrow">Android early access</p>
+            <h1 id="ono-title">A private tarot journal for readings, spreads, and custom decks.</h1>
             <p class="lede">
-              Private tarot journaling. Custom decks. Early Android access.
+              Ono Sideboard is a tarot journaling app: select a deck, record a spread, write the reflection, and watch patterns emerge over time.
             </p>
+          </div>
+
+          <div class="hero__media" aria-label="Ono Sideboard app imagery">
+            <figure class="phone-frame">
+              <img
+                src="/images/ono-sideboard/splash.jpg"
+                alt="Ono Sideboard app splash artwork."
+                width="733"
+                height="1100"
+                fetchpriority="high"
+                decoding="async"
+              />
+            </figure>
+            <div class="card-stack" aria-label="Deck preview cards">
+              {initialCardPreviews.map((card) => (
+                <figure class="stack-card">
+                  <img src={card.src} alt={card.alt} width="371" height="620" loading="eager" decoding="async" />
+                </figure>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section id="decks" class="deck-section" aria-label="Ono Sideboard card previews">
-          <div class="deck-strip deck-strip--sample" data-random-cards>
-            {initialCardPreviews.map((card) => (
-              <figure class="deck-card" tabindex="0">
-                <img
-                  src={card.src}
-                  alt={card.alt}
-                  width="371"
-                  height="620"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <figcaption>{card.title}</figcaption>
-              </figure>
-            ))}
+        <section class="control-plane" aria-label="Ono Sideboard product exploration">
+          <div class="panel" data-panel="overview" hidden>
+            <div class="panel__head">
+              <p class="eyebrow">Explore</p>
+              <h2>Built for quiet repeat use.</h2>
+            </div>
+            <div class="feature-grid">
+              {featureAreas.map((feature) => (
+                <article class="feature">
+                  <svg aria-hidden="true"><use href={`#icon-${feature.icon}`}></use></svg>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div class="panel is-active" data-panel="decks">
+            <div class="panel__head panel__head--inline">
+              <div>
+                <p class="eyebrow">Deck system</p>
+                <h2>Preview the visual language.</h2>
+              </div>
+              <p class="deck-note">{cardDecks.length} deck families loaded from the app image library.</p>
+            </div>
+            <div class="deck-browser">
+              <div class="deck-list" aria-label="Choose a deck">
+                {cardDecks.map((deck, index) => (
+                  <button class:list={['deck-choice', { 'is-active': index === 0 }]} type="button" data-deck-id={deck.deckId}>
+                    {deck.preview && <img src={deck.preview} alt="" width="371" height="620" loading="lazy" decoding="async" />}
+                    <span>{deck.title}</span>
+                  </button>
+                ))}
+              </div>
+              <div class="deck-stage" data-deck-stage>
+                {initialCardPreviews.map((card) => (
+                  <figure class="deck-card">
+                    <img src={card.src} alt={card.alt} width="371" height="620" loading="lazy" decoding="async" />
+                    <figcaption>{card.title}</figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" data-panel="docs" hidden>
+            <div class="panel__head">
+              <p class="eyebrow">Docs</p>
+              <h2>Simple operating notes.</h2>
+            </div>
+            <div class="docs-list">
+              {docs.map(([title, body]) => (
+                <article>
+                  <span><svg aria-hidden="true"><use href="#icon-check"></use></svg></span>
+                  <div>
+                    <h3>{title}</h3>
+                    <p>{body}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div class="panel" data-panel="faq" hidden>
+            <div class="panel__head">
+              <p class="eyebrow">FAQ</p>
+              <h2>Launch details.</h2>
+            </div>
+            <div class="faq-list">
+              {faqs.map(([question, answer]) => (
+                <details>
+                  <summary>{question}</summary>
+                  <p>{answer}</p>
+                </details>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section id="whitelist" class="panel whitelist" aria-labelledby="whitelist-title">
-          <div>
-            <p class="eyebrow">Whitelist invitation</p>
-            <h2 id="whitelist-title">Join the whitelist.</h2>
-            <p>
-              One email when early access opens. No noise.
-            </p>
+        <aside id="whitelist" class="signup" aria-labelledby="signup-title">
+          <div class="signup__head">
+            <p class="eyebrow">Whitelist</p>
+            <h2 id="signup-title">Reserve early Android access.</h2>
+            <p>One launch email. No campaign drip.</p>
           </div>
 
           <form class="whitelist-form" data-endpoint={waitlistEndpoint} novalidate>
             <label>
               <span>Name</span>
-              <input name="name" type="text" autocomplete="name" placeholder="Your name" required />
+              <input name="name" type="text" autocomplete="name" placeholder="Name" required />
             </label>
             <label>
               <span>Email address</span>
-              <input name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+              <input name="email" type="email" autocomplete="email" placeholder="Email" required />
             </label>
             <label class="whitelist-form__trap" aria-hidden="true">
               <span>Website</span>
               <input name="website" type="text" tabindex="-1" autocomplete="off" />
             </label>
-            <button class="button" type="submit">Join the whitelist</button>
+            <button class="submit-button" type="submit" aria-label="Join whitelist">
+              <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
+            </button>
             <p class="whitelist-form__message" role="status" aria-live="polite">
-              We will store your name and email only for Ono Sideboard launch updates.
+              We store your name and email only for Ono Sideboard launch updates.
             </p>
           </form>
 
-          <div class="whitelist-confirmation" data-whitelist-confirmation hidden>
-            <p class="eyebrow">Confirmed</p>
-            <h3>You're on the whitelist.</h3>
-            <p>
-              We saved your details. We'll email you when early access opens.
-            </p>
+          <div class="download-placeholder" aria-label="Android download status">
+            <svg aria-hidden="true"><use href="#icon-android"></use></svg>
+            <div>
+              <strong>Android download</strong>
+              <span>Play Store and beta link placeholder.</span>
+            </div>
           </div>
-        </section>
-
-        <section class="splash-section" aria-label="Ono Sideboard splash artwork">
-          <figure class="splash">
-            <img
-              src="/images/ono-sideboard/splash.jpg"
-              alt="Ono Sideboard splash artwork with tarot symbols, mountains, and a winding river."
-              width="733"
-              height="1100"
-              loading="lazy"
-              decoding="async"
-            />
-          </figure>
-        </section>
-
-        <section class="feature-grid" aria-label="Ono Sideboard features">
-          {features.map(([title, body]) => (
-            <article>
-              <h3>{title}</h3>
-              <p>{body}</p>
-            </article>
-          ))}
-        </section>
+        </aside>
       </main>
 
-      <footer class="ono-footer">
+      <footer class="footer">
         <nav aria-label="Footer">
           {legalLinks.map((link) => <a href={link.href}>{link.label}</a>)}
           <a href={`${supportBase}/account/delete`}>Account deletion</a>
           <a href={`mailto:${supportEmail}`}>Contact</a>
         </nav>
-        <p>
-          &copy; 2026 Daniel Hawes. Ono Sideboard is for reflection and creative journaling. It is not medical, legal, financial, or mental-health advice.
-        </p>
+        <p>&copy; 2026 Daniel Hawes. Ono Sideboard is for reflection and creative journaling.</p>
       </footer>
     </div>
 
     <script type="application/json" id="ono-card-pool" set:html={JSON.stringify(cardDecks)} />
     <script>
-      const cardPoolElement = document.querySelector('#ono-card-pool')
-      const deckStage = document.querySelector('[data-random-cards]')
+      const navButtons = Array.from(document.querySelectorAll('[data-panel-target]'))
+      const panels = Array.from(document.querySelectorAll('[data-panel]'))
+      const deckPoolElement = document.querySelector('#ono-card-pool')
+      const deckStage = document.querySelector('[data-deck-stage]')
+      const deckChoices = Array.from(document.querySelectorAll('[data-deck-id]'))
       const form = document.querySelector('.whitelist-form')
 
-      if (cardPoolElement && deckStage instanceof HTMLElement) {
+      const showPanel = (panelName) => {
+        panels.forEach((panel) => {
+          const isActive = panel instanceof HTMLElement && panel.dataset.panel === panelName
+          panel.classList.toggle('is-active', isActive)
+          if (panel instanceof HTMLElement) panel.hidden = !isActive
+        })
+
+        navButtons.forEach((button) => {
+          const isActive = button instanceof HTMLElement && button.dataset.panelTarget === panelName
+          button.classList.toggle('is-active', isActive)
+          button.setAttribute('aria-pressed', String(isActive))
+        })
+      }
+
+      navButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          if (!(button instanceof HTMLElement) || !button.dataset.panelTarget) return
+          showPanel(button.dataset.panelTarget)
+        })
+      })
+
+      if (deckPoolElement && deckStage instanceof HTMLElement) {
         try {
-          const decks = JSON.parse(cardPoolElement.textContent || '[]')
-          const cardsStorageKey = 'ono-sideboard-last-preview-cards'
-          const deckStorageKey = 'ono-sideboard-last-preview-deck'
-          const lastDeckId = window.localStorage?.getItem(deckStorageKey) || ''
-          const parsedCardIds = JSON.parse(window.localStorage?.getItem(cardsStorageKey) || '[]')
-          const lastCardIds = Array.isArray(parsedCardIds) ? parsedCardIds : []
-          const availableDecks = decks.filter((deck) => Array.isArray(deck.cards) && deck.cards.length >= 5)
-          const shuffledDecks = [...availableDecks]
+          const decks = JSON.parse(deckPoolElement.textContent || '[]')
 
-          for (let index = shuffledDecks.length - 1; index > 0; index -= 1) {
-            const swapIndex = Math.floor(Math.random() * (index + 1))
-            ;[shuffledDecks[index], shuffledDecks[swapIndex]] = [shuffledDecks[swapIndex], shuffledDecks[index]]
+          const renderDeck = (deckId) => {
+            const deck = decks.find((item) => item.deckId === deckId) || decks[0]
+            if (!deck || !Array.isArray(deck.cards)) return
+            const selectedCards = deck.cards.slice(0, 3)
+            const slots = Array.from(deckStage.querySelectorAll('.deck-card'))
+
+            slots.forEach((slot, index) => {
+              const card = selectedCards[index]
+              const image = slot.querySelector('img')
+              const caption = slot.querySelector('figcaption')
+              if (!card || !(image instanceof HTMLImageElement) || !caption) return
+
+              image.src = card.src
+              image.alt = card.alt
+              caption.textContent = card.title
+            })
+
+            deckChoices.forEach((choice) => {
+              if (!(choice instanceof HTMLElement)) return
+              choice.classList.toggle('is-active', choice.dataset.deckId === deck.deckId)
+            })
           }
 
-          const selectedDeck = shuffledDecks.find((deck) => deck.deckId !== lastDeckId) || shuffledDecks[0]
-          if (!selectedDeck) throw new Error('No preview decks are available')
-
-          const shuffledCards = [...selectedDeck.cards]
-
-          for (let index = shuffledCards.length - 1; index > 0; index -= 1) {
-            const swapIndex = Math.floor(Math.random() * (index + 1))
-            ;[shuffledCards[index], shuffledCards[swapIndex]] = [shuffledCards[swapIndex], shuffledCards[index]]
-          }
-
-          const freshCards = shuffledCards.filter((card) => !lastCardIds.includes(card.cardId))
-          const selectedCards = [...freshCards, ...shuffledCards.filter((card) => lastCardIds.includes(card.cardId))].slice(0, 5)
-          const slots = Array.from(deckStage.querySelectorAll('.deck-card'))
-
-          slots.forEach((slot, index) => {
-            const card = selectedCards[index]
-            const image = slot.querySelector('img')
-            const caption = slot.querySelector('figcaption')
-
-            if (!card || !(image instanceof HTMLImageElement) || !caption) return
-
-            image.src = card.src
-            image.alt = card.alt
-            caption.textContent = card.title
+          deckChoices.forEach((choice) => {
+            choice.addEventListener('click', () => {
+              if (!(choice instanceof HTMLElement) || !choice.dataset.deckId) return
+              renderDeck(choice.dataset.deckId)
+            })
           })
-
-          window.localStorage?.setItem(deckStorageKey, selectedDeck.deckId)
-          window.localStorage?.setItem(cardsStorageKey, JSON.stringify(selectedCards.map((card) => card.cardId)))
         } catch {
           // Keep the server-rendered fallback cards if the pool cannot be parsed.
         }
@@ -291,7 +467,6 @@ const appSchema = {
       if (form instanceof HTMLFormElement) {
         const message = form.querySelector('.whitelist-form__message')
         const button = form.querySelector('button[type="submit"]')
-        const confirmation = document.querySelector('[data-whitelist-confirmation]')
         const endpoint = form.dataset.endpoint || ''
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -309,7 +484,6 @@ const appSchema = {
 
           if (!message || !(button instanceof HTMLButtonElement)) return
           setFormState('idle')
-          if (confirmation instanceof HTMLElement) confirmation.hidden = true
 
           if (!name) {
             setFormState('error')
@@ -331,7 +505,6 @@ const appSchema = {
 
           setFormState('submitting')
           button.disabled = true
-          button.textContent = 'Joining...'
           message.textContent = 'Submitting your whitelist request.'
 
           try {
@@ -342,15 +515,12 @@ const appSchema = {
             })
             const data = await response.json().catch(() => ({}))
 
-            if (!response.ok) {
-              throw new Error(data?.status || 'error')
-            }
+            if (!response.ok) throw new Error(data?.status || 'error')
 
             setFormState('success')
             message.textContent = data?.status === 'updated'
               ? 'Your whitelist details have been updated.'
               : 'You are on the Ono Sideboard whitelist.'
-            if (confirmation instanceof HTMLElement) confirmation.hidden = false
             form.reset()
           } catch (error) {
             setFormState('error')
@@ -361,7 +531,6 @@ const appSchema = {
             }
           } finally {
             button.disabled = false
-            button.textContent = 'Join the whitelist'
           }
         })
       }
@@ -371,18 +540,21 @@ const appSchema = {
 
 <style>
   :root {
-    --bg: #100d18;
-    --bg-soft: #171320;
-    --panel: rgba(255, 248, 232, 0.08);
-    --panel-strong: rgba(255, 248, 232, 0.13);
-    --text: #fff7e8;
-    --muted: #c8bfae;
-    --gold: #d8b76a;
-    --rose: #d99a8f;
-    --violet: #8f7bd9;
-    --ink: #0c0912;
-    --line: rgba(255, 247, 232, 0.16);
-    --success: #b9e6c9;
+    --paper: #f4efe4;
+    --paper-strong: #fffbf1;
+    --ink: #171611;
+    --ink-soft: #3f3d35;
+    --muted: #756f62;
+    --line: rgba(23, 22, 17, 0.14);
+    --line-strong: rgba(23, 22, 17, 0.25);
+    --gold: #b78d36;
+    --clay: #aa4f35;
+    --teal: #2c6e68;
+    --olive: #64723d;
+    --night: #10100c;
+    --success: #1f6b4b;
+    --error: #a43f32;
+    --shadow: 0 24px 70px rgba(28, 24, 16, 0.14);
   }
 
   * {
@@ -390,34 +562,33 @@ const appSchema = {
   }
 
   html {
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
+    min-width: 320px;
+    background: var(--paper);
+    color: var(--ink);
     scroll-behavior: smooth;
   }
 
   body {
     min-width: 320px;
+    min-height: 100vh;
     margin: 0;
     overflow-x: hidden;
     background:
-      radial-gradient(circle at 17% 8%, rgba(216, 183, 106, 0.18), transparent 28rem),
-      radial-gradient(circle at 76% 18%, rgba(143, 123, 217, 0.16), transparent 30rem),
-      linear-gradient(180deg, var(--bg), #0b0810 72%, var(--ink));
-    color: var(--text);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      linear-gradient(90deg, rgba(23, 22, 17, 0.05) 1px, transparent 1px),
+      linear-gradient(rgba(23, 22, 17, 0.04) 1px, transparent 1px),
+      linear-gradient(135deg, #f4efe4 0%, #ebe4d7 42%, #f8f5ed 100%);
+    background-size: 32px 32px, 32px 32px, auto;
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
 
-  body:before {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    opacity: 0.2;
-    background-image:
-      linear-gradient(rgba(255, 247, 232, 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 247, 232, 0.025) 1px, transparent 1px);
-    background-size: 46px 46px;
-    content: "";
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    color: inherit;
   }
 
   a {
@@ -425,266 +596,598 @@ const appSchema = {
     text-decoration: none;
   }
 
+  img,
+  svg {
+    display: block;
+  }
+
   img {
     max-width: 100%;
   }
 
+  p,
+  h1,
+  h2,
+  h3,
+  figure {
+    margin: 0;
+  }
+
   a:focus-visible,
   button:focus-visible,
-  input:focus-visible {
-    outline: 2px solid var(--gold);
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--teal);
     outline-offset: 4px;
   }
 
-  .ono-page {
-    width: min(100% - 32px, 1160px);
+  .svg-sprite {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .svg-sprite symbol * {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  svg,
+  use {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+  }
+
+  .ono-shell {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    width: min(100% - 28px, 1360px);
+    min-height: 100vh;
     margin: 0 auto;
+    padding: 16px 0 18px;
   }
 
-  .ono-header {
+  .topbar,
+  .experience,
+  .footer {
+    border: 1px solid var(--line);
+    background: rgba(255, 251, 241, 0.82);
+    backdrop-filter: blur(20px);
+  }
+
+  .topbar {
     position: sticky;
-    top: 0;
+    top: 12px;
     z-index: 20;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 16px 0;
-    background: linear-gradient(180deg, rgba(16, 13, 24, 0.94), rgba(16, 13, 24, 0.72));
-    backdrop-filter: blur(14px);
+    min-height: 68px;
+    padding: 10px;
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 14px 36px rgba(28, 24, 16, 0.08);
   }
 
-  .ono-brand,
-  .ono-nav,
-  .eyebrow {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  }
-
-  .ono-brand {
+  .brand {
     display: inline-flex;
     align-items: center;
+    width: fit-content;
     gap: 10px;
-    font-weight: 700;
+    color: var(--ink);
+    font-weight: 760;
   }
 
-  .ono-brand img {
-    width: 42px;
-    height: 42px;
-    border: 1px solid var(--line);
+  .brand img {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line-strong);
     border-radius: 8px;
     object-fit: cover;
   }
 
-  .ono-nav,
-  .ono-footer nav {
+  .icon-nav,
+  .topbar__actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    color: var(--muted);
-    font-size: 0.82rem;
+    align-items: center;
+    gap: 8px;
   }
 
-  .ono-nav a,
-  .ono-footer a {
-    border-bottom: 1px solid transparent;
+  .topbar__actions {
+    justify-content: end;
   }
 
-  .ono-nav a:hover,
-  .ono-footer a:hover {
-    border-bottom-color: currentColor;
+  .icon-button,
+  .icon-link,
+  .submit-button {
+    display: inline-grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 251, 241, 0.64);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition:
+      background 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      transform 160ms ease;
   }
 
-  main {
+  .icon-button:hover,
+  .icon-link:hover,
+  .submit-button:hover,
+  .icon-button.is-active {
+    border-color: rgba(44, 110, 104, 0.44);
+    background: #ffffff;
+    color: var(--teal);
+    transform: translateY(-1px);
+  }
+
+  .icon-link.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.46;
+  }
+
+  .icon-link.is-disabled:hover {
+    border-color: var(--line);
+    background: rgba(255, 251, 241, 0.64);
+    color: var(--ink-soft);
+    transform: none;
+  }
+
+  .icon-button svg,
+  .icon-link svg,
+  .submit-button svg,
+  .feature svg,
+  .download-placeholder svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .experience {
     display: grid;
-    gap: 56px;
+    grid-template-columns: minmax(0, 1.08fr) minmax(410px, 0.92fr) minmax(280px, 0.5fr);
+    gap: 18px;
+    align-items: stretch;
+    min-height: min(760px, calc(100vh - 150px));
+    padding: 18px;
+    border-top: 0;
+    border-bottom: 0;
+  }
+
+  .hero,
+  .control-plane,
+  .signup {
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 251, 241, 0.7);
+    box-shadow: var(--shadow);
   }
 
   .hero {
+    position: relative;
     display: grid;
-    justify-items: center;
-    padding: 70px 0 0;
-    text-align: center;
+    grid-template-rows: auto 1fr;
+    gap: 24px;
+    overflow: hidden;
+    padding: clamp(22px, 3vw, 38px);
   }
 
-  .hero__copy,
-  .section-intro,
-  .panel {
-    display: grid;
-    gap: 18px;
+  .hero:after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 46%;
+    height: 48%;
+    background: linear-gradient(135deg, transparent, rgba(44, 110, 104, 0.11));
+    content: "";
+    pointer-events: none;
   }
 
-  .hero__logo {
-    justify-self: center;
-    width: 112px;
-    height: 112px;
-    border: 1px solid rgba(216, 183, 106, 0.34);
-    border-radius: 18px;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
-    object-fit: cover;
+  .hero__copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 16px;
   }
 
   .eyebrow {
-    margin: 0;
-    color: var(--gold);
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
+    color: var(--clay);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    font-size: 0.74rem;
+    font-weight: 760;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 
   h1,
-  h2,
-  h3,
-  p {
-    margin: 0;
-  }
-
-  h1,
   h2 {
-    color: var(--text);
+    max-width: 13ch;
+    color: var(--ink);
     font-family: Georgia, "Times New Roman", serif;
     font-weight: 400;
     letter-spacing: 0;
   }
 
   h1 {
-    max-width: 11ch;
-    font-size: clamp(3.2rem, 8vw, 6.6rem);
-    line-height: 0.9;
+    font-size: clamp(2.85rem, 6vw, 6.1rem);
+    line-height: 0.88;
   }
 
   h2 {
-    max-width: 14ch;
-    font-size: clamp(2rem, 4vw, 3rem);
-    line-height: 1;
+    font-size: clamp(1.65rem, 3vw, 2.8rem);
+    line-height: 0.98;
   }
 
   h3 {
-    color: var(--text);
-    font-size: 1.05rem;
-    line-height: 1.3;
+    color: var(--ink);
+    font-size: 0.95rem;
+    line-height: 1.22;
   }
 
-  p,
-  li {
+  p {
     color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.68;
+    font-size: 0.96rem;
+    line-height: 1.56;
   }
 
   .lede {
     max-width: 54ch;
-    margin: 0 auto;
-    color: #eee2cd;
-    font-size: 1.12rem;
+    color: var(--ink-soft);
+    font-size: 1.04rem;
   }
 
-  .actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 8px;
-  }
-
-  .button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 46px;
-    padding: 0 18px;
-    border: 1px solid var(--gold);
-    border-radius: 6px;
-    background: var(--gold);
-    color: var(--ink);
-    cursor: pointer;
-    font-weight: 700;
-  }
-
-  .button--ghost {
-    background: rgba(255, 248, 232, 0.04);
-    color: var(--text);
-  }
-
-  .button:disabled {
-    cursor: wait;
-    opacity: 0.72;
-  }
-
-  .splash {
+  .hero__media {
     position: relative;
-    width: min(390px, 100%);
-    aspect-ratio: 2 / 3;
-    justify-self: center;
-    margin: 0;
-    overflow: hidden;
-    border: 1px solid rgba(216, 183, 106, 0.44);
-    border-radius: 8px;
-    background: var(--panel);
-    box-shadow:
-      0 46px 120px rgba(0, 0, 0, 0.48),
-      0 0 0 10px rgba(255, 248, 232, 0.04),
-      0 0 100px rgba(216, 183, 106, 0.18);
-    transform: rotate(1deg);
-  }
-
-  .splash-section {
+    z-index: 1;
     display: grid;
-    justify-items: center;
+    min-height: 320px;
+    place-items: end center;
   }
 
-  .splash:before {
+  .phone-frame {
+    width: min(56%, 290px);
+    min-width: 205px;
+    aspect-ratio: 733 / 1100;
+    overflow: hidden;
+    border: 9px solid var(--night);
+    border-radius: 32px;
+    background: var(--night);
+    box-shadow:
+      0 28px 70px rgba(23, 22, 17, 0.28),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+  }
+
+  .phone-frame img {
+    width: 100%;
+    height: 100%;
+    border-radius: 22px;
+    object-fit: cover;
+  }
+
+  .card-stack {
     position: absolute;
-    inset: -24%;
-    z-index: -1;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(216, 183, 106, 0.32), transparent 58%);
-    content: "";
-    filter: blur(14px);
+    right: 3%;
+    bottom: 6%;
+    display: grid;
+    width: min(39%, 178px);
+    min-width: 128px;
+    aspect-ratio: 3 / 5;
   }
 
-  .splash img,
-  .deck-card img {
-    display: block;
+  .stack-card {
+    grid-area: 1 / 1;
+    overflow: hidden;
+    border: 1px solid rgba(23, 22, 17, 0.22);
+    border-radius: 7px;
+    background: #111;
+    box-shadow: 0 18px 40px rgba(23, 22, 17, 0.3);
+  }
+
+  .stack-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
 
-  .panel,
-  .feature-grid article {
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--panel);
-    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+  .stack-card:nth-child(1) {
+    transform: translateX(-44%) rotate(-9deg);
   }
 
-  .whitelist {
-    grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1fr);
-    align-items: start;
-    padding: 28px;
-    background: var(--panel-strong);
+  .stack-card:nth-child(2) {
+    transform: translateX(-18%) translateY(-7%) rotate(2deg);
+  }
+
+  .stack-card:nth-child(3) {
+    transform: translateX(10%) rotate(9deg);
+  }
+
+  .control-plane {
+    display: grid;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .panel {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+    min-height: 0;
+    padding: 24px;
+  }
+
+  .panel[hidden] {
+    display: none;
+  }
+
+  .panel__head {
+    display: grid;
+    gap: 10px;
+  }
+
+  .panel__head--inline {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 16px;
+  }
+
+  .deck-note {
+    max-width: 22ch;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    text-align: right;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-content: start;
+  }
+
+  .feature {
+    display: grid;
+    gap: 10px;
+    min-height: 168px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.44);
+  }
+
+  .feature svg {
+    color: var(--teal);
+  }
+
+  .feature:nth-child(2) svg {
+    color: var(--gold);
+  }
+
+  .feature:nth-child(3) svg {
+    color: var(--olive);
+  }
+
+  .feature:nth-child(4) svg {
+    color: var(--clay);
+  }
+
+  .feature p {
+    font-size: 0.9rem;
+    line-height: 1.46;
+  }
+
+  .deck-browser {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    min-height: 0;
+  }
+
+  .deck-list {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .deck-choice {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: 7px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .deck-choice img {
+    width: 100%;
+    aspect-ratio: 3 / 5;
+    border: 2px solid transparent;
+    border-radius: 5px;
+    object-fit: cover;
+    transition:
+      border-color 160ms ease,
+      transform 160ms ease;
+  }
+
+  .deck-choice span {
+    overflow: hidden;
+    color: inherit;
+    font-size: 0.66rem;
+    line-height: 1.2;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .deck-choice:hover img,
+  .deck-choice.is-active img {
+    border-color: var(--teal);
+    transform: translateY(-2px);
+  }
+
+  .deck-choice.is-active {
+    color: var(--ink);
+  }
+
+  .deck-stage {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: end;
+    min-height: 0;
+  }
+
+  .deck-card {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .deck-card img {
+    width: 100%;
+    aspect-ratio: 3 / 5;
+    border: 1px solid var(--line-strong);
+    border-radius: 7px;
+    object-fit: cover;
+    box-shadow: 0 18px 40px rgba(28, 24, 16, 0.2);
+  }
+
+  .deck-card:nth-child(2) {
+    transform: translateY(-18px);
+  }
+
+  .deck-card figcaption {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .docs-list,
+  .faq-list {
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .docs-list article {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.44);
+  }
+
+  .docs-list span {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(44, 110, 104, 0.12);
+    color: var(--teal);
+  }
+
+  .docs-list svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .docs-list h3 {
+    margin-bottom: 4px;
+  }
+
+  .docs-list p,
+  .faq-list p {
+    font-size: 0.9rem;
+    line-height: 1.46;
+  }
+
+  .faq-list details {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.44);
+  }
+
+  .faq-list summary {
+    cursor: pointer;
+    padding: 16px;
+    color: var(--ink);
+    font-weight: 720;
+    line-height: 1.28;
+  }
+
+  .faq-list p {
+    padding: 0 16px 16px;
+  }
+
+  .signup {
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: 18px;
+    align-content: start;
+    padding: 22px;
+  }
+
+  .signup__head {
+    display: grid;
+    gap: 10px;
+  }
+
+  .signup h2 {
+    max-width: 9ch;
+    font-size: clamp(1.6rem, 2.4vw, 2.2rem);
   }
 
   .whitelist-form {
     display: grid;
-    gap: 14px;
+    grid-template-columns: 1fr 44px;
+    gap: 10px;
   }
 
-  .whitelist-form label {
+  .whitelist-form label:not(.whitelist-form__trap) {
     display: grid;
-    gap: 8px;
-    color: var(--text);
-    font-weight: 700;
+    grid-column: 1 / -1;
+    gap: 6px;
+  }
+
+  .whitelist-form label span {
+    color: var(--ink-soft);
+    font-size: 0.76rem;
+    font-weight: 720;
   }
 
   .whitelist-form input {
     width: 100%;
-    min-height: 46px;
+    min-height: 44px;
     border: 1px solid var(--line);
-    border-radius: 6px;
-    background: rgba(12, 9, 18, 0.86);
-    color: var(--text);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.66);
+    color: var(--ink);
     padding: 0 12px;
+  }
+
+  .whitelist-form input::placeholder {
+    color: #9c9484;
   }
 
   .whitelist-form__trap {
@@ -697,271 +1200,337 @@ const appSchema = {
     white-space: nowrap;
   }
 
+  .submit-button {
+    grid-column: 2;
+    background: var(--night);
+    color: var(--paper-strong);
+  }
+
+  .submit-button:hover {
+    background: var(--teal);
+    color: #fff;
+  }
+
+  .submit-button:disabled {
+    cursor: wait;
+    opacity: 0.58;
+  }
+
   .whitelist-form__message {
-    min-height: 1.7em;
-    color: var(--success);
-    font-size: 0.92rem;
+    grid-column: 1 / -1;
+    min-height: 3.2em;
+    color: var(--muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
   }
 
   .whitelist-form__message[data-state="error"] {
-    color: #f0b5aa;
+    color: var(--error);
   }
 
   .whitelist-form__message[data-state="submitting"] {
     color: var(--gold);
   }
 
-  .whitelist-confirmation {
-    grid-column: 1 / -1;
+  .whitelist-form__message[data-state="success"] {
+    color: var(--success);
+  }
+
+  .download-placeholder {
+    align-self: end;
     display: grid;
-    gap: 8px;
-    padding: 16px;
-    border: 1px solid rgba(185, 230, 201, 0.36);
-    border-radius: 8px;
-    background: rgba(185, 230, 201, 0.08);
-  }
-
-  .whitelist-confirmation[hidden] {
-    display: none;
-  }
-
-  .whitelist-confirmation h3 {
-    font-size: 1.1rem;
-  }
-
-  .whitelist-confirmation p:not(.eyebrow) {
-    font-size: 0.94rem;
-    line-height: 1.45;
-  }
-
-  .deck-section {
-    display: grid;
-    gap: 28px;
-  }
-
-  .deck-section__note {
-    max-width: 34ch;
-    color: var(--muted);
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  .deck-strip {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-    align-items: end;
-  }
-
-  .deck-strip--sample {
-    grid-template-columns: repeat(5, minmax(0, 178px));
-    justify-content: center;
-  }
-
-  .deck-card {
-    --card-x: 0%;
-    --card-y: 0px;
-    --card-rotate: 0deg;
-    --card-scale: 1;
-    position: relative;
-    display: grid;
+    grid-template-columns: auto 1fr;
     gap: 12px;
-    margin: 0;
-    transform: translateX(var(--card-x)) translateY(var(--card-y)) rotate(var(--card-rotate)) scale(var(--card-scale));
-    transition:
-      transform 180ms ease,
-      filter 180ms ease;
-    will-change: transform;
+    padding: 14px;
+    border: 1px dashed var(--line-strong);
+    border-radius: 8px;
+    color: var(--ink-soft);
   }
 
-  .deck-card:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 6px;
+  .download-placeholder svg {
+    color: var(--olive);
   }
 
-  .deck-card img {
-    aspect-ratio: 3 / 5;
-    border: 1px solid rgba(216, 183, 106, 0.38);
-    border-radius: 7px;
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.34);
+  .download-placeholder strong,
+  .download-placeholder span {
+    display: block;
   }
 
-  .deck-card:nth-child(2),
-  .deck-card:nth-child(4) {
-    --card-y: 28px;
+  .download-placeholder strong {
+    color: var(--ink);
+    font-size: 0.88rem;
   }
 
-  .deck-strip--sample .deck-card:nth-child(2) {
-    --card-y: 24px;
-  }
-
-  .deck-card:hover,
-  .deck-card:focus-visible,
-  .deck-card:focus-within {
-    --card-y: -16px;
-    --card-rotate: 0deg;
-    --card-scale: 1.06;
-    z-index: 30 !important;
-    filter: saturate(1.05);
-  }
-
-  .deck-card figcaption {
+  .download-placeholder span {
     color: var(--muted);
-    font-size: 0.9rem;
-    text-align: center;
+    font-size: 0.78rem;
+    line-height: 1.36;
   }
 
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 14px;
+    min-height: 56px;
+    padding: 12px 16px;
+    border-radius: 0 0 8px 8px;
+    font-size: 0.78rem;
   }
 
-  .feature-grid article {
-    min-height: 150px;
-    padding: 20px;
+  .footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  .feature-grid h3 {
-    margin-bottom: 10px;
+  .footer a {
+    color: var(--ink-soft);
   }
 
-  .ono-footer {
-    display: grid;
-    gap: 16px;
-    padding: 20px 0 38px;
+  .footer a:hover {
+    color: var(--teal);
   }
 
-  .ono-footer p {
-    max-width: 76ch;
-    font-size: 0.94rem;
+  .footer p {
+    font-size: 0.78rem;
+    line-height: 1.3;
+    text-align: right;
   }
 
-  @media (max-width: 1023px) {
-    .hero {
-      padding-top: 42px;
+  @media (max-width: 1180px) {
+    .experience {
+      grid-template-columns: minmax(0, 1fr) minmax(360px, 0.86fr);
     }
 
-    .splash {
-      width: min(340px, 88%);
-      transform: none;
+    .signup {
+      grid-column: 1 / -1;
+      grid-template-columns: minmax(0, 0.65fr) minmax(320px, 1fr) minmax(220px, 0.7fr);
+      grid-template-rows: auto;
+      align-items: start;
     }
 
-    .feature-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .download-placeholder {
+      align-self: stretch;
     }
   }
 
-  @media (max-width: 767px) {
-    .ono-page {
-      width: min(100% - 24px, 1160px);
+  @media (max-width: 860px) {
+    .ono-shell {
+      width: min(100% - 18px, 720px);
+      padding-top: 9px;
     }
 
-    .ono-header {
-      align-items: center;
-      flex-direction: row;
-      position: static;
-      padding: 12px 0 8px;
+    .topbar {
+      top: 8px;
+      grid-template-columns: auto 1fr auto;
+      min-height: 58px;
+      border-radius: 8px;
     }
 
-    .ono-nav {
-      justify-content: flex-start;
-      gap: 10px;
-      font-size: 0.76rem;
-    }
-
-    .ono-nav a:nth-child(n + 3) {
-      display: none;
-    }
-
-    .ono-brand {
-      gap: 8px;
-    }
-
-    .ono-brand img {
-      width: 34px;
-      height: 34px;
-      border-radius: 7px;
-    }
-
-    .ono-brand span {
-      max-width: 9ch;
+    .brand span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
       overflow: hidden;
-      text-overflow: ellipsis;
+      clip: rect(0 0 0 0);
       white-space: nowrap;
     }
 
-    main {
-      gap: 36px;
+    .brand img,
+    .icon-button,
+    .icon-link,
+    .submit-button {
+      width: 40px;
+      height: 40px;
+    }
+
+    .icon-nav {
+      justify-content: center;
+    }
+
+    .experience {
+      grid-template-columns: 1fr;
+      min-height: auto;
+      padding: 10px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      border-radius: 8px;
     }
 
     .hero {
-      gap: 0;
-      padding-top: 18px;
-    }
-
-    .splash {
-      width: min(285px, 78vw);
-      box-shadow:
-        0 34px 90px rgba(0, 0, 0, 0.48),
-        0 0 0 8px rgba(255, 248, 232, 0.035),
-        0 0 80px rgba(216, 183, 106, 0.16);
-    }
-
-    .hero__copy {
-      gap: 12px;
-      justify-items: center;
-    }
-
-    .hero__logo {
-      display: none;
-    }
-
-    .eyebrow {
-      font-size: 0.68rem;
-      letter-spacing: 0.1em;
+      min-height: auto;
+      padding: 20px;
     }
 
     h1 {
-      max-width: 100%;
-      font-size: clamp(3rem, 17vw, 4.9rem);
-      line-height: 0.86;
-    }
-
-    h2 {
       max-width: 11ch;
-      font-size: clamp(2rem, 10vw, 2.7rem);
+      font-size: clamp(2.55rem, 12vw, 4.5rem);
     }
 
     .lede {
-      max-width: 28ch;
-      font-size: 1rem;
-      line-height: 1.45;
+      max-width: 36ch;
+      font-size: 0.98rem;
     }
 
-    .actions,
-    .actions .button,
-    .whitelist-form .button {
-      width: 100%;
+    .hero__media {
+      min-height: 300px;
     }
 
-    .whitelist,
+    .phone-frame {
+      width: min(48vw, 230px);
+      min-width: 168px;
+      border-width: 7px;
+      border-radius: 26px;
+    }
+
+    .phone-frame img {
+      border-radius: 18px;
+    }
+
+    .card-stack {
+      right: 14%;
+      width: min(30vw, 142px);
+      min-width: 106px;
+    }
+
+    .panel {
+      min-height: 420px;
+      padding: 18px;
+    }
+
+    .signup {
+      grid-template-columns: 1fr;
+      padding: 18px;
+    }
+
+    .signup h2 {
+      max-width: 12ch;
+    }
+
+    .footer {
+      align-items: flex-start;
+      flex-direction: column;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
+
+    .footer p {
+      text-align: left;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .ono-shell {
+      width: min(100% - 12px, 520px);
+    }
+
+    .topbar {
+      gap: 6px;
+      padding: 8px;
+    }
+
+    .topbar__actions {
+      gap: 6px;
+    }
+
+    .icon-nav {
+      gap: 6px;
+    }
+
+    .brand img,
+    .icon-button,
+    .icon-link,
+    .submit-button {
+      width: 38px;
+      height: 38px;
+    }
+
+    .experience {
+      gap: 10px;
+      padding: 8px;
+    }
+
+    .hero {
+      gap: 14px;
+      padding: 18px;
+    }
+
+    h1 {
+      max-width: 10ch;
+      font-size: clamp(2.45rem, 15vw, 3.6rem);
+    }
+
+    h2 {
+      font-size: clamp(1.65rem, 9vw, 2.2rem);
+    }
+
+    p {
+      font-size: 0.92rem;
+    }
+
+    .hero__media {
+      min-height: 258px;
+    }
+
+    .phone-frame {
+      width: min(49vw, 194px);
+      min-width: 152px;
+    }
+
+    .card-stack {
+      right: 8%;
+      bottom: 7%;
+      min-width: 96px;
+    }
+
+    .panel {
+      gap: 16px;
+      min-height: auto;
+      padding: 16px;
+    }
+
+    .panel__head--inline {
+      grid-template-columns: 1fr;
+    }
+
+    .deck-note {
+      max-width: 100%;
+      text-align: left;
+    }
+
     .feature-grid {
       grid-template-columns: 1fr;
     }
 
-    .whitelist {
-      gap: 16px;
-      padding: 18px;
+    .feature {
+      min-height: auto;
+      grid-template-columns: auto 1fr;
+      align-items: start;
     }
 
-    .whitelist p {
-      font-size: 0.94rem;
-      line-height: 1.45;
+    .feature p {
+      grid-column: 2;
+    }
+
+    .deck-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .deck-stage {
+      gap: 8px;
+    }
+
+    .deck-card:nth-child(2) {
+      transform: translateY(-10px);
+    }
+
+    .deck-card figcaption {
+      font-size: 0.68rem;
     }
 
     .whitelist-form {
-      gap: 10px;
+      grid-template-columns: 1fr 40px;
     }
 
     .whitelist-form label span {
@@ -972,159 +1541,14 @@ const appSchema = {
       clip: rect(0 0 0 0);
       white-space: nowrap;
     }
-
-    .whitelist-form__message {
-      min-height: auto;
-      font-size: 0.82rem;
-      line-height: 1.4;
-    }
-
-    .deck-section {
-      gap: 16px;
-    }
-
-    .deck-section .section-intro {
-      gap: 10px;
-    }
-
-    .deck-section__note {
-      max-width: 28ch;
-      font-size: 0.9rem;
-    }
-
-    .deck-strip {
-      display: grid;
-      grid-template-columns: 1fr;
-      width: 100%;
-      min-height: clamp(176px, 52vw, 250px);
-      margin: 4px auto 0;
-      padding: 10px 0 8px;
-      place-items: center;
-      overflow: visible;
-    }
-
-    .deck-strip--sample {
-      grid-template-columns: 1fr;
-      justify-content: center;
-    }
-
-    .deck-card {
-      grid-area: 1 / 1;
-      width: clamp(72px, 21vw, 92px);
-      min-width: 0;
-      transform-origin: 50% 88%;
-    }
-
-    .deck-card:first-child {
-      --card-x: -148%;
-      --card-y: 22px;
-      --card-rotate: -13deg;
-      z-index: 1;
-    }
-
-    .deck-card:nth-child(2) {
-      --card-x: -76%;
-      --card-y: 7px;
-      --card-rotate: -5deg;
-      z-index: 2;
-    }
-
-    .deck-card:nth-child(3) {
-      --card-x: 0%;
-      --card-y: 0px;
-      --card-rotate: 1deg;
-      z-index: 5;
-    }
-
-    .deck-card:nth-child(4) {
-      --card-x: 78%;
-      --card-y: 10px;
-      --card-rotate: 6deg;
-      z-index: 4;
-    }
-
-    .deck-card:nth-child(5) {
-      --card-x: 150%;
-      --card-y: 24px;
-      --card-rotate: 15deg;
-      z-index: 3;
-    }
-
-    .deck-card:hover,
-    .deck-card:focus-visible,
-    .deck-card:focus-within {
-      --card-y: -14px;
-      --card-rotate: 0deg;
-      --card-scale: 1.08;
-    }
-
-    .deck-card img {
-      box-shadow:
-        0 18px 46px rgba(0, 0, 0, 0.44),
-        0 0 0 1px rgba(255, 248, 232, 0.08);
-    }
-
-    .deck-card figcaption {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
-    }
-
-    .feature-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .feature-grid article {
-      min-height: 92px;
-      padding: 14px;
-    }
-
-    .feature-grid h3 {
-      margin-bottom: 6px;
-      font-size: 0.96rem;
-    }
-
-    .feature-grid p {
-      font-size: 0.84rem;
-      line-height: 1.38;
-    }
-
-    .ono-footer {
-      gap: 12px;
-      padding-top: 4px;
-    }
-
-    .ono-footer nav {
-      gap: 10px 12px;
-      font-size: 0.78rem;
-    }
-
-    .ono-footer p {
-      font-size: 0.78rem;
-      line-height: 1.45;
-    }
-  }
-
-  @media (max-width: 420px) {
-    .deck-card {
-      width: clamp(70px, 20.5vw, 86px);
-    }
-
-    .splash {
-      width: min(255px, 76vw);
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.001ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.001ms !important;
+    *,
+    *:before,
+    *:after {
       scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
     }
   }
 </style>
