@@ -1,4 +1,4 @@
-const CACHE_NAME = 'danyel-ii-v1'
+const CACHE_NAME = 'danyel-ii-v2'
 const OFFLINE_URLS = [
   '/',
   '/capture/',
@@ -29,29 +29,37 @@ self.addEventListener('activate', (event) => {
   self.clients.claim()
 })
 
+const cacheResponse = async (request, response) => {
+  if (response && response.status === 200 && response.type === 'basic') {
+    const cache = await caches.open(CACHE_NAME)
+    await cache.put(request, response.clone())
+  }
+
+  return response
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
+
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => cacheResponse(event.request, response))
+        .catch(async () =>
+          (await caches.match(event.request)) ??
+          (await caches.match('/')) ??
+          Response.error(),
+        ),
+    )
+    return
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached
 
       return fetch(event.request)
-        .then((response) => {
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response
-          }
-
-          const responseClone = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone))
-          return response
-        })
-        .catch(async () => {
-          if (event.request.mode === 'navigate') {
-            return caches.match('/')
-          }
-          throw new Error('Network unavailable and resource not cached')
-        })
+        .then((response) => cacheResponse(event.request, response))
     }),
   )
 })
