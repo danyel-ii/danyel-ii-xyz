@@ -88,7 +88,46 @@ const scribbles = [
         </div>
 
         <div class="public-home__identity">
-          <h1 id="home-title">danyel-ii</h1>
+          <div class="public-home__title-paint">
+            <svg
+              class="public-home__title-art"
+              viewBox="0 0 900 265"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <g fill="currentColor">
+                <path d="M78 58c8 11 17 13 28 7l-1 17c12-4 24 3 27 14l17 1-13 12c5 12-2 25-14 30l3 17-17-9c-10 8-24 6-32-4l-14 12-3-18c-13-2-21-14-18-27l-18-6 17-9c0-13 10-23 23-24l5-17z" />
+                <path d="M57 55 48 27l18 25zm-26 20L8 57l29 10zm-9 28L0 100l24 13zm15 31-24 15 29-7zm30 13-7 27 18-25zm48-88 8-27 4 31zm27 21 24-15-18 23zm-2 45 27 9-30 1z" />
+                <circle cx="31" cy="47" r="4" />
+                <circle cx="13" cy="82" r="2.8" />
+                <circle cx="43" cy="163" r="3.3" />
+                <circle cx="133" cy="48" r="3" />
+
+                <path d="m724 39 5 11 12-4-4 12 10 7-13 2-2 13-7-11-12 5 4-12-10-7 13-1z" />
+                <path d="m807 37 6 12 12-5-4 13 11 7-14 2-2 14-8-12-12 5 5-13-11-7 14-1z" />
+                <circle cx="749" cy="40" r="2.8" />
+                <circle cx="783" cy="53" r="2.2" />
+                <circle cx="838" cy="43" r="3" />
+
+                <path d="M819 78c10 9 19 10 29 3l4 17c13-2 25 6 27 19l17 6-15 10c3 13-5 25-18 28l-1 19-15-12c-11 7-25 3-31-8l-18 7 3-19c-11-6-15-20-8-31l-12-14 19-2c4-12 14-19 26-18z" />
+                <path d="m799 83-13-24 21 19zm32-12 2-31 9 31zm35 17 21-19-14 26zm20 28 14-3-12 11zm-3 42 17 17-24-9zm-32 15 4 31-13-29zm-40-5-13 25 4-30z" />
+                <circle cx="884" cy="92" r="3.5" />
+                <circle cx="893" cy="145" r="2.4" />
+                <circle cx="875" cy="187" r="3" />
+
+                <path d="M79 143c10 0 15 8 13 21l-4 51c-1 12-10 12-11 0l-3-50c-1-12 0-19 5-22z" />
+                <path d="M287 153c7-2 11 4 10 13l-2 27c-1 9-7 9-8 0l-3-26c-1-8 0-12 3-14z" />
+                <path d="M486 146c8 1 11 8 9 21l-3 68c-1 12-8 12-9 0l-3-69c-1-11 1-18 6-20z" />
+                <path d="M628 153c9-2 14 4 12 16l-3 42c-1 10-8 10-9 0l-4-41c-1-9 0-15 4-17z" />
+                <path d="M831 147c10-2 16 6 15 19l-2 69c0 13-10 14-12 1l-6-68c-2-12 0-19 5-21z" />
+                <circle cx="486" cy="253" r="4" />
+                <circle cx="633" cy="228" r="3" />
+                <circle cx="839" cy="254" r="4.5" />
+              </g>
+            </svg>
+            <h1 id="home-title">danyel-ii</h1>
+          </div>
           {email && <a class="public-home__email" href={email.href}>{email.value}</a>}
         </div>
 
@@ -249,6 +288,8 @@ const scribbles = [
   }
 
   .public-home__top {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -283,9 +324,36 @@ const scribbles = [
     justify-items: start;
   }
 
-  .public-home h1 {
-    margin: 0;
+  .public-home__title-paint {
+    position: relative;
+    display: inline-grid;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: clamp(12px, 2vw, 24px);
     color: #fff8dc;
+    isolation: isolate;
+  }
+
+  .public-home__title-art {
+    position: absolute;
+    z-index: 0;
+    top: -25%;
+    left: -4%;
+    width: 108%;
+    height: 172%;
+    overflow: visible;
+    color: inherit;
+    pointer-events: none;
+    filter:
+      drop-shadow(0 0 1px rgba(255, 255, 255, 0.5))
+      drop-shadow(0 0 12px rgba(246, 216, 96, 0.16));
+  }
+
+  .public-home h1 {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: inherit;
     font-family: var(--mono-font);
     font-size: clamp(3.6rem, 9.5vw, 7.2rem);
     font-weight: 700;
@@ -298,6 +366,8 @@ const scribbles = [
   }
 
   .public-home__email {
+    position: relative;
+    z-index: 2;
     width: fit-content;
     color: #d9d0b7;
     font-size: clamp(1rem, 2vw, 1.2rem);
