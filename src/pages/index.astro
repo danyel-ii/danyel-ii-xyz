@@ -267,7 +267,7 @@ const scribbles = [
         <section class="public-home__apps" aria-labelledby="apps-title">
           <h2 id="apps-title">Apps</h2>
           <a
-            class="floating-reader-link js-floating-reader-link"
+            class="floating-reader-link js-floating-app-link"
             href="https://reader.danyel-ii.xyz"
             aria-label="Open Reader"
             title="Open Reader"
@@ -278,6 +278,18 @@ const scribbles = [
             </svg>
             <span>Reader</span>
           </a>
+          <a
+            class="floating-reader-link floating-reader-link--cklix js-floating-app-link"
+            href="https://cklix.danyel-ii.xyz"
+            aria-label="Open Cklix"
+            title="Open Cklix"
+          >
+            <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+              <rect x="5.5" y="5.5" width="21" height="21" rx="3" />
+              <path d="m10.5 16 3.7 3.7L22 11.8" />
+            </svg>
+            <span>Cklix</span>
+          </a>
         </section>
         <p class="u-sr-only js-copy-status" aria-live="polite"></p>
       </section>
@@ -287,35 +299,35 @@ const scribbles = [
       const button = document.querySelector('.js-banner-toggle')
       const contactLinks = document.querySelectorAll('.js-copy-contact')
       const copyStatus = document.querySelector('.js-copy-status')
-      const readerLink = document.querySelector('.js-floating-reader-link')
+      const floatingAppLinks = document.querySelectorAll('.js-floating-app-link')
       const feedbackTimers = new WeakMap()
-      let readerAnimation
-      let readerDrag
-      let readerWasDragged = false
+      const appAnimations = new WeakMap()
+      const appDrags = new WeakMap()
+      const draggedApps = new WeakSet()
 
-      const floatReaderLink = () => {
+      const floatAppLink = (appLink) => {
         if (
-          readerLink instanceof HTMLAnchorElement
+          appLink instanceof HTMLAnchorElement
           && !document.documentElement.classList.contains('construction-hidden')
           && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
         ) {
           const edgePadding = 12
-          const bounds = readerLink.getBoundingClientRect()
-          const maxLeft = Math.max(edgePadding, window.innerWidth - readerLink.offsetWidth - edgePadding)
-          const maxTop = Math.max(edgePadding, window.innerHeight - readerLink.offsetHeight - edgePadding)
+          const bounds = appLink.getBoundingClientRect()
+          const maxLeft = Math.max(edgePadding, window.innerWidth - appLink.offsetWidth - edgePadding)
+          const maxTop = Math.max(edgePadding, window.innerHeight - appLink.offsetHeight - edgePadding)
           const targetLeft = Math.round(edgePadding + Math.random() * (maxLeft - edgePadding))
           const targetTop = Math.round(edgePadding + Math.random() * (maxTop - edgePadding))
           const rotation = Math.round(Math.random() * 16 - 8)
           const distance = Math.hypot(targetLeft - bounds.left, targetTop - bounds.top)
           const duration = Math.max(5000, Math.min(14000, Math.round(distance * 18)))
 
-          readerLink.style.left = `${bounds.left}px`
-          readerLink.style.top = `${bounds.top}px`
-          readerLink.style.right = 'auto'
-          readerLink.style.bottom = 'auto'
-          readerLink.style.transform = 'none'
+          appLink.style.left = `${bounds.left}px`
+          appLink.style.top = `${bounds.top}px`
+          appLink.style.right = 'auto'
+          appLink.style.bottom = 'auto'
+          appLink.style.transform = 'none'
 
-          readerAnimation = readerLink.animate(
+          const animation = appLink.animate(
             {
               left: `${targetLeft}px`,
               top: `${targetTop}px`,
@@ -323,76 +335,81 @@ const scribbles = [
             },
             { duration, easing: 'ease-in-out', fill: 'forwards' },
           )
-          readerAnimation.finished.then(() => {
-            readerLink.style.left = `${targetLeft}px`
-            readerLink.style.top = `${targetTop}px`
-            readerLink.style.transform = `rotate(${rotation}deg)`
-            readerAnimation?.cancel()
-            readerAnimation = undefined
-            floatReaderLink()
+          appAnimations.set(appLink, animation)
+          animation.finished.then(() => {
+            appLink.style.left = `${targetLeft}px`
+            appLink.style.top = `${targetTop}px`
+            appLink.style.transform = `rotate(${rotation}deg)`
+            animation.cancel()
+            appAnimations.delete(appLink)
+            floatAppLink(appLink)
           }).catch(() => {})
         }
       }
 
-      if (readerLink instanceof HTMLAnchorElement) {
-        readerLink.addEventListener('pointerdown', (event) => {
+      floatingAppLinks.forEach((appLink) => {
+        if (!(appLink instanceof HTMLAnchorElement)) return
+
+        appLink.addEventListener('pointerdown', (event) => {
           if (
             event.button !== 0
             || document.documentElement.classList.contains('construction-hidden')
           ) return
 
-          readerAnimation?.cancel()
-          readerAnimation = undefined
+          appAnimations.get(appLink)?.cancel()
+          appAnimations.delete(appLink)
 
-          const bounds = readerLink.getBoundingClientRect()
-          readerLink.style.left = `${bounds.left}px`
-          readerLink.style.top = `${bounds.top}px`
-          readerLink.style.right = 'auto'
-          readerLink.style.bottom = 'auto'
-          readerLink.style.transform = 'none'
-          readerLink.setPointerCapture(event.pointerId)
-          readerLink.dataset.dragging = 'true'
-          readerWasDragged = false
-          readerDrag = {
+          const bounds = appLink.getBoundingClientRect()
+          appLink.style.left = `${bounds.left}px`
+          appLink.style.top = `${bounds.top}px`
+          appLink.style.right = 'auto'
+          appLink.style.bottom = 'auto'
+          appLink.style.transform = 'none'
+          appLink.setPointerCapture(event.pointerId)
+          appLink.dataset.dragging = 'true'
+          draggedApps.delete(appLink)
+          appDrags.set(appLink, {
             pointerId: event.pointerId,
             startX: event.clientX,
             startY: event.clientY,
             left: bounds.left,
             top: bounds.top,
-          }
+          })
         })
 
-        readerLink.addEventListener('pointermove', (event) => {
-          if (!readerDrag || event.pointerId !== readerDrag.pointerId) return
+        appLink.addEventListener('pointermove', (event) => {
+          const drag = appDrags.get(appLink)
+          if (!drag || event.pointerId !== drag.pointerId) return
 
-          const deltaX = event.clientX - readerDrag.startX
-          const deltaY = event.clientY - readerDrag.startY
-          if (Math.hypot(deltaX, deltaY) > 4) readerWasDragged = true
+          const deltaX = event.clientX - drag.startX
+          const deltaY = event.clientY - drag.startY
+          if (Math.hypot(deltaX, deltaY) > 4) draggedApps.add(appLink)
 
-          const maxLeft = Math.max(0, window.innerWidth - readerLink.offsetWidth)
-          const maxTop = Math.max(0, window.innerHeight - readerLink.offsetHeight)
-          readerLink.style.left = `${Math.min(maxLeft, Math.max(0, readerDrag.left + deltaX))}px`
-          readerLink.style.top = `${Math.min(maxTop, Math.max(0, readerDrag.top + deltaY))}px`
+          const maxLeft = Math.max(0, window.innerWidth - appLink.offsetWidth)
+          const maxTop = Math.max(0, window.innerHeight - appLink.offsetHeight)
+          appLink.style.left = `${Math.min(maxLeft, Math.max(0, drag.left + deltaX))}px`
+          appLink.style.top = `${Math.min(maxTop, Math.max(0, drag.top + deltaY))}px`
         })
 
-        const finishReaderDrag = (event) => {
-          if (!readerDrag || event.pointerId !== readerDrag.pointerId) return
+        const finishAppDrag = (event) => {
+          const drag = appDrags.get(appLink)
+          if (!drag || event.pointerId !== drag.pointerId) return
 
-          readerLink.releasePointerCapture(event.pointerId)
-          delete readerLink.dataset.dragging
-          readerDrag = undefined
-          if (!readerWasDragged) floatReaderLink()
+          appLink.releasePointerCapture(event.pointerId)
+          delete appLink.dataset.dragging
+          appDrags.delete(appLink)
+          if (!draggedApps.has(appLink)) floatAppLink(appLink)
         }
 
-        readerLink.addEventListener('pointerup', finishReaderDrag)
-        readerLink.addEventListener('pointercancel', finishReaderDrag)
-        readerLink.addEventListener('click', (event) => {
-          if (!readerWasDragged) return
+        appLink.addEventListener('pointerup', finishAppDrag)
+        appLink.addEventListener('pointercancel', finishAppDrag)
+        appLink.addEventListener('click', (event) => {
+          if (!draggedApps.has(appLink)) return
           event.preventDefault()
-          readerWasDragged = false
-          floatReaderLink()
+          draggedApps.delete(appLink)
+          floatAppLink(appLink)
         })
-      }
+      })
 
       const writeToClipboard = async (value) => {
         if (navigator.clipboard && window.isSecureContext) {
@@ -463,9 +480,11 @@ const scribbles = [
           button.setAttribute('aria-pressed', state === 'hidden' ? 'true' : 'false')
           button.textContent = state === 'hidden' ? 'show banners' : 'hide banners'
 
-          readerAnimation?.cancel()
-          readerAnimation = undefined
-          if (state === 'visible') floatReaderLink()
+          floatingAppLinks.forEach((appLink) => {
+            appAnimations.get(appLink)?.cancel()
+            appAnimations.delete(appLink)
+            if (state === 'visible') floatAppLink(appLink)
+          })
         }
 
         applyState(localStorage.getItem(storageKey) ?? 'visible')
@@ -519,6 +538,11 @@ const scribbles = [
 
   .floating-reader-link[data-dragging] {
     cursor: grabbing;
+  }
+
+  .floating-reader-link--cklix {
+    right: clamp(76px, 9vw, 118px);
+    bottom: clamp(118px, 17vh, 176px);
   }
 
   .floating-reader-link span,
