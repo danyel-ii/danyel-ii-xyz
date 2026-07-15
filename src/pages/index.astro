@@ -464,14 +464,14 @@ const scribbles = [
     font-weight: 700;
     letter-spacing: 0;
     line-height: 1;
-    text-shadow: 0 14px 48px rgba(0, 0, 0, 0.9);
+    text-shadow:
+      0 0 1px rgba(255, 255, 255, 0.95),
+      0 0 24px rgba(246, 216, 96, 0.28),
+      0 14px 48px rgba(0, 0, 0, 0.9);
   }
 
   :global(html.construction-hidden) .public-home h1 {
-    text-shadow:
-      0 0 1px rgba(255, 255, 255, 0.95),
-      0 0 30px rgba(246, 216, 96, 0.36),
-      0 14px 48px rgba(0, 0, 0, 0.9);
+    text-shadow: 0 14px 48px rgba(0, 0, 0, 0.9);
   }
 
   .public-home__email {
