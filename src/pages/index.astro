@@ -290,6 +290,8 @@ const scribbles = [
       const readerLink = document.querySelector('.js-floating-reader-link')
       const feedbackTimers = new WeakMap()
       let readerAnimation
+      let readerDrag
+      let readerWasDragged = false
 
       const floatReaderLink = () => {
         if (
@@ -297,17 +299,99 @@ const scribbles = [
           && !document.documentElement.classList.contains('construction-hidden')
           && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
         ) {
-          const x = Math.round(Math.random() * 36 - 18)
-          const y = Math.round(Math.random() * 36 - 18)
+          const edgePadding = 12
+          const bounds = readerLink.getBoundingClientRect()
+          const maxLeft = Math.max(edgePadding, window.innerWidth - readerLink.offsetWidth - edgePadding)
+          const maxTop = Math.max(edgePadding, window.innerHeight - readerLink.offsetHeight - edgePadding)
+          const targetLeft = Math.round(edgePadding + Math.random() * (maxLeft - edgePadding))
+          const targetTop = Math.round(edgePadding + Math.random() * (maxTop - edgePadding))
           const rotation = Math.round(Math.random() * 16 - 8)
-          const duration = Math.round(Math.random() * 2400 + 4200)
+          const distance = Math.hypot(targetLeft - bounds.left, targetTop - bounds.top)
+          const duration = Math.max(5000, Math.min(14000, Math.round(distance * 18)))
+
+          readerLink.style.left = `${bounds.left}px`
+          readerLink.style.top = `${bounds.top}px`
+          readerLink.style.right = 'auto'
+          readerLink.style.bottom = 'auto'
+          readerLink.style.transform = 'none'
 
           readerAnimation = readerLink.animate(
-            { transform: `translate3d(${x}px, ${y}px, 0) rotate(${rotation}deg)` },
+            {
+              left: `${targetLeft}px`,
+              top: `${targetTop}px`,
+              transform: `rotate(${rotation}deg)`,
+            },
             { duration, easing: 'ease-in-out', fill: 'forwards' },
           )
-          readerAnimation.finished.then(floatReaderLink).catch(() => {})
+          readerAnimation.finished.then(() => {
+            readerLink.style.left = `${targetLeft}px`
+            readerLink.style.top = `${targetTop}px`
+            readerLink.style.transform = `rotate(${rotation}deg)`
+            readerAnimation?.cancel()
+            readerAnimation = undefined
+            floatReaderLink()
+          }).catch(() => {})
         }
+      }
+
+      if (readerLink instanceof HTMLAnchorElement) {
+        readerLink.addEventListener('pointerdown', (event) => {
+          if (
+            event.button !== 0
+            || document.documentElement.classList.contains('construction-hidden')
+          ) return
+
+          readerAnimation?.cancel()
+          readerAnimation = undefined
+
+          const bounds = readerLink.getBoundingClientRect()
+          readerLink.style.left = `${bounds.left}px`
+          readerLink.style.top = `${bounds.top}px`
+          readerLink.style.right = 'auto'
+          readerLink.style.bottom = 'auto'
+          readerLink.style.transform = 'none'
+          readerLink.setPointerCapture(event.pointerId)
+          readerLink.dataset.dragging = 'true'
+          readerWasDragged = false
+          readerDrag = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startY: event.clientY,
+            left: bounds.left,
+            top: bounds.top,
+          }
+        })
+
+        readerLink.addEventListener('pointermove', (event) => {
+          if (!readerDrag || event.pointerId !== readerDrag.pointerId) return
+
+          const deltaX = event.clientX - readerDrag.startX
+          const deltaY = event.clientY - readerDrag.startY
+          if (Math.hypot(deltaX, deltaY) > 4) readerWasDragged = true
+
+          const maxLeft = Math.max(0, window.innerWidth - readerLink.offsetWidth)
+          const maxTop = Math.max(0, window.innerHeight - readerLink.offsetHeight)
+          readerLink.style.left = `${Math.min(maxLeft, Math.max(0, readerDrag.left + deltaX))}px`
+          readerLink.style.top = `${Math.min(maxTop, Math.max(0, readerDrag.top + deltaY))}px`
+        })
+
+        const finishReaderDrag = (event) => {
+          if (!readerDrag || event.pointerId !== readerDrag.pointerId) return
+
+          readerLink.releasePointerCapture(event.pointerId)
+          delete readerLink.dataset.dragging
+          readerDrag = undefined
+          if (!readerWasDragged) floatReaderLink()
+        }
+
+        readerLink.addEventListener('pointerup', finishReaderDrag)
+        readerLink.addEventListener('pointercancel', finishReaderDrag)
+        readerLink.addEventListener('click', (event) => {
+          if (!readerWasDragged) return
+          event.preventDefault()
+          readerWasDragged = false
+          floatReaderLink()
+        })
       }
 
       const writeToClipboard = async (value) => {
@@ -426,8 +510,15 @@ const scribbles = [
     border-radius: 50%;
     background: #f6d860;
     color: #111114;
+    cursor: grab;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.34);
+    touch-action: none;
+    user-select: none;
     will-change: transform;
+  }
+
+  .floating-reader-link[data-dragging] {
+    cursor: grabbing;
   }
 
   .floating-reader-link span,
@@ -482,9 +573,11 @@ const scribbles = [
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.035);
     color: var(--text);
+    cursor: pointer;
     box-shadow: none;
     font-family: var(--mono-font);
     transform: none !important;
+    touch-action: auto;
     will-change: auto;
   }
 
