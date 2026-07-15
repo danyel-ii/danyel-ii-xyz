@@ -1,4 +1,4 @@
-const CACHE_NAME = 'danyel-ii-v2'
+const CACHE_NAME = 'danyel-ii-v3'
 const OFFLINE_URLS = [
   '/',
   '/capture/',
@@ -15,7 +15,9 @@ const OFFLINE_URLS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_URLS)),
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(OFFLINE_URLS.map((url) => cache.add(url))),
+    ),
   )
   self.skipWaiting()
 })

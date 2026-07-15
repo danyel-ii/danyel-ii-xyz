@@ -86,9 +86,14 @@ const scribbles = [
       <section class="public-home__panel">
         <div class="public-home__top">
           <p class="public-home__eyebrow">public node</p>
-          <button class="public-home__toggle js-banner-toggle" type="button" aria-label="Toggle construction banners">
-            banners
-          </button>
+          <div class="public-home__actions">
+            <button class="public-home__toggle js-install-app" type="button" hidden>
+              install app
+            </button>
+            <button class="public-home__toggle js-banner-toggle" type="button" aria-label="Toggle construction banners">
+              banners
+            </button>
+          </div>
         </div>
 
         <div class="public-home__identity">
@@ -301,6 +306,7 @@ const scribbles = [
 
     <script>
       const button = document.querySelector('.js-banner-toggle')
+      const installButton = document.querySelector('.js-install-app')
       const contactLinks = document.querySelectorAll('.js-copy-contact')
       const copyStatus = document.querySelector('.js-copy-status')
       const floatingAppLinks = document.querySelectorAll('.js-floating-app-link')
@@ -308,6 +314,29 @@ const scribbles = [
       const appAnimations = new WeakMap()
       const appDrags = new WeakMap()
       const draggedApps = new WeakSet()
+      /** @type {any} */
+      let deferredInstallPrompt
+
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault()
+        deferredInstallPrompt = event
+        if (installButton instanceof HTMLButtonElement) installButton.hidden = false
+      })
+
+      window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = undefined
+        if (installButton instanceof HTMLButtonElement) installButton.hidden = true
+      })
+
+      if (installButton instanceof HTMLButtonElement) {
+        installButton.addEventListener('click', async () => {
+          if (!deferredInstallPrompt) return
+          await deferredInstallPrompt.prompt()
+          await deferredInstallPrompt.userChoice
+          deferredInstallPrompt = undefined
+          installButton.hidden = true
+        })
+      }
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -698,6 +727,16 @@ const scribbles = [
     font-size: 0.74rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
+  }
+
+  .public-home__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .public-home__toggle[hidden] {
+    display: none;
   }
 
   .public-home__toggle {
