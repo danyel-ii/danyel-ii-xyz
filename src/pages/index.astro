@@ -78,6 +78,18 @@ const scribbles = [
       <span>UNDER CONSTRUCTION</span>
     </div>
 
+    <a
+      class="floating-reader-link js-floating-reader-link"
+      href="https://reader.danyel-ii.xyz"
+      aria-label="Open the reader"
+      title="Open the reader"
+    >
+      <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <path d="M16 8.4c-2.1-2.1-5.3-3.1-9.6-3.1v18.1c4.3 0 7.5 1 9.6 3.1m0-18.1c2.1-2.1 5.3-3.1 9.6-3.1v18.1c-4.3 0-7.5 1-9.6 3.1m0-18.1v18.1" />
+        <path d="M9.3 10.2c1.7.2 3.1.7 4.2 1.4M9.3 14.3c1.7.2 3.1.7 4.2 1.4M22.7 10.2c-1.7.2-3.1.7-4.2 1.4M22.7 14.3c-1.7.2-3.1.7-4.2 1.4" />
+      </svg>
+    </a>
+
     <main class="public-home" aria-labelledby="home-title">
       <section class="public-home__panel">
         <div class="public-home__top">
@@ -272,7 +284,24 @@ const scribbles = [
       const button = document.querySelector('.js-banner-toggle')
       const contactLinks = document.querySelectorAll('.js-copy-contact')
       const copyStatus = document.querySelector('.js-copy-status')
+      const readerLink = document.querySelector('.js-floating-reader-link')
       const feedbackTimers = new WeakMap()
+
+      if (readerLink instanceof HTMLAnchorElement && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const floatReaderLink = () => {
+          const x = Math.round(Math.random() * 36 - 18)
+          const y = Math.round(Math.random() * 36 - 18)
+          const rotation = Math.round(Math.random() * 16 - 8)
+          const duration = Math.round(Math.random() * 2400 + 4200)
+
+          readerLink.animate(
+            { transform: `translate3d(${x}px, ${y}px, 0) rotate(${rotation}deg)` },
+            { duration, easing: 'ease-in-out', fill: 'forwards' },
+          ).finished.then(floatReaderLink).catch(() => {})
+        }
+
+        floatReaderLink()
+      }
 
       const writeToClipboard = async (value) => {
         if (navigator.clipboard && window.isSecureContext) {
@@ -371,6 +400,52 @@ const scribbles = [
     min-height: 100svh;
     place-items: center;
     padding: 92px 18px;
+  }
+
+  .floating-reader-link {
+    position: fixed;
+    z-index: 50;
+    right: clamp(22px, 4vw, 52px);
+    bottom: clamp(76px, 10vh, 112px);
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid rgba(17, 17, 20, 0.72);
+    border-radius: 50%;
+    background: #f6d860;
+    color: #111114;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.34);
+    will-change: transform;
+  }
+
+  .floating-reader-link svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .floating-reader-link:hover {
+    background: #ffe57c;
+    box-shadow: 0 10px 30px rgba(246, 216, 96, 0.26);
+  }
+
+  @media (max-width: 680px) {
+    .floating-reader-link {
+      right: 20px;
+      bottom: 72px;
+      width: 38px;
+      height: 38px;
+    }
+
+    .floating-reader-link svg {
+      width: 22px;
+      height: 22px;
+    }
   }
 
   .public-home__panel {
